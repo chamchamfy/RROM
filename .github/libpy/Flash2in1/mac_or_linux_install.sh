@@ -2,7 +2,7 @@ cd $(dirname $0)
 clear
 
 not_support() {
-    echo 'Hệ thống của bạn chưa được hỗ trợ, Vui lòng chọn hệ thống khác để flash'
+    echo 'Hệ thống của bạn chưa được hỗ trợ, Vui lòng chọn hệ thống khác để flash! (Your system is not supported yet, Please choose another system to flash!)'
     exit
 }
 
@@ -15,40 +15,30 @@ else
 fi
 
 if [ -f "images/super.img.zst" ]; then
-    echo 'Đang chuẩn bị'
-    echo '- Bắt đầu chuyển đổi super.img.zst ==》super.img (Có thể mất nhiều thời gian, tùy thuộc vào cấu hình máy tính của bạn)'
-    read -p "Lưu ý: Hãy đảm bảo rằng dung lượng còn lại của phân vùng hiện tại của bạn lớn hơn 10GB, nếu không, quá trình chuyển đổi super sẽ không thành công, dẫn đến không thể flash. (Bấm phím bất kỳ để tiếp tục)" readtemp
+    echo 'Đang chuẩn bị... (Preparing...)'
+    echo '- Bắt đầu chuyển đổi super. Có thể mất nhiều thời gian, tùy thuộc vào cấu hình máy tính của bạn. (- Start converting super partition. It may take a long time, depending on your computer configuration.)'
+    read -p "Lưu ý: Hãy đảm bảo rằng dung lượng còn lại của phân vùng hiện tại của bạn lớn hơn 10GB, nếu không quá trình chuyển đổi super sẽ không thành công. Bấm phím bất kỳ để tiếp tục... (Note: Please ensure that the free size of the current partition is greater than 10GB, otherwise the super conversion will fail. Press any key to continue...)" readtemp
     zstd --rm -d images/super.img.zst -o images/super.img
     if [ $? -ne 0 ]; then
-        read -p "Chuyển đổi bị lỗi, nhấn phím bất kì để thoát" readtemp
+        read -p "Chuyển đổi bị lỗi, nhấn phím bất kì để thoát... (Conversion process error, press any key to exit...)" readtemp
         exit
     fi
-    echo 'Chuẩn bị hoàn thành'
+    echo 'Chuẩn bị hoàn thành... (Preparation completed...)'
     echo
 fi
 
 q1() {
-    read -p "Q1:Thiết bị của sẳn sàng cài đặt? (Y/N) " choice1
+    read -p "1. Cài đặt lần đầu sẽ xóa dữ liệu và bộ nhớ trong. Bạn đồng ý không？ (1. Flashing the first time will erase data and internal memory. Do you agree?) (Y/N) " choice1
     if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ]; then
         q2
     elif [ "$choice1" == 'N' ] || [ "$choice1" == 'n' ]; then
-        q1_1
+        q2
     fi
     q1
 }
 
-q1_1() {
-    read -p "Q1-1:Cài đặt lần đầu sẽ xóa dữ liệu và bộ nhớ trong. Bạn đồng ý không？(Y/N) " choice1_1
-    if [ "$choice1_1" == 'Y' ] || [ "$choice1_1" == 'y' ]; then
-        q2
-    elif [ "$choice1_1" == 'N' ] || [ "$choice1_1" == 'n' ]; then
-        exit
-    fi
-    q1_1
-}
-
 q2() {
-    read -p "Q2:Bạn muốn cài đặt Magisk (ROOT)? (Y/N) " choice2
+    read -p "2. Bạn muốn cài đặt boot_magisk.img (ROOT) nếu có?  (2. Do you want to flash boot_magisk.img (ROOT))?(Y/N) " choice2
     if [ "$choice2" == 'Y' ] || [ "$choice2" == 'y' ] || [ "$choice2" == 'N' ] || [ "$choice2" == 'n' ]; then
         main
     fi
@@ -143,13 +133,36 @@ main() {
     fi
 
     if [ -f "images/super.img" ]; then
-        echo 'Bắt đầu flash super. Tệp này lớn và có thể mất nhiều thời gian (tùy thuộc vào cấu hình máy tính của bạn).'
+        echo 'Bắt đầu flash super. Tệp này lớn và có thể mất nhiều thời gian tùy thuộc vào cấu hình máy tính của bạn. (Start flashing super. This file is large and may take a long time depending on your computer configuration.)'
         bin/$systemType/all/fastboot $* flash super images/super.img
     fi
+    
+    if [ -f "images/recovery.img" ]; then 
+        bin/$systemType/all/fastboot $* flash recovery images/recovery.img
+    fi
 
-    bin/$systemType/all/fastboot $* flash cust images/cust.img
+    if [ -f "images/cust.img" ]; then 
+        bin/$systemType/all/fastboot $* flash cust images/cust.img
+    fi
+    
+    if [ -f "images/cust.img.0" ]; then 
+        bin/$systemType/all/fastboot $* flash cust images/cust.img.0
+    fi
+    
+    if [ -f "images/cust.img.1" ]; then 
+        bin/$systemType/all/fastboot $* flash cust images/cust.img.1
+    fi
+    
+    if [ -f "images/persist.img" ]; then 
+        bin/$systemType/all/fastboot $* flash persistbak images/persist.img
+        bin/$systemType/all/fastboot $* flash persist images/persist.img
+    fi
+    
+    if [ -f "images/splash.img" ]; then 
+        bin/$systemType/all/fastboot $* flash splash images/splash.img
+    fi
 
-    if [ "$choice1_1" == 'Y' ] || [ "$choice1_1" == 'y' ]; then
+    if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ]; then
         bin/$systemType/all/fastboot $* erase userdata
         bin/$systemType/all/fastboot $* erase metadata
     fi
