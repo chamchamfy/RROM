@@ -48,6 +48,9 @@ main() {
     if [ -f "images/abl.img" ]; then
         bin/$systemType/all/fastboot $* flash abl_ab images/abl.img
     fi
+    if [ -f "images/aop_config.img" ]; then
+        bin/$systemType/all/fastboot $* flash aop_config_ab images/aop_config.img
+    fi
     if [ -f "images/aop.img" ]; then
         bin/$systemType/all/fastboot $* flash aop_ab images/aop.img
     fi
@@ -62,6 +65,9 @@ main() {
     fi
     if [ -f "images/cpucp.img" ]; then
         bin/$systemType/all/fastboot $* flash cpucp_ab images/cpucp.img
+    fi
+    if [ -f "images/cpucp_dtb.img" ]; then
+        bin/$systemType/all/fastboot $* flash cpucp_dtb images/cpucp_dtbl.img
     fi
     if [ -f "images/devcfg.img" ]; then
         bin/$systemType/all/fastboot $* flash devcfg_ab images/devcfg.img
@@ -87,17 +93,30 @@ main() {
     if [ -f "images/modem.img" ]; then
         bin/$systemType/all/fastboot $* flash modem_ab images/modem.img
     fi
+    if [ -f "images/modemfirmware.img" ]; then
+        bin/$systemType/all/fastboot $* flash modemfirmware_ab images/modemfirmware.img
+    fi
+    if [ -f "images/multiimgqti.img" ]; then
+        bin/$systemType/all/fastboot $* flash multiimgqti_ab images/multiimgqti.img
+    fi
     if [ -f "images/qupfw.img" ]; then
         bin/$systemType/all/fastboot $* flash qupfw_ab images/qupfw.img
     fi
     if [ -f "images/shrm.img" ]; then
         bin/$systemType/all/fastboot $* flash shrm_ab images/shrm.img
     fi
+    if [ -f "images/spuservice.img" ]; then
+        bin/$systemType/all/fastboot $* flash spuservice_ab images/spuservice.img
+    fi
+    
     if [ -f "images/tz.img" ]; then
         bin/$systemType/all/fastboot $* flash tz_ab images/tz.img
     fi
     if [ -f "images/uefisecapp.img" ]; then
         bin/$systemType/all/fastboot $* flash uefisecapp_ab images/uefisecapp.img
+    fi
+    if [ -f "images/uefi.img" ]; then
+        bin/$systemType/all/fastboot $* flash uefi_ab images/uefi.img
     fi
     if [ -f "images/vbmeta.img" ]; then
         bin/$systemType/all/fastboot $* flash vbmeta_ab images/vbmeta.img
@@ -108,6 +127,12 @@ main() {
     if [ -f "images/vendor_boot.img" ]; then
         bin/$systemType/all/fastboot $* flash vendor_boot_ab images/vendor_boot.img
     fi
+    if [ -f "images/vm-bootsys.img" ]; then
+        bin/$systemType/all/fastboot $* flash vm-bootsys_ab images/vm-bootsys.img
+    fi
+    if [ -f "images/xbl_ramdump.img" ]; then
+        bin/$systemType/all/fastboot $* flash xbl_ramdump_ab images/xbl_ramdump.img
+    fi
     if [ -f "images/xbl_config.img" ]; then
         bin/$systemType/all/fastboot $* flash xbl_config_ab images/xbl_config.img
     fi
@@ -115,6 +140,9 @@ main() {
         bin/$systemType/all/fastboot $* flash xbl_ab images/xbl.img
     fi
     
+    if [ -f "images/init_boot.img" ]; then
+        bin/$systemType/all/fastboot $* flash init_boot_ab images/init_boot.img
+    fi
 
     if [ "$choice2" == 'Y' ] || [ "$choice2" == 'y' ]; then
         bin/$systemType/all/fastboot $* flash boot_ab images/boot_magisk.img
@@ -128,7 +156,7 @@ main() {
     fi
 
     if [ -f "images/recovery.img" ]; then 
-        bin/$systemType/all/fastboot $* flash recovery images/recovery.img
+        bin/$systemType/all/fastboot $* flash recovery_ab images/recovery.img
     fi
 
     if [ -f "images/cust.img" ]; then 

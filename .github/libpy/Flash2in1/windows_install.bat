@@ -8,7 +8,7 @@ echo. |DATE
 echo.
 echo.
 if exist images\super.img.zst (
-eecho. Bat dau chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
+echo. Bat dau chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
 echo. Start converting super partition. It may take a long time, depending on your computer configuration.
 echo. Luu y: Dung luong trong cua phan vung hien tai cua ban phai lon hon 10GB, neu khong qua trinh chuyen doi super se khong thanh cong. 
 echo. Note: Please ensure that the free size of the current partition is greater than 10GB, otherwise the super conversion will fail.
@@ -163,7 +163,13 @@ echo. Bat dau flash super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc 
 echo. Start flashing super. This file is large and may take a long time depending on your computer configuration.
 %fastboot% %* flash super images\super.img
 )
+if exist images\cust.img (
 %fastboot% %* flash cust images\cust.img
+)
+if exist images\persist.img (
+%fastboot% %* flash persist images\persist.img
+%fastboot% %* flash persistbak images\persistbak.img
+)
 if exist images\recovery.img (
 %fastboot% %* flash recovery images\recovery.img
 )

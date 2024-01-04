@@ -61,6 +61,9 @@ if exist images\abl.img (
 if exist images\aop.img (
 %fastboot% %* flash aop_ab images\aop.img
 )
+if exist images\aop_config.img (
+%fastboot% %* flash aop_config_ab images\aop_config.img
+)
 if exist images\bluetooth.img (
 %fastboot% %* flash bluetooth_ab images\bluetooth.img
 )
@@ -72,6 +75,9 @@ if exist images\cmnlib.img (
 )
 if exist images\cpucp.img (
 %fastboot% %* flash cpucp_ab images\cpucp.img
+)
+if exist images\cpucp_dtb.img (
+%fastboot% %* flash cpucp_dtb_ab images\cpucp_dtb.img
 )
 if exist images\devcfg.img (
 %fastboot% %* flash devcfg_ab images\devcfg.img
@@ -91,11 +97,20 @@ if exist images\hyp.img (
 if exist images\imagefv.img (
 %fastboot% %* flash imagefv_ab images\imagefv.img
 )
+if exist images\init_boot.img (
+%fastboot% %* flash init_boot_ab images\init_boot.img
+)
 if exist images\keymaster.img (
 %fastboot% %* flash keymaster_ab images\keymaster.img
 )
 if exist images\modem.img (
 %fastboot% %* flash modem_ab images\modem.img
+)
+if exist images\modemfirmware.img (
+%fastboot% %* flash modemfirmware_ab images\modemfirmware.img
+)
+if exist images\multiimgqti.img (
+%fastboot% %* flash multiimgqti_ab images\multiimgqti.img
 )
 if exist images\qupfw.img (
 %fastboot% %* flash qupfw_ab images\qupfw.img
@@ -103,8 +118,14 @@ if exist images\qupfw.img (
 if exist images\shrm.img (
 %fastboot% %* flash shrm_ab images\shrm.img
 )
+if exist images\spuservice.img (
+%fastboot% %* flash spuservice_ab images\spuservice.img
+)
 if exist images\tz.img (
 %fastboot% %* flash tz_ab images\tz.img
+)
+if exist images\uefi.img (
+%fastboot% %* flash uefi_ab images\uefi.img
 )
 if exist images\uefisecapp.img (
 %fastboot% %* flash uefisecapp_ab images\uefisecapp.img
@@ -117,6 +138,12 @@ if exist images\vbmeta_system.img (
 )
 if exist images\vendor_boot.img (
 %fastboot% %* flash vendor_boot_ab images\vendor_boot.img
+)
+if exist images\vm-bootsys.img (
+%fastboot% %* flash vm-bootsys_ab images\vm-bootsys.img
+)
+if exist images\xbl_ramdump.img (
+%fastboot% %* flash xbl_ramdump_ab images\xbl_ramdump.img
 )
 if exist images\xbl_config.img (
 %fastboot% %* flash xbl_config_ab images\xbl_config.img
@@ -136,9 +163,23 @@ echo. Bat dau flash super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc 
 echo. Start flashing super. This file is large and may take a long time depending on your computer configuration.
 %fastboot% %* flash super images\super.img
 )
+if exist images\cust.img (
 %fastboot% %* flash cust images\cust.img
+)
+if exist images\cust.img.0 (
+%fastboot% %* flash cust images\cust.img.0
+%fastboot% %* flash cust images\cust.img.1
+)
+)
+if exist images\persist.img (
+%fastboot% %* flash persist images\persist.img
+%fastboot% %* flash persistbak images\persistbak.img
+)
+if exist images\splash.img (
+%fastboot% %* flash splash images\splash.img
+)
 if exist images\recovery.img (
-%fastboot% %* flash recovery images\recovery.img
+%fastboot% %* flash recovery_ab images\recovery.img
 )
 if /i "%CHOICE1%" == "y" (
     %fastboot% %* erase userdata
