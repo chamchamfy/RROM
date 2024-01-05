@@ -28,6 +28,7 @@ settings put system link_turbo_option 1
 settings put global SUPPORT_UGD true
 settings put secure in_call_notification_enabled 1
 settings put secure qs_media_resumption 0
+settings put global tether_dun_required 0
 }
 
 tuychinh() { 
@@ -123,7 +124,7 @@ sed -i '/<\/features>/d' $f
 echo '
 <integer name="config_cell_count_y_max">15</integer>
 <integer name="config_cell_count_x_max">15</integer>
-<integer name="support_widevine_l1">2</integer>
+<integer name="support_widevine_l1">1</integer>
 <bool name="support_sound_assist">true</bool>
 <bool name="is_support_video_tool_box">true</bool>
 <bool name="support_videobox_display_effect">true</bool>

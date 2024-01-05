@@ -12,4 +12,3 @@
 ### https://bigota.d.miui.com/V14.0.4.0.TKDINXM/miui_VILIINGlobal_V14.0.4.0.TKDINXM_1f3be070c3_13.0.zip
 ### https://bigota.d.miui.com/V14.0.3.0.TKDMIXM/miui_VILIGlobal_V14.0.3.0.TKDMIXM_e7abe78e55_13.0.zip
 ### https://bigota.d.miui.com/V14.0.4.0.TKDMIXM/miui_VILIGlobal_V14.0.4.0.TKDMIXM_613ae1e5cf_13.0.zip
-### https://bigota.d.miui.com/V14.0.5.0.TKDMIXM/miui_VILIGlobal_V14.0.5.0.TKDMIXM_396f1d1cba_13.0.zip
