@@ -1,41 +1,4 @@
-# Initialization
-on property:init.svc.thermal-engine=running
-	#stop thermal-engine
-	stop logd
-	stop vendor.cnss_diag
-	stop vendor.tcpdump
-	stop vendor.ipacm-diag
-	stop cnss_diag
-	stop tcpdump
-	stop ipacm-diag
-	stop logcat
-	stop logcatd
-	start settings /system/bin/settings put system ai_preload_user_state 1
-	start settings /system/bin/settings put system miui_home_double_tap_to_lock 1
-	start settings /system/bin/settings put global GPUTUNER_SWITCH true
-	start settings /system/bin/settings put global sys_uidcpupower true
-	start settings /system/bin/settings put global sysui_powerui_enabled true
-	start settings /system/bin/settings put global screen_enhance_engine_gallery_ai_mode_status true
-	start settings /system/bin/settings put global settings_network_and_internet_v2 true
-	start settings /system/bin/settings put secure vtb_boosting 1
-	start settings /system/bin/settings put system link_turbo_option 1
-	start settings /system/bin/settings put global SUPPORT_UGD true
-	start settings /system/bin/settings put secure in_call_notification_enabled 1
-	start settings /system/bin/settings put secure qs_media_resumption 0
-	start settings /system/bin/settings put global tether_dun_required 0
-	chmod 0731 /data/system/theme
-# Van tay
-on init && property:ro.product.build.version.sdk=30
-	setprop ro.product.build.fingerprint "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
-on init && property:ro.product.build.version.sdk=31
-	setprop ro.product.build.fingerprint "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys"
-on init && property:ro.product.build.version.sdk=32
-	setprop ro.product.build.fingerprint "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys"
-on init && property:ro.product.build.version.sdk=33
-	setprop ro.product.build.fingerprint "google/cheetah/cheetah:13/TQ1A.230205.002/9471150:user/release-keys"
-on init && property:ro.product.build.version.sdk=34
-	setprop ro.product.build.fingerprint "google/husky/husky:14/UD1A.231105.004/11010374:user/release-keys"
-# run setprop
+# Setprop
 on init
 	#setprop ro.fod.dimlayer.enable false 
 	#setprop ro.hardware.fp.fod false
@@ -52,10 +15,18 @@ on init
 	setprop debug.qc.hardware true
 	setprop debug.qctwa.preservebuf 1
 	setprop debug.qctwa.statusbar 1
-	setprop debug.sf.high_fps_early_gl_phase_offset_ns 1000000
-	setprop debug.sf.high_fps_early_phase_offset_ns 1000000
-	setprop debug.sf.high_fps_late_app_phase_offset_ns 2000000
-	setprop debug.sf.high_fps_late_sf_phase_offset_ns 1000000
+	setprop debug.sf.early_app_phase_offset_ns 500000
+	setprop debug.sf.early_gl_app_phase_offset_ns 15000000
+	setprop debug.sf.early_gl_phase_offset_ns 3000000
+	setprop debug.sf.early_phase_offset_ns 500000
+	setprop debug.sf.high_fps_early_gl_phase_offset_ns 650000
+	setprop debug.sf.high_fps_early_phase_offset_ns 6100000
+	setprop debug.sf.high_fps_late_app_phase_offset_ns 100000
+	setprop debug.sf.phase_offset_threshold_for_next_vsync_ns 6100000
+	setprop debug.sf.showbackground 0
+	setprop debug.sf.showcpu 0 
+	setprop debug.sf.showfps 0 
+	setprop debug.sf.showupdates 0 
 	setprop hwui.disable_vsync true
 	setprop net.tethering.noprovisioning true
 	setprop persist.camera.HAL3.enabled 1
@@ -72,7 +43,6 @@ on init
 	setprop persist.radio.rat_on combine
 	setprop persist.radio.volte.dan_support true
 	setprop persist.rcs.supported 1
-	setprop persist.sys.NV_FPSLIMIT 120
 	setprop persist.sys.allow_sys_app_update true
 	setprop persist.sys.composition.type gpu
 	setprop persist.sys.cust.lte_config true
@@ -118,9 +88,15 @@ on init
 	setprop ro.secureboot.devicelock 1
 	setprop ro.secureboot.lockstate 1
 	setprop ro.surface_flinger.enable_frame_rate_override false
+	setprop ro.surface_flinger.force_hwc_copy_for_virtual_displays true 
+	setprop ro.surface_flinger.has_wide_color_display true 
+	setprop ro.surface_flinger.max_virtual_display_dimension 4096 
+	setprop ro.surface_flinger.protected_contents true 
+	setprop ro.surface_flinger.running_without_sync_framework true 
 	setprop ro.surface_flinger.set_display_power_timer_ms 2147483647
 	setprop ro.surface_flinger.set_idle_timer_ms 2147483647
 	setprop ro.surface_flinger.set_touch_timer_ms 2147483647
+	setprop ro.surface_flinger.use_color_management true
 	setprop ro.surface_flinger.use_content_detection_for_refresh_rate true
 	setprop ro.telephony.call_ring.delay 0
 	setprop ro.vendor.audio.aiasst.support true
@@ -137,7 +113,6 @@ on init
 	setprop ro.vendor.audio.sfx.harmankardon true 
 	setprop ro.vendor.audio.sfx.scenario true
 	setprop ro.vendor.audio.speaker.surround.boost 110
-	setprop ro.vendor.audio.speaker.surround.boost 2
 	setprop ro.vendor.audio.spk.clean true
 	setprop ro.vendor.audio.spk.stereo true
 	setprop ro.vendor.audio.support.sound.id true
@@ -146,19 +121,17 @@ on init
 	setprop ro.vendor.audio.vocal.support true
 	setprop ro.vendor.audio.voice.change.support true
 	setprop ro.vendor.audio.voice.change.youme.support true
-	setprop ro.vendor.audio.voice.volume.boost none
 	setprop ro.vendor.audio.voice.volume.boost true
 	setprop ro.vendor.audio.voip.assistant true
 	setprop ro.vendor.audio.volume.modeler.enable true
 	setprop ro.vendor.boot.warranty_bit 0
 	setprop ro.vendor.dfps.enable true
-	setprop ro.vendor.display.default_fps 60,90,120
+	setprop ro.vendor.display.default_fps 120
 	setprop ro.vendor.display.fod_monitor_default_fps 120
 	setprop ro.vendor.display.idle_default_fps 120
 	setprop ro.vendor.display.idle_default_fps.support false
 	setprop ro.vendor.display.primary_idle_refresh_rate 1,120:3280
 	setprop ro.vendor.fps.switch.default true
-	setprop ro.vendor.fps.switch.thermal true
 	setprop ro.vendor.net.enable_dual_wifi 1
 	setprop ro.vendor.smart_dfps.enable true
 	setprop ro.vendor.touchfeature.gamemode.enable true
@@ -196,20 +169,33 @@ on init
 	setprop video.accelerate.hw 1
 	setprop wifi.supplicant_scan_interval 180
 	setprop windowsmgr.max_events_per_sec 90
-
 # Permissive
 on init
 	chmod 0666 /sys/fs/selinux/enforce
 	write /sys/fs/selinux/enforce 0
+	write /sys/touchpanel/double_tap 1
+	write /proc/sys/net/ipv4/ip_default_ttl 63
+	write /proc/sys/net/ipv4/ip_forward 1
 	chmod 0640 /sys/fs/selinux/enforce
 	chmod 0440 /sys/fs/selinux/policy
-# DT2W
-on init
-	write /sys/touchpanel/double_tap 1
-	write /proc/sys/net/ipv4/ip_default_ttl 128
+	chmod 0440 /proc/net/unix
+# Initialization
+on property:init.svc.thermal-engine=running
+	#stop thermal-engine
+	stop logd
+	stop vendor.cnss_diag
+	stop vendor.tcpdump
+	stop vendor.ipacm-diag
+	stop cnss_diag
+	stop tcpdump
+	stop ipacm-diag
+	stop logcat
+	stop logcatd
 # Set boot completed
 on property:sys.boot_completed=1
+	chmod 0731 /data/system/theme
 	chmod 0755 /system/bin/spm
+	exec u:r:init:s0 root root -- /system/bin/iptables -t mangle -A POSTROUTING -j TTL --ttl-set 63
 	exec u:r:init:s0 root root -- /system/bin/spm 
 	exec u:r:sysinit:s0 root root -- /system/bin/spm 
-	exec -- /system/bin/spm 
+
