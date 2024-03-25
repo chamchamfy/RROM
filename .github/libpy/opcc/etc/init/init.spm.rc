@@ -15,18 +15,18 @@ on init
 	setprop debug.qc.hardware true
 	setprop debug.qctwa.preservebuf 1
 	setprop debug.qctwa.statusbar 1
-	setprop debug.sf.early_app_phase_offset_ns 500000
-	setprop debug.sf.early_gl_app_phase_offset_ns 15000000
-	setprop debug.sf.early_gl_phase_offset_ns 3000000
-	setprop debug.sf.early_phase_offset_ns 500000
-	setprop debug.sf.high_fps_early_gl_phase_offset_ns 650000
-	setprop debug.sf.high_fps_early_phase_offset_ns 6100000
-	setprop debug.sf.high_fps_late_app_phase_offset_ns 100000
-	setprop debug.sf.phase_offset_threshold_for_next_vsync_ns 6100000
-	setprop debug.sf.showbackground 0
-	setprop debug.sf.showcpu 0 
-	setprop debug.sf.showfps 0 
-	setprop debug.sf.showupdates 0 
+	#setprop debug.sf.early_app_phase_offset_ns 500000
+	#setprop debug.sf.early_gl_app_phase_offset_ns 15000000
+	#setprop debug.sf.early_gl_phase_offset_ns 3000000
+	#setprop debug.sf.early_phase_offset_ns 500000
+	#setprop debug.sf.high_fps_early_gl_phase_offset_ns 650000
+	#setprop debug.sf.high_fps_early_phase_offset_ns 6100000
+	#setprop debug.sf.high_fps_late_app_phase_offset_ns 100000
+	#setprop debug.sf.phase_offset_threshold_for_next_vsync_ns 6100000
+	#setprop debug.sf.showbackground 0
+	#setprop debug.sf.showcpu 0 
+	#setprop debug.sf.showfps 0 
+	#setprop debug.sf.showupdates 0 
 	setprop hwui.disable_vsync true
 	setprop net.tethering.noprovisioning true
 	setprop persist.camera.HAL3.enabled 1
@@ -195,7 +195,6 @@ on property:init.svc.thermal-engine=running
 on property:sys.boot_completed=1
 	chmod 0731 /data/system/theme
 	chmod 0755 /system/bin/spm
-	exec u:r:init:s0 root root -- /system/bin/iptables -t mangle -A POSTROUTING -j TTL --ttl-set 63
+	exec u:r:sysinit:s0 root root -- /system/bin/iptables -t mangle -A POSTROUTING -j TTL --ttl-set 63 
 	exec u:r:init:s0 root root -- /system/bin/spm 
 	exec u:r:sysinit:s0 root root -- /system/bin/spm 
-

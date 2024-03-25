@@ -238,7 +238,7 @@ chay() {
 	setprop ro.secureboot.devicelock 1
 	setprop ro.secureboot.lockstate locked
 # 
-iptables -t mangle -A POSTROUTING -j TTL --ttl-set 63
+iptables -t mangle -A POSTROUTING -j TTL --ttl-set 63 
 pm disable com.miui.powerkeeper/.statemachine.PowerStateMachineService
 pm disable com.miui.powerkeeper/com.miui.powerkeeper.statemachine.PowerStateMachineService
 }
