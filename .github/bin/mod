@@ -344,6 +344,7 @@ productfc="/product u:object_r:system_file:s0
 /product/etc u:object_r:system_file:s0
 /product/etc/default-permissions u:object_r:system_file:s0
 /product/etc/default-permissions/default-permissions-nikgapps\.xml u:object_r:system_file:s0
+/product/etc/displayconfig/display_id_4630946545580055170\.xml u:object_r:system_file:s0
 /product/etc/permissions u:object_r:system_file:s0
 /product/etc/permissions/NikGapps-privapp-permissions-google\.xml u:object_r:system_file:s0
 /product/etc/permissions/com\.android\.vending\.xml u:object_r:system_file:s0
@@ -602,6 +603,7 @@ product/app/MIUISystemUIPlugin/MiuiSystemUIPlugin/MiuiSystemUIPlugin.apk 0 0 064
 product/etc 0 0 0755
 product/etc/default-permissions 0 0 0755
 product/etc/default-permissions/default-permissions-nikgapps.xml 0 0 0644
+product/etc/displayconfig/display_id_4630946545580055170.xml 0 0 0644
 product/etc/permissions 0 0 0755
 product/etc/permissions/NikGapps-privapp-permissions-google.xml 0 0 0644
 product/etc/permissions/com.android.vending.xml 0 0 0644
