@@ -930,18 +930,22 @@ class ImageHandler(object):
                                   struct.calcsize(ImageChunk.FORMAT)))
     self._read_header()
 
-  def append_raw(self, data):
+  def append_raw(self, data, multiple_block_size=True):
     """Appends a RAW chunk to the sparse file.
 
-    The length of the given data must be a multiple of the block size.
+    The length of the given data must be a multiple of the block size,
+    unless |multiple_block_size| is False.
 
     Arguments:
       data: Data to append as bytes.
+      multiple_block_size: whether to check the length of the
+        data is a multiple of the block size.
 
     Raises:
       OSError: If ImageHandler was initialized in read-only mode.
     """
-    assert len(data) % self.block_size == 0
+    if multiple_block_size:
+      assert len(data) % self.block_size == 0
 
     if self._read_only:
       raise OSError('ImageHandler is in read-only mode.')
@@ -3329,7 +3333,8 @@ class Avb(object):
       image.truncate(original_image_size)
       raise AvbError('Appending VBMeta image failed: {}.'.format(e)) from e
 
-  def add_hash_footer(self, image_filename, partition_size, partition_name,
+  def add_hash_footer(self, image_filename, partition_size,
+                      dynamic_partition_size, partition_name,
                       hash_algorithm, salt, chain_partitions, algorithm_name,
                       key_path,
                       public_key_metadata_path, rollback_index, flags,
@@ -3347,6 +3352,7 @@ class Avb(object):
     Arguments:
       image_filename: File to add the footer to.
       partition_size: Size of partition.
+      dynamic_partition_size: Calculate partition size based on image size.
       partition_name: Name of partition (without A/B suffix).
       hash_algorithm: Hash algorithm to use.
       salt: Salt to use as a hexadecimal string or None to use /dev/urandom.
@@ -3380,6 +3386,14 @@ class Avb(object):
     Raises:
       AvbError: If an argument is incorrect of if adding of hash_footer failed.
     """
+    if not partition_size and not dynamic_partition_size:
+      raise AvbError('--dynamic_partition_size required when not specifying a '
+                     'partition size')
+
+    if dynamic_partition_size and calc_max_image_size:
+      raise AvbError('--calc_max_image_size not supported with '
+                     '--dynamic_partition_size')
+
     required_libavb_version_minor = 0
     if use_persistent_digest or do_not_use_ab:
       required_libavb_version_minor = 1
@@ -3395,23 +3409,17 @@ class Avb(object):
     # this size + metadata (footer + vbmeta struct) fits in
     # |partition_size|.
     max_metadata_size = self.MAX_VBMETA_SIZE + self.MAX_FOOTER_SIZE
-    if partition_size < max_metadata_size:
+    if not dynamic_partition_size and partition_size < max_metadata_size:
       raise AvbError('Parition size of {} is too small. '
                      'Needs to be at least {}'.format(
                          partition_size, max_metadata_size))
-    max_image_size = partition_size - max_metadata_size
 
     # If we're asked to only calculate the maximum image size, we're done.
     if calc_max_image_size:
-      print('{}'.format(max_image_size))
+      print('{}'.format(partition_size - max_metadata_size))
       return
 
     image = ImageHandler(image_filename)
-
-    if partition_size % image.block_size != 0:
-      raise AvbError('Partition size of {} is not a multiple of the image '
-                     'block size {}.'.format(partition_size,
-                                             image.block_size))
 
     # If there's already a footer, truncate the image to its original
     # size. This way 'avbtool add_hash_footer' is idempotent (modulo
@@ -3428,6 +3436,16 @@ class Avb(object):
     else:
       # Image size is too small to possibly contain a footer.
       original_image_size = image.image_size
+
+    if dynamic_partition_size:
+      partition_size = round_to_multiple(
+          original_image_size + max_metadata_size, image.block_size)
+
+    max_image_size = partition_size - max_metadata_size
+    if partition_size % image.block_size != 0:
+      raise AvbError('Partition size of {} is not a multiple of the image '
+                     'block size {}.'.format(partition_size,
+                                             image.block_size))
 
     # If anything goes wrong from here-on, restore the image back to
     # its original size.
@@ -3670,7 +3688,12 @@ class Avb(object):
       # Ensure image is multiple of block_size.
       rounded_image_size = round_to_multiple(image.image_size, block_size)
       if rounded_image_size > image.image_size:
-        image.append_raw('\0' * (rounded_image_size - image.image_size))
+        # If we need to round up the image size, it means the length of the
+        # data to append is not a multiple of block size.
+        # Setting multiple_block_size to false, so append_raw() will not
+        # require it.
+        image.append_raw(b'\0' * (rounded_image_size - image.image_size),
+                         multiple_block_size=False)
 
       # If image size exceeds the maximum image size, fail.
       if partition_size > 0:
@@ -3739,7 +3762,8 @@ class Avb(object):
       padding_needed = (round_to_multiple(len(hash_tree), image.block_size) -
                         len(hash_tree))
       hash_tree_with_padding = hash_tree + b'\0' * padding_needed
-      image.append_raw(hash_tree_with_padding)
+      if len(hash_tree_with_padding) > 0:
+        image.append_raw(hash_tree_with_padding)
       len_hashtree_and_fec = len(hash_tree_with_padding)
 
       # Generate FEC codes, if requested.
@@ -4093,6 +4117,14 @@ def generate_hash_tree(image, image_size, block_size, hash_alg_name, salt,
   hash_src_offset = 0
   hash_src_size = image_size
   level_num = 0
+
+  # If there is only one block, returns the top-level hash directly.
+  if hash_src_size == block_size:
+    hasher = create_avb_hashtree_hasher(hash_alg_name, salt)
+    image.seek(0)
+    hasher.update(image.read(block_size))
+    return hasher.digest(), bytes(hash_ret)
+
   while hash_src_size > block_size:
     level_output_list = []
     remaining = hash_src_size
@@ -4323,6 +4355,9 @@ class AvbTool(object):
     sub_parser.add_argument('--partition_size',
                             help='Partition size',
                             type=parse_number)
+    sub_parser.add_argument('--dynamic_partition_size',
+                            help='Calculate partition size based on image size',
+                            action='store_true')
     sub_parser.add_argument('--partition_name',
                             help='Partition name',
                             default=None)
@@ -4751,7 +4786,7 @@ class AvbTool(object):
     """Implements the 'add_hash_footer' sub-command."""
     args = self._fixup_common_args(args)
     self.avb.add_hash_footer(args.image.name if args.image else None,
-                             args.partition_size,
+                             args.partition_size, args.dynamic_partition_size,
                              args.partition_name, args.hash_algorithm,
                              args.salt, args.chain_partition, args.algorithm,
                              args.key,

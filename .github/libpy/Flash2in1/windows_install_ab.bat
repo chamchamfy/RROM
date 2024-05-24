@@ -56,137 +56,137 @@ goto MAIN
 
 :MAIN
 if exist images\abl.img (
-%fastboot% %* flash abl_ab images\abl.img
+%fastboot% flash abl_ab images\abl.img
 )
 if exist images\aop.img (
-%fastboot% %* flash aop_ab images\aop.img
+%fastboot% flash aop_ab images\aop.img
 )
 if exist images\aop_config.img (
-%fastboot% %* flash aop_config_ab images\aop_config.img
+%fastboot% flash aop_config_ab images\aop_config.img
 )
 if exist images\bluetooth.img (
-%fastboot% %* flash bluetooth_ab images\bluetooth.img
+%fastboot% flash bluetooth_ab images\bluetooth.img
 )
 if exist images\cmnlib64.img (
-%fastboot% %* flash cmnlib64_ab images\cmnlib64.img
+%fastboot% flash cmnlib64_ab images\cmnlib64.img
 )
 if exist images\cmnlib.img (
-%fastboot% %* flash cmnlib_ab images\cmnlib.img
+%fastboot% flash cmnlib_ab images\cmnlib.img
 )
 if exist images\cpucp.img (
-%fastboot% %* flash cpucp_ab images\cpucp.img
+%fastboot% flash cpucp_ab images\cpucp.img
 )
 if exist images\cpucp_dtb.img (
-%fastboot% %* flash cpucp_dtb_ab images\cpucp_dtb.img
+%fastboot% flash cpucp_dtb_ab images\cpucp_dtb.img
 )
 if exist images\devcfg.img (
-%fastboot% %* flash devcfg_ab images\devcfg.img
+%fastboot% flash devcfg_ab images\devcfg.img
 )
 if exist images\dsp.img (
-%fastboot% %* flash dsp_ab images\dsp.img
+%fastboot% flash dsp_ab images\dsp.img
 )
 if exist images\dtbo.img (
-%fastboot% %* flash dtbo_ab images\dtbo.img
+%fastboot% flash dtbo_ab images\dtbo.img
 )
 if exist images\featenabler.img (
-%fastboot% %* flash featenabler_ab images\featenabler.img
+%fastboot% flash featenabler_ab images\featenabler.img
 )
 if exist images\hyp.img (
-%fastboot% %* flash hyp_ab images\hyp.img
+%fastboot% flash hyp_ab images\hyp.img
 )
 if exist images\imagefv.img (
-%fastboot% %* flash imagefv_ab images\imagefv.img
+%fastboot% flash imagefv_ab images\imagefv.img
 )
 if exist images\init_boot.img (
-%fastboot% %* flash init_boot_ab images\init_boot.img
+%fastboot% flash init_boot_ab images\init_boot.img
 )
 if exist images\keymaster.img (
-%fastboot% %* flash keymaster_ab images\keymaster.img
+%fastboot% flash keymaster_ab images\keymaster.img
 )
 if exist images\modem.img (
-%fastboot% %* flash modem_ab images\modem.img
+%fastboot% flash modem_ab images\modem.img
 )
 if exist images\modemfirmware.img (
-%fastboot% %* flash modemfirmware_ab images\modemfirmware.img
+%fastboot% flash modemfirmware_ab images\modemfirmware.img
 )
 if exist images\multiimgqti.img (
-%fastboot% %* flash multiimgqti_ab images\multiimgqti.img
+%fastboot% flash multiimgqti_ab images\multiimgqti.img
 )
 if exist images\qupfw.img (
-%fastboot% %* flash qupfw_ab images\qupfw.img
+%fastboot% flash qupfw_ab images\qupfw.img
 )
 if exist images\shrm.img (
-%fastboot% %* flash shrm_ab images\shrm.img
+%fastboot% flash shrm_ab images\shrm.img
 )
 if exist images\spuservice.img (
-%fastboot% %* flash spuservice_ab images\spuservice.img
+%fastboot% flash spuservice_ab images\spuservice.img
 )
 if exist images\tz.img (
-%fastboot% %* flash tz_ab images\tz.img
+%fastboot% flash tz_ab images\tz.img
 )
 if exist images\uefi.img (
-%fastboot% %* flash uefi_ab images\uefi.img
+%fastboot% flash uefi_ab images\uefi.img
 )
 if exist images\uefisecapp.img (
-%fastboot% %* flash uefisecapp_ab images\uefisecapp.img
+%fastboot% flash uefisecapp_ab images\uefisecapp.img
 )
 if exist images\vbmeta.img (
-%fastboot% %* flash vbmeta_ab images\vbmeta.img
+%fastboot% flash vbmeta_ab images\vbmeta.img
 )
 if exist images\vbmeta_system.img (
-%fastboot% %* flash vbmeta_system_ab images\vbmeta_system.img
+%fastboot% flash vbmeta_system_ab images\vbmeta_system.img
 )
 if exist images\vendor_boot.img (
-%fastboot% %* flash vendor_boot_ab images\vendor_boot.img
+%fastboot% flash vendor_boot_ab images\vendor_boot.img
 )
 if exist images\vm-bootsys.img (
-%fastboot% %* flash vm-bootsys_ab images\vm-bootsys.img
+%fastboot% flash vm-bootsys_ab images\vm-bootsys.img
 )
 if exist images\xbl_ramdump.img (
-%fastboot% %* flash xbl_ramdump_ab images\xbl_ramdump.img
+%fastboot% flash xbl_ramdump_ab images\xbl_ramdump.img
 )
 if exist images\xbl_config.img (
-%fastboot% %* flash xbl_config_ab images\xbl_config.img
+%fastboot% flash xbl_config_ab images\xbl_config.img
 )
 if exist images\xbl.img (
-%fastboot% %* flash xbl_ab images\xbl.img
+%fastboot% flash xbl_ab images\xbl.img
 )
 @REM flash firmware done
 
 if /i "%CHOICE2%" == "y" (
-    %fastboot% %* flash boot_ab images\boot_magisk.img
+    %fastboot% flash boot_ab images\boot_magisk.img
 ) else if /i "%CHOICE2%" == "n" (
-    %fastboot% %* flash boot_ab images\boot.img
+    %fastboot% flash boot_ab images\boot.img
 )
 if exist images\super.img (
 echo. Bat dau flash super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban. 
 echo. Start flashing super. This file is large and may take a long time depending on your computer configuration.
-%fastboot% %* flash super images\super.img
+%fastboot% flash super images\super.img
 )
 if exist images\cust.img (
-%fastboot% %* flash cust images\cust.img
+%fastboot% flash cust images\cust.img
 )
 if exist images\cust.img.0 (
-%fastboot% %* flash cust images\cust.img.0
-%fastboot% %* flash cust images\cust.img.1
+%fastboot% flash cust images\cust.img.0
+%fastboot% flash cust images\cust.img.1
 )
 )
 if exist images\persist.img (
-%fastboot% %* flash persist images\persist.img
-%fastboot% %* flash persistbak images\persistbak.img
+%fastboot% flash persist images\persist.img
+%fastboot% flash persistbak images\persistbak.img
 )
 if exist images\splash.img (
-%fastboot% %* flash splash images\splash.img
+%fastboot% flash splash images\splash.img
 )
 if exist images\recovery.img (
-%fastboot% %* flash recovery_ab images\recovery.img
+%fastboot% flash recovery_ab images\recovery.img
 )
 if /i "%CHOICE1%" == "y" (
-    %fastboot% %* erase userdata
-    %fastboot% %* erase metadata
+    %fastboot% erase userdata
+    %fastboot% erase metadata
 )
-%fastboot% %* set_active a
-%fastboot% %* reboot
+%fastboot% set_active a
+%fastboot% reboot
 echo.
 echo.
 :Finish

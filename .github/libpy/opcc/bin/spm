@@ -29,6 +29,9 @@ settings put global SUPPORT_UGD true
 settings put secure in_call_notification_enabled 1
 settings put secure qs_media_resumption 0
 settings put global tether_dun_required 0
+settings put system peak_refresh_rate 120
+settings put secure miui_refresh_rate 120
+settings put secure user_refresh_rate 120
 }
 
 tuychinh() { 
@@ -62,8 +65,6 @@ ghi "777" "1024" "644" "/sys/devices/virtual/bdi/8:32/read_ahead_kb"
 ghi "777" "1024" "644" "/sys/devices/virtual/bdi/8:48/read_ahead_kb"
 ghi "777" "1024" "644" "/sys/devices/virtual/bdi/8:64/read_ahead_kb"
 ghi "777" "1024" "644" "/sys/devices/virtual/bdi/8:80/read_ahead_kb"
-ghi "777" "1024" "644" "/sys/devices/virtual/bdi/8:80/read_ahead_kb"
-ghi "777" "1024" "644" "/sys/devices/virtual/bdi/8:80/read_ahead_kb"
 
 # Policy
 if [ -e /sys/devices/system/cpu/cpufreq/policy7 ]; then policy=policy7; cpu=cpu7; elif [ -e /sys/devices/system/cpu/cpufreq/policy6 ]; then policy=policy6; cpu=cpu6; else policy=policy4; cpu=cpu4; fi 
@@ -94,12 +95,12 @@ ghi "777" "1" "644" "/sys/class/kgsl/kgsl-3d0/force_no_nap"
 ghi "777" "1" "644" "/sys/class/kgsl/kgsl-3d0/bus_split"
 ghi "777" "0" "644" "/sys/class/kgsl/kgsl-3d0/devfreq/adrenoboost"
 ghi "777" "$Governor" "644" "/sys/class/kgsl/kgsl-3d0/devfreq/governor"
-ghi "777" "850000000" "644" "/sys/class/kgsl/kgsl-3d0/devfreq/max_freq"
+ghi "777" "840000000" "644" "/sys/class/kgsl/kgsl-3d0/devfreq/max_freq"
 ghi "777" "315000000" "644" "/sys/class/kgsl/kgsl-3d0/devfreq/min_freq"
 ghi "777" "315000000" "644" "/sys/class/kgsl/kgsl-3d0/gpuclk"
-ghi "777" "850000000" "644" "/sys/class/kgsl/kgsl-3d0/max_gpuclk"
+ghi "777" "840000000" "644" "/sys/class/kgsl/kgsl-3d0/max_gpuclk"
 ghi "777" "10000000" "644" "/sys/class/kgsl/kgsl-3d0/idle_timer"
-ghi "777" "850" "644" "/sys/class/kgsl/kgsl-3d0/max_clock_mhz"
+ghi "777" "840" "644" "/sys/class/kgsl/kgsl-3d0/max_clock_mhz"
 ghi "777" "315" "644" "/sys/class/kgsl/kgsl-3d0/min_clock_mhz"
 fi  
 }
@@ -184,6 +185,7 @@ echo '
 <bool name="support_smart_fps">true</bool>
 <integer name="smart_fps_value">120</integer> 
 <integer-array name="fpsList">
+        <item>144</item>
         <item>120</item>
         <item>90</item>
         <item>60</item>
@@ -216,7 +218,7 @@ chay() {
 	chmod 0666 /sys/fs/selinux/enforce
 	echo 0 > /sys/fs/selinux/enforce
 	echo 1 > /sys/touchpanel/double_tap
-	echo 63 > /proc/sys/net/ipv4/ip_default_ttl
+	echo 65 > /proc/sys/net/ipv4/ip_default_ttl
 	echo 1 > /proc/sys/net/ipv4/ip_forward
 	chmod 0640 /sys/fs/selinux/enforce
 	chmod 0440 /sys/fs/selinux/policy
@@ -238,7 +240,7 @@ chay() {
 	setprop ro.secureboot.devicelock 1
 	setprop ro.secureboot.lockstate locked
 # 
-iptables -t mangle -A POSTROUTING -j TTL --ttl-set 63 
+iptables -t mangle -A POSTROUTING -j TTL --ttl-set 65
 pm disable com.miui.powerkeeper/.statemachine.PowerStateMachineService
 pm disable com.miui.powerkeeper/com.miui.powerkeeper.statemachine.PowerStateMachineService
 }

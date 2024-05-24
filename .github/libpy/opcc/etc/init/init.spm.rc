@@ -11,6 +11,7 @@ on init
 	setprop debug.config.media.video.frc.support true
 	setprop debug.game.video.speed true
 	setprop debug.game.video.support true
+	setprop debug.hwui.disable_vsync true
 	setprop debug.performance.tuning 1
 	setprop debug.qc.hardware true
 	setprop debug.qctwa.preservebuf 1
@@ -29,6 +30,7 @@ on init
 	#setprop debug.sf.showupdates 0 
 	setprop hwui.disable_vsync true
 	setprop net.tethering.noprovisioning true
+	setprop net.ipv4.ip_default_ttl 65
 	setprop persist.camera.HAL3.enabled 1
 	setprop persist.camera.eis.enable 1 
 	setprop persist.dbg.ims_volte_enable 1
@@ -56,11 +58,11 @@ on init
 	setprop persist.vendor.battery.health true
 	setprop persist.vendor.camera.HAL3.enabled 1
 	setprop persist.vendor.camera.eis.enable 1
-	setprop persist.vendor.dfps.level 60,90,120 
-	setprop persist.vendor.disable_idle_fps true
-	setprop persist.vendor.disable_idle_fps.threshold 492
+	setprop persist.vendor.dfps.level 60,90,120,144 
+	#setprop persist.vendor.disable_idle_fps true
+	#setprop persist.vendor.disable_idle_fps.threshold 492
 	setprop persist.vendor.night.charge true
-	setprop persist.vendor.power.dfps.level 60,90,120 
+	setprop persist.vendor.power.dfps.level 60,90,120,144
 	setprop ro.adb.secure 1
 	setprop ro.allow.mock.location 0
 	setprop ro.boot.flash.locked 1
@@ -79,6 +81,7 @@ on init
 	setprop ro.debuggable 0
 	setprop ro.feature.dolby_enable true
 	setprop ro.floatingtouch.available 1
+	setprop ro.is_ever_orange 0
 	setprop ro.miui.fpstool_enabled true
 	setprop ro.miui.has_cust_partition true
 	setprop ro.miui.has_security_keyboard 1
@@ -125,13 +128,13 @@ on init
 	setprop ro.vendor.audio.voip.assistant true
 	setprop ro.vendor.audio.volume.modeler.enable true
 	setprop ro.vendor.boot.warranty_bit 0
-	setprop ro.vendor.dfps.enable true
+	#setprop ro.vendor.dfps.enable true
 	setprop ro.vendor.display.default_fps 120
 	setprop ro.vendor.display.fod_monitor_default_fps 120
 	setprop ro.vendor.display.idle_default_fps 120
-	setprop ro.vendor.display.idle_default_fps.support false
-	setprop ro.vendor.display.primary_idle_refresh_rate 1,120:3280
-	setprop ro.vendor.fps.switch.default true
+	#setprop ro.vendor.display.idle_default_fps.support false
+	#setprop ro.vendor.display.primary_idle_refresh_rate 1,120:3280
+	#setprop ro.vendor.fps.switch.default true
 	setprop ro.vendor.net.enable_dual_wifi 1
 	setprop ro.vendor.smart_dfps.enable true
 	setprop ro.vendor.touchfeature.gamemode.enable true
@@ -174,14 +177,14 @@ on init
 	chmod 0666 /sys/fs/selinux/enforce
 	write /sys/fs/selinux/enforce 0
 	write /sys/touchpanel/double_tap 1
-	write /proc/sys/net/ipv4/ip_default_ttl 63
+	write /proc/sys/net/ipv4/ip_default_ttl 65
 	write /proc/sys/net/ipv4/ip_forward 1
 	chmod 0640 /sys/fs/selinux/enforce
 	chmod 0440 /sys/fs/selinux/policy
 	chmod 0440 /proc/net/unix
 # Initialization
 on property:init.svc.thermal-engine=running
-	#stop thermal-engine
+	stop thermal-engine
 	stop logd
 	stop vendor.cnss_diag
 	stop vendor.tcpdump
@@ -195,6 +198,8 @@ on property:init.svc.thermal-engine=running
 on property:sys.boot_completed=1
 	chmod 0731 /data/system/theme
 	chmod 0755 /system/bin/spm
-	exec u:r:sysinit:s0 root root -- /system/bin/iptables -t mangle -A POSTROUTING -j TTL --ttl-set 63 
 	exec u:r:init:s0 root root -- /system/bin/spm 
 	exec u:r:sysinit:s0 root root -- /system/bin/spm 
+	exec u:r:sysinit:s0 root root -- /system/bin/iptables -t mangle -A POSTROUTING -j TTL --ttl-set 65
+	exec u:r:sysinit:s0 root root -- /system/bin/sysctl -w net.ipv4.ip_default_ttl=65
+	
