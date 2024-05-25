@@ -22,7 +22,7 @@ body:
       label: Dùng Recovery mod
       description: |
         Dùng `Twrp`, hoặc `OrangeFox`
-        Lưu ý: Nếu chọn Fox một số rom sẽ không có sẵn nó sẽ tự chọn Twrp.
+        Lưu ý: Nếu chọn Fox một số rom sẽ không có sẵn.
       options:
         - Không thêm
         - OrangeFox
@@ -83,7 +83,7 @@ body:
     attributes:
       label: Xoá ứng dụng
       description: |
-        Tên thư mục ứng dụng ở /system/app/AiAsstVision, priv-app, product v.v
+        Tên thư mục ứng dụng ở /system/app/abc, priv-app, product v.v
         Thêm dấu # trước tên thư mục là không xóa ứng dụng đó như: #Calculator và được phân biệt bởi khoảng cách.
       render: shell
       value: |
