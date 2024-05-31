@@ -56,6 +56,7 @@ body:
         - label: "Thêm âm thanh HARMAN KARDON"
         - label: "Vá hệ thống"
         - label: "Bỏ mã hoá Rom"
+        - label: "Vá Permissive"
           required: false
   - type: dropdown
     attributes:
