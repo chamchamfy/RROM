@@ -184,7 +184,7 @@ on init
 	chmod 0440 /proc/net/unix
 # Initialization
 on property:init.svc.thermal-engine=running
-	stop thermal-engine
+	#stop thermal-engine
 	stop logd
 	stop vendor.cnss_diag
 	stop vendor.tcpdump
