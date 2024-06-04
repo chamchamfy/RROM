@@ -1,3 +1,4 @@
+### Chỉnh sửa rom online
 # RROM
 [![REBUILD Rom MIUI](https://github.com/chamchamfy/RROM/actions/workflows/main.yml/badge.svg)](https://github.com/chamchamfy/RROM/actions/workflows/main.yml)
 + Tính năng:
@@ -6,7 +7,6 @@
   - Xóa ứng dụng thừa...
 + Donate:
   - Viettel Money: 9704229225265656
-+ Chỉnh sửa rom online
 + Rom Vili: 
 ## https://bn.d.miui.com/V14.0.3.0.TKDTWXM/miui_VILITWGlobal_V14.0.3.0.TKDTWXM_3bfd41caa1_13.0.zip
 ### https://bn.d.miui.com/V14.0.4.0.TKDTWXM/miui_VILITWGlobal_V14.0.4.0.TKDTWXM_3dfd315d17_13.0.zip
