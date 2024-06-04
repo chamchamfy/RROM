@@ -441,7 +441,7 @@ productfc="/product u:object_r:system_file:s0
 /product/priv-app/PrebuiltGmsCore/m/optional/MlkitBarcodeUIPrebuilt\.apk u:object_r:system_file:s0
 /product/priv-app/PrebuiltGmsCore/m/optional/VisionBarcodePrebuilt\.apk u:object_r:system_file:s0"
 #
-system_extfc=''
+system_extfc="/system_ext/etc/cust_prop_white_keys_list u:object_r:system_file:s0"
 #
 # Thêm fsconfig
 systemfs=''
@@ -701,7 +701,7 @@ product/priv-app/PrebuiltGmsCore/m/optional 0 0 0755
 product/priv-app/PrebuiltGmsCore/m/optional/MlkitBarcodeUIPrebuilt.apk 0 0 0644
 product/priv-app/PrebuiltGmsCore/m/optional/VisionBarcodePrebuilt.apk 0 0 0644"
 #
-system_extfs=""
+system_extfs="system_ext/etc/cust_prop_white_keys_list 0 0 0644"
 }
 #
 ngonngu() { 
