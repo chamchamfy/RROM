@@ -1,6 +1,9 @@
 # RROM
 [![REBUILD Rom MIUI](https://github.com/chamchamfy/RROM/actions/workflows/main.yml/badge.svg)](https://github.com/chamchamfy/RROM/actions/workflows/main.yml)
-
++ Tính năng:
+  - Sửa lỗi Không sử dụng được VNeID
+  - Tối ưu hệ thống
+  - Xóa ứng dụng thừa...
 + Donate:
   - Viettel Money: 9704229225265656
 + Chỉnh sửa rom online
