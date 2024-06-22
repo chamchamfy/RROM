@@ -802,9 +802,7 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
  for tt in $(find $TOME/cauhinh/system_ext -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
  for i in sefc sefs pfs pfc; do sudo sed -i -e 's/\r$//g' $TOME/$i; done
  sudo rm -rf $TOME/{gapp,cauhinh} $TOME/gapp.zip $TOME/gboad.zip
- fi
- 
- if [[ "$(du -m $TOME/nikgapp.zip | awk '{print $1}')" -gt 20 ]]; then echo " * Thêm Gói NikGapp..."
+ elif [[ "$(du -m $TOME/nikgapp.zip | awk '{print $1}')" -gt 20 ]]; then echo " * Thêm Gói NikGapp..."
  mkdir -p $TOME/gapp $TOME/tam
  7za x -tzip -y $TOME/nikgapp.zip -o$TOME/tam >/dev/null
  for f in $TOME/tam/AppSet/CarrierServices/*.zip $TOME/tam/AppSet/Core/*.zip; do 
