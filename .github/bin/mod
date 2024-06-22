@@ -783,7 +783,7 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
  taigapp "core" "$API" "gapp.zip" || tainikgapp "nikgapp.zip"
  taigboad "gapps" "$API" "gboad.zip"
  
- if [[ "$(du -m $TOME/gboad.zip | awk '{print $1}')" -gt 80 ]]; then 
+ if [[ "$(du -m $TOME/gboad.zip | awk '{print $1}')" -gt 30 ]]; then 
  #7za x -tzip -y $TOME/gboad.zip -o$TOME/gapp >/dev/null
  #sudo cp -af $TOME/gapp/system/* $TOME/cauhinh 2>/dev/null 
  7za e -tzip -y $TOME/gboad.zip -o$TOME/gapp >/dev/null
