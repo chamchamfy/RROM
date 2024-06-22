@@ -776,11 +776,37 @@ fi
 du -m $TOME/twrp/*.img 2>/dev/null
 #
 if [[ "$GAPP" == "1" ]]; then 
-if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "$VERS" == "14" ]; then PB=U; elif [ "$VERS" == "15" ]; then PB=V; elif [ "$VERS" == "16" ]; then PB=W; elif [ "$VERS" == "17" ]; then PB=X; elif [ "$VERS" == "18" ]; then PB=Y; elif [ "$API" == "19" ]; then PB=Z; fi
- Taive "https://sourceforge.net/projects/nikgapps/files/Releases/NikGapps-${PB}/07-Nov-2023/NikGapps-basic-arm64-${VERS}-20231107-signed.zip" "$TOME/gapp.zip"
- if [[ "$(du -m $TOME/gapp.zip | awk '{print $1}')" -gt 20 ]]; then echo " * Thêm Gói Gapp..."
+if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "$VERS" == "14" ]; then PB=U; elif [ "$VERS" == "15" ]; then PB=V; elif [ "$VERS" == "16" ]; then PB=W; elif [ "$VERS" == "17" ]; then PB=X; elif [ "$VERS" == "18" ]; then PB=Y; elif [ "$VERS" == "19" ]; then PB=Z; fi
+ tainikgapp() { LURL="https://sourceforge.net/projects/nikgapps/files/Releases/NikGapps-${PB}"; Taive "$(Xem "$LURL/$(Xem "$LURL" | grep 'net.sf.files' | awk -F'"' '{print $2}')" | grep 'net.sf.files' | awk -F'"' '{print $286}')" "$TOME/$1"; } 
+ taigapp() { LURL="https://sourceforge.net/projects/litegapps/files/litegapps/arm64/$2/$1"; Taive "$(Xem "$LURL/$(Xem "$LURL" | grep 'net.sf.files' | awk -F'"' '{print $2}')" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
+ taigboad() { LURL="https://sourceforge.net/projects/litegapps/files/addon/arm64/$2/$1/GoogleKeyboard"; Taive "$(Xem "$LURL" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
+ taigapp "core" "$API" "gapp.zip" || tainikgapp "nikgapp.zip"
+ taigboad "gapps" "$API" "gboad.zip"
+ 
+ if [[ "$(du -m $TOME/gboad.zip | awk '{print $1}')" -gt 80 ]]; then 
+ #7za x -tzip -y $TOME/gboad.zip -o$TOME/gapp >/dev/null
+ #sudo cp -af $TOME/gapp/system/* $TOME/cauhinh 2>/dev/null 
+ 7za e -tzip -y $TOME/gboad.zip -o$TOME/gapp >/dev/null
+ mkdir -p $TOME/cauhinh/product/app/LatinIMEGoogle
+ sudo cp -af $TOME/gapp/*.apk $TOME/cauhinh/product/app/LatinIMEGoogle/LatinIMEGoogle.apk 2>/dev/null 
+ fi
+ if [[ "$(du -m $TOME/gapp.zip | awk '{print $1}')" -gt 80 ]]; then echo " * Thêm Gói Gapp..."
+ mkdir -p $TOME/gapp $TOME/cauhinh
+ 7za x -tzip -y $TOME/gapp.zip -o$TOME/gapp >/dev/null
+ tar -xJf $TOME/gapp/files/files.tar.xz -C $TOME/gapp 2>/dev/null 
+ sudo cp -af $TOME/gapp/arm64/*/system/* $TOME/cauhinh 2>/dev/null 
+ sudo cp -af $TOME/cauhinh/* $phanvungtam
+ for tt in $(find $TOME/cauhinh/product -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for tt in $(find $TOME/cauhinh/product -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for tt in $(find $TOME/cauhinh/system_ext -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
+ for tt in $(find $TOME/cauhinh/system_ext -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
+ for i in sefc sefs pfs pfc; do sudo sed -i -e 's/\r$//g' $TOME/$i; done
+ sudo rm -rf $TOME/{gapp,cauhinh} $TOME/gapp.zip $TOME/gboad.zip
+ fi
+ 
+ if [[ "$(du -m $TOME/nikgapp.zip | awk '{print $1}')" -gt 20 ]]; then echo " * Thêm Gói NikGapp..."
  mkdir -p $TOME/gapp $TOME/tam
- 7za x -tzip -y $TOME/gapp.zip -o$TOME/tam >/dev/null
+ 7za x -tzip -y $TOME/nikgapp.zip -o$TOME/tam >/dev/null
  for f in $TOME/tam/AppSet/CarrierServices/*.zip $TOME/tam/AppSet/Core/*.zip; do 
  tm=${f//.zip/}; ttm=${tm##*/}; mkdir -p $TOME/gapp/$ttm; 
  7za x -tzip -y $f -o$TOME/gapp/$ttm >/dev/null
@@ -800,8 +826,8 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
  sudo cp -af $TOME/cauhinh/product/* $phanvungtam/product
  for tt in $(find $TOME/cauhinh/product -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
  for tt in $(find $TOME/cauhinh/product -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- 
- sudo rm -rf $TOME/{tam,gapp,cauhinh} $TOME/gapp.zip
+ for i in pfs pfc; do sudo sed -i -e 's/\r$//g' $TOME/$i; done
+ sudo rm -rf $TOME/{tam,gapp,cauhinh} $TOME/nikgapp.zip
  fi
 fi
 if [[ "$APPM" == "1" ]]; then 
