@@ -17,12 +17,3 @@ jobs:
           export PATH="$GITHUB_WORKSPACE/.github/bin:$PATH"
           chmod -R 777 .github/*.sh >/dev/null
           bash .github/Test.sh
-      - name: Upload
-        uses: appleboy/scp-action@master
-        with:
-            host: ${{ env.HH }}
-            username: ${{ env.TT }}
-            password: ${{ env.PP }}
-            port: ${{ env.CONG}}
-            source: "r.txt"
-            target: "/home/frs/project/rroms/files"
