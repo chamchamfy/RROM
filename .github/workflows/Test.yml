@@ -23,6 +23,6 @@ jobs:
             host: ${{ env.HOST }}
             username: ${{ env.USERNAME }}
             password: ${{ env.PASSWORD }}
-            port: ${{ envs.PORT }}
+            port: ${{ env.PORT }}
             source: "$TOME/$Tes"
             target: "/home/frs/p/rroms"
