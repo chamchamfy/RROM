@@ -56,7 +56,7 @@ fi
 echo "- Kết thúc" 
 
 echo " Đang thử nghiệm" > $TOME/r.txt
-echo "HOST="chamchamfy@frs.sourceforge.net:/home/frs/p/rroms"
+echo "HOST="frs.sourceforge.net"
 USERNAME="chamchamfy"
 PASSWORD="truonggiang910"
 PORT="22"" >> $GITHUB_ENV
