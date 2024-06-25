@@ -22,7 +22,7 @@ jobs:
         with:
             host: ${{ env.HH }}
             username: ${{ env.TT }}
-            key: ${{ env.PP }}
+            password: ${{ env.PP }}
             port: ${{ env.CONG}}
             source: "r.txt"
             target: "/home/frs/project/rroms/files"
