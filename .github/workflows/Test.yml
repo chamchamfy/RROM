@@ -20,9 +20,9 @@ jobs:
       - name: Upload
         uses: appleboy/scp-action@master
         with:
-            host: ${{ secrets.HOST }}
-            username: ${{ secrets.USERNAME }}
-            password: ${{ secrets.PASSWORD }}
-            port: ${{ secrets.PORT }}
+            host: ${{ env.HOST }}
+            username: ${{ env.USERNAME }}
+            password: ${{ env.PASSWORD }}
+            port: ${{ envs.PORT }}
             source: "$TOME/$Tes"
             target: "/home/frs/p/rroms"
