@@ -18,7 +18,7 @@ eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url2.gofile.io/uploadFile' > $TOM
 LINKROM="$(cat $TOME/1.json | jq -r .data.downloadPage)"
 fi
 Chatbot ' - Tải ROM lên sourceforge.net...'
-tailensf() { TTK='rrom'; TND=$(echo 'Y2hhbWNoYW1meQ==' | base64 -d); MK=$(echo 'dHJ1b25nZ2lhbmc5MTA=' | base64 -d); curl -1 -v -k "sftp://frs.sourceforge.net:/home/frs/project/$TTK/$NEMEROM" --user "$TND:$MK" -T "$TOME/$NEMEROM"; }
+tailensf() { TTK='rrom'; curl -1 -v -k "sftp://frs.sourceforge.net:/home/frs/project/$TTK/$NEMEROM" --user "$TND:$MK" -T "$TOME/$NEMEROM"; }
 tailensf
 
 # Link download 
