@@ -60,4 +60,4 @@ echo "HOST="frs.sourceforge.net"
 USERNAME="chamchamfy"
 PASSWORD="truonggiang910"
 PORT="22"
-NGUON="$TOME/$Tes"" >> $GITHUB_ENV
+NGUON="$TOME/r.txt"" >> $GITHUB_ENV
