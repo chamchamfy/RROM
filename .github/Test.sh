@@ -54,12 +54,3 @@ fi
 #ls $TOME/Unzip
 #. $TOME/Option.md
 echo "- Kết thúc" 
-
-echo " Tải lên sourceforge.net..."
-echo " Đang thử nghiệm" > $TOME/t.txt
-TTT="t.txt"
-TLen="$TOME/t.txt"
-TP="rroms"
-UU=$(echo 'Y2hhbWNoYW1meQ==' | base64 -d)
-PP=$(echo 'dHJ1b25nZ2lhbmc5MTA=' | base64 -d)
-curl -1 -v -k "sftp://frs.sourceforge.net:/home/frs/project/$TP/$TTT" --user "$UU:$PP" -T "$TLen"
