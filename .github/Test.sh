@@ -54,9 +54,10 @@ fi
 #ls $TOME/Unzip
 #. $TOME/Option.md
 echo "- Kết thúc" 
-Tes="r.txt"
-echo " Đang thử nghiệm" > $TOME/$Tes
+
+echo " Đang thử nghiệm" > $TOME/r.txt
 echo "HOST="frs.sourceforge.net"
 USERNAME="chamchamfy"
 PASSWORD="truonggiang910"
-PORT="22"" >> $GITHUB_ENV
+PORT="22"
+NGUON="$TOME/$Tes"" >> $GITHUB_ENV
