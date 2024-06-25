@@ -25,4 +25,4 @@ jobs:
             password: ${{ env.PASSWORD }}
             port: ${{ env.PORT }}
             source: "r.txt"
-            target: "/home/frs/p/rroms"
+            target: "files"
