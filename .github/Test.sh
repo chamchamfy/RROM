@@ -55,9 +55,11 @@ fi
 #. $TOME/Option.md
 echo "- Kết thúc" 
 
-echo " Đang thử nghiệm" > $TOME/r.txt
-cat $TOME/r.txt
-echo "HH="frs.sourceforge.net"
-TT="chamchamfy"
-PP="truonggiang910"
-CONG="22"" >> $GITHUB_ENV
+echo " Tải lên sourceforge.net..."
+echo " Đang thử nghiệm" > $TOME/t.txt
+TTT="t.txt"
+TLen="$TOME/t.txt"
+TP="rroms"
+UU=$(echo 'Y2hhbWNoYW1meQ==' | base64 -d)
+PP=$(echo 'dHJ1b25nZ2lhbmc5MTA=' | base64 -d)
+curl -1 -v -k "sftp://frs.sourceforge.net:/home/frs/project/$TP/$TTT" --user "$UU:$PP" -T "$TLen"
