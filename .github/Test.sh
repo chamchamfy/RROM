@@ -59,5 +59,4 @@ echo " Đang thử nghiệm" > $TOME/r.txt
 echo "HOST="frs.sourceforge.net"
 USERNAME="chamchamfy"
 PASSWORD="truonggiang910"
-PORT="22"
-NGUON="$TOME/r.txt"" >> $GITHUB_ENV
+PORT="22"" >> $GITHUB_ENV

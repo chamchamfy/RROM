@@ -24,5 +24,5 @@ jobs:
             username: ${{ env.USERNAME }}
             password: ${{ env.PASSWORD }}
             port: ${{ env.PORT }}
-            source: "${{ env.NGUON }}"
+            source: "r.txt"
             target: "/home/frs/p/rroms"
