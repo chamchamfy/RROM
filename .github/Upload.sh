@@ -26,7 +26,7 @@ echo
 echo "Link download: $LINKROM"
 echo "Link download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 
-closechat "Tạo rom thành công <br/><br/>Link Download: $LINKROM<br/>Link download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
+closechat "Tạo rom thành công <br/><br/>Link Download: $LINKROM<br/><br/>Link Download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 addlabel "Hoàn thành"
 
 else
