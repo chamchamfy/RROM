@@ -27,12 +27,12 @@ echo "Link download: $LINKROM"
 echo "Link download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 
 closechat "Tạo rom thành công <br/><br/>Link Download: $LINKROM<br/><br/>Link Download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
-addlabel "Hoàn thành"
+#addlabel "Hoàn thành"
 
 else
 closechat "Tạo rom thất bại, Xem log: 📱[Actions runs](https://github.com/chamchamfy/RROM/actions/runs/$GITHUB_RUN_ID)"
-addlabel "Thất bại"
+#addlabel "Thất bại"
 fi
 
-removelabel "Build"
-removelabel "Wait"
+#removelabel "Build"
+#removelabel "Wait"
