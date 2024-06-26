@@ -18,15 +18,15 @@ eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url2.gofile.io/uploadFile' > $TOM
 LINKROM="$(cat $TOME/1.json | jq -r .data.downloadPage)"
 fi
 Chatbot ' - Tải ROM lên sourceforge.net...'
-tailenr() { TTK=$4; curl -1 -v -k "sftp://$1$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
-tailenr "frs.sourceforge.net:/home/frs/project" "$TND" "$MK" "/rroms"
+tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
+tailenr "frs.sourceforge.net:/home/frs/project" "$TND" "$MK" "rroms"
 
 # Link download 
 echo
 echo "Link download: $LINKROM"
 echo "Link download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 
-closechat "Tạo rom thành công <br/><br/>Link Download: $LINKROM<br/><br/>Link Download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
+closechat "Tạo rom thành công <br/><br/>Link Download: "$LINKROM" <br/><br/>Link Download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 #addlabel "Hoàn thành"
 
 else
