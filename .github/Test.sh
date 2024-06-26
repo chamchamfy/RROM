@@ -49,8 +49,8 @@ else echo "- Không có tập tin rom"
 fi 
 }
 
-#Taidulieu
-#ls $TOME/$Tenrom
-#ls $TOME/Unzip
+Taidulieu
+ls $TOME/$Tenrom
+ls $TOME/Unzip
 #. $TOME/Option.md
 echo "- Kết thúc" 
