@@ -467,14 +467,14 @@
     <bool name="support_displayfeature_gamemode">true</bool>
     <!-- whether support fps change -->
     <bool name="support_smart_fps">true</bool>
-    <integer name="smart_fps_value">120</integer> 
+    <integer name="smart_fps_value">60</integer> 
     <integer-array name="fpsList">
         <item>144</item>
         <item>120</item>
         <item>90</item>
         <item>60</item>
     </integer-array>
-    <integer name="defaultFps">120</integer>
+    <integer name="defaultFps">60</integer>
     <!-- whether support wlan low latency mode -->
     <bool name="support_wifi_low_latency_mode">true</bool>
     <!-- whether support network rps mode -->
