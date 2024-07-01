@@ -746,6 +746,16 @@ fi
 #
 [[ "$tenmamay" == "vili" ]] && sudo cp -af $TOME/.github/libpy/input/* $phanvungtam || tinhnang
 #
+thempersist() {
+if [[ "$tenmamay" == "vili" ]]; then 
+ if [[ ! -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ]]; then 
+  if [[ -n "$(echo "$URL" | grep 'MIXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}gl.zip"; elif [[ -n "$(echo "$URL" | grep 'TWXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}tw.zip"; fi
+  Taive "$linkps" "$TOME/persist.zip"
+  [ -s $TOME/persist.zip ] && 7za x -tzip -y $TOME/persist.zip *.img -o$TOME/.github/libpy/Flash2in1/images/persist.img >/dev/null && rm -rf $TOME/persist.zip 2>/dev/null
+ fi
+fi
+}
+thempersist
 #
 #linktwrp="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/${tenmamay}/twrp-3.7.0_12-v7.9_A13-${tenmamay}-skkk.img"
  mkdir -p $TOME/twrp
@@ -765,14 +775,6 @@ else
   taivetwrp "twrp-" "$TOME/twrp/twrp.img"
  fi
 fi
-mayvili() {
-if [[ "$tenmamay" == "vili" ]]; then 
- if [[ ! -f "$TOME/twrp/twrp.img" ]]; then 
-  if [[ -n "$(echo "$URL" | grep 'MIXM')" ]]; then linktwrp="https://sourceforge.net/projects/chamchamfy/files/Tools/boot_global_$tenmamay.img"; elif [[ -n "$(echo "$URL" | grep 'TWXM')" ]]; then linktwrp="https://sourceforge.net/projects/chamchamfy/files/Tools/boot_tw_$tenmamay.img"; fi
-  Taive "$linktwrp" "$TOME/twrp/boot.img"
- fi
-fi
-}
 [[ -n "$(ls $TOME/twrp/*.img 2>/dev/null)" ]] && echo " * Thêm Recovery $tenmamay..."
 du -m $TOME/twrp/*.img 2>/dev/null
 #
