@@ -28,7 +28,7 @@ jobs:
       - name: Upload
         run: |
           # kakathic         
-          bash .github/Upload.sh >/dev/null
+          bash .github/Upload.sh 2>&1 | tee -a log.txt
       - name: Lưu Log
         uses: actions/upload-artifact@v4
         with:
