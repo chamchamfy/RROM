@@ -83,7 +83,7 @@ pip3 install -r requirements.txt >/dev/null;
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 Taiver "$URL" "$TOME/rom.zip" 
-[ -s "$TOME/rom.zip" ] || Taive "$URL" "$TOME/rom.zip"
+[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
 [ ! -s "$TOME/rom.zip" ] && exit 0
 mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
 [ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
