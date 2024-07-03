@@ -714,7 +714,7 @@ mkdir -p $TOME/tam
 sudo cp -af $TOME/tam/system/vendor/* $phanvungtam/vendor 
 for tt in $(find $TOME/tam/system/vendor -type f); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; done
 for tt in $(find $TOME/tam/system/vendor -type d); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; done
-for i in vfs vfc; do sudo sed -i -e 's/\r$//g' $TOME/$i; done
+for i in vfs vfc; do sudo sed -i -e 's/\r$//g' $TOME/$i 2>/dev/null; done
 sudo rm -rf $TOME/tam
 fi 
 #
