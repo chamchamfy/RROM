@@ -297,6 +297,7 @@ vendorfc="/vendor/etc/permissions/public\.libraries\.txt u:object_r:same_process
 /vendor/lib64/vendor\.qti\.hardware\.display\.mapperextensionsshim\.so u:object_r:same_process_hal_file:s0
 /vendor/lib64/vendor\.qti\.hardware\.graphics\.composer@1\.0\.so u:object_r:same_process_hal_file:s0
 /vendor/lib64/vendor\.qti\.hardware\.graphics\.composer@1\.1\.so u:object_r:same_process_hal_file:s0
+/vendor/etc/audio u:object_r:system_file:s0
 /vendor/etc/audio/sku_cape u:object_r:system_file:s0
 /vendor/etc/audio/sku_cape/mixer_paths_overlay_static\.xml u:object_r:system_file:s0
 /vendor/etc/dolby/daxa-default\.xml u:object_r:system_file:s0
@@ -537,6 +538,7 @@ vendor/lib/rfsa/adsp/misound_res_headphone.bin 0 0 0644
 vendor/lib/rfsa/adsp/misound_res_spk.bin 0 0 0644
 vendor/etc/mixer_paths.xml 0 0 0644
 vendor/etc/mixer_paths_cdp.xml 0 0 0644
+vendor/etc/audio 0 0 0755
 vendor/etc/audio/sku_cape 0 0 0755
 vendor/etc/audio/sku_cape/mixer_paths_overlay_static.xml 0 0 0644
 vendor/etc/dolby/daxa-default.xml 0 0 0644
