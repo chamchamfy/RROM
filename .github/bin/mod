@@ -536,6 +536,7 @@ vendor/lib/rfsa/adsp/misound_karaokemix_res.bin 0 0 0644
 vendor/lib/rfsa/adsp/misound_karaoke_res.bin 0 0 0644
 vendor/lib/rfsa/adsp/misound_res_headphone.bin 0 0 0644
 vendor/lib/rfsa/adsp/misound_res_spk.bin 0 0 0644
+vendor/lib/soundfx/libmisoundfx.so 0 0 0644
 vendor/etc/mixer_paths.xml 0 0 0644
 vendor/etc/mixer_paths_cdp.xml 0 0 0644
 vendor/etc/audio 0 0 0755
@@ -711,6 +712,8 @@ if [[ "$HK" == "1" ]]; then echo " * Thêm Harman Kardon..."
 mkdir -p $TOME/tam
 7za x -tzip -y $TOME/.github/HarmanKardon.zip -o$TOME/tam >/dev/null
 sudo cp -af $TOME/tam/system/vendor/* $phanvungtam/vendor 
+for tt in $(find $TOME/tam/system/vendor -type f); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; done
+for tt in $(find $TOME/tam/system/vendor -type d); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; done
 sudo rm -rf $TOME/tam
 fi 
 #
