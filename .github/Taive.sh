@@ -70,7 +70,7 @@ GITENV Tacgia "chamchamfy"
 GITENV SEVERUP "$(checktc Transfer)"
 
 # check url
-if [ "$URL" ];then
+if [ "$URL" ]; then
 
 (
 sudo apt-get update >/dev/null
@@ -82,15 +82,16 @@ pip3 install -r requirements.txt >/dev/null;
 
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-Taiver "$URL" "$TOME/rom.zip" || Taive "$URL" "$TOME/rom.zip"
-[ ! -f "$TOME/rom.zip" ] && exit 0
+Taiver "$URL" "$TOME/rom.zip" 
+[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
+[ ! -s "$TOME/rom.zip" ] && exit 0
 mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
-[ -e "$TOME/$NEMEROM" ] || echo "$TOME/lag"
+[ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
 
 ) & (
 # Tải rom và tải file khác
 while true; do
-if [ "$(gh issue view $NUMBIE | grep -cm1 CLOSED)" == 1 ];then
+if [ "$(gh issue view $NUMBIE | grep -cm1 CLOSED)" == 1 ]; then
 Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0

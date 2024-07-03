@@ -19,6 +19,7 @@ LINKROM="$(cat $TOME/1.json | jq -r .data.downloadPage)"
 fi
 Chatbot '- Tải ROM lên máy chủ khác...'
 tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
+. $TOME/mk.sh
 tailenr "frs.sourceforge.net:/home/frs/project" "$TND" "$MK" "rroms"
 
 # Link download 

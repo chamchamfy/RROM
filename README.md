@@ -2,7 +2,8 @@
 # RROM
 [![REBUILD Rom MIUI](https://github.com/chamchamfy/RROM/actions/workflows/main.yml/badge.svg)](https://github.com/chamchamfy/RROM/actions/workflows/main.yml)
 + Tính năng:
-  - Sửa lỗi Không sử dụng được VNeID
+  - Mặc định Safetynet Pass
+  - Hỗ trợ rom gốc và xiaomi.eu
   - Tối ưu hệ thống
   - Xóa ứng dụng thừa...
 + Donate:

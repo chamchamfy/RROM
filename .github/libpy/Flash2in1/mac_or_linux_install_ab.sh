@@ -16,7 +16,11 @@ else
 fi
 
 fastboot="bin/$systemType/all/fastboot"
+thietbi='vili'
 [ -f "bin/$systemType/all/zstd" ] && zst="bin/$systemType/all/zstd" || zst=zstd
+device=$($fastboot getvar product 2>&1 | grep -F "product:" | tr -s " " | cut -d " " -f 2)
+[ -z "$device" ] && device="unknown"
+[ "$device" != "$thietbi" ] && echo "Dành cho thiết bị (Compatible devices): vili" && echo "Thiết bị của bạn (Your device): $device" && exit 1
 
 if [ -f "images/super.img.zst" ]; then
     echo 'Đang chuẩn bị... (Preparing...)'
