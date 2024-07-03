@@ -714,7 +714,7 @@ mkdir -p $TOME/tam
 sudo cp -af $TOME/tam/system/vendor/* $phanvungtam/vendor 
 for tt in $(find $TOME/tam/system/vendor -type f); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; done
 for tt in $(find $TOME/tam/system/vendor -type d); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; done
-for i in vfs vfc; do sudo sed -i -e 's/\r$//g' $TOME/$i 2>/dev/null; done
+for i in vfs vfc; do sudo [ -f $TOME/$i ] && sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
 sudo rm -rf $TOME/tam
 fi 
 #
@@ -792,7 +792,7 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
  for tt in $(find $TOME/cauhinh/product -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
  for tt in $(find $TOME/cauhinh/system_ext -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
  for tt in $(find $TOME/cauhinh/system_ext -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
- for i in sefc sefs pfs pfc; do sudo sed -i -e 's/\r$//g' $TOME/$i; done
+ for i in sefc sefs pfs pfc; do sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
  sudo rm -rf $TOME/{gapp,cauhinh} $TOME/gapp.zip $TOME/gboad.zip
  elif [[ "$(du -m $TOME/nikgapp.zip | awk '{print $1}')" -gt 20 ]]; then echo " * Thêm Gói NikGapp..."
  mkdir -p $TOME/gapp $TOME/tam
@@ -816,7 +816,7 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
  sudo cp -af $TOME/cauhinh/product/* $phanvungtam/product
  for tt in $(find $TOME/cauhinh/product -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
  for tt in $(find $TOME/cauhinh/product -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for i in pfs pfc; do sudo sed -i -e 's/\r$//g' $TOME/$i; done
+ for i in pfs pfc; do sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
  sudo rm -rf $TOME/{tam,gapp,cauhinh} $TOME/nikgapp.zip
  fi
 fi
@@ -848,7 +848,7 @@ if [[ "$APPM" == "1" ]]; then
  
  for tt in $(find $TOME/tam/product/*app -type d); do sudo bash -c "echo '${tt//$TOME\/tam\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/tam/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
  for tt in $(find $TOME/tam/product/*app -type f); do sudo bash -c "echo '${tt//$TOME\/tam\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/tam/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for i in pfs pfc; do sudo sed -i -e 's/\r$//g' $TOME/$i; done
+ for i in pfs pfc; do sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
 
   sudo cp -af $TOME/tam/product/*app $phanvungtam/product 2>/dev/null
   sudo cp -af $TOME/tam/vendor/*app $phanvungtam/vendor 2>/dev/null
