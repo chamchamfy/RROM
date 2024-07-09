@@ -505,6 +505,18 @@
     return-void
 .end method
 
+.method public static putIntinSettingsGlobal(Ljava/lang/String;I)V
+    .registers 3
+
+    invoke-static {}, Landroidx/preference/SettingsCCHelper;->getCR()Landroidx/content/ContentResolver;
+
+    move-result-object v0
+
+    invoke-static {v0, p0, p1}, Landroidx/provider/Settings$Global;->putInt(Landroidx/content/ContentResolver;Ljava/lang/String;I)Z
+
+    return-void
+.end method
+
 .method public static putLonginSettings(Ljava/lang/String;J)V
     .registers 4
 
