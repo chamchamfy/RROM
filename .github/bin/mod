@@ -45,7 +45,7 @@ sudo sed -i 's/"ro.build.host"/"CC "/g' $TOME/Mod/$tjar/classes*/com/android/set
   suasmalis; thayphuongthuc 'MiPlayController.smali' 'supportMiPlayAudio()' '0' '0' '0' '.end method' 'const/4 p0, 0x1\n return p0\n'
  fi
  if [[ "$tjar" == "MIUIPackageInstaller" ]]; then 
-  for taptin in $(find $TOME/Mod/$tjar -type f -name '*.smali');; do
+  for taptin in $(find $TOME/Mod/$tjar -type f -name '*.smali'); do
    noichua=${taptin##*/}
    suasmalis; chensaudongn "$noichua" '.method public static a(Landroid/content/pm/ApplicationInfo;)Z' '2' '.register' '0' '0' 'const/4 v0, 0x0\n return v0'
   done
