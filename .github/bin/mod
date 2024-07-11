@@ -1,7 +1,7 @@
 #!/bin/bash
 TOME="$GITHUB_WORKSPACE"
 phanvungtam=$TOME/Unpack
-[[ -f $phanvungtam/odm/etc/build.prop ]] && tenmamay=$(sudo grep 'ro.product.odm.device' $phanvungtam/odm/etc/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}') || tenmamay=$(sudo grep 'ro.product.vendor.device' $phanvungtam/vendor/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}')
+[[ -f "$phanvungtam/odm/etc/build.prop" ]] && tenmamay=$(sudo grep 'ro.product.odm.device' $phanvungtam/odm/etc/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}') || tenmamay=$(sudo grep 'ro.product.vendor.device' $phanvungtam/vendor/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}')
 API=$(sudo grep 'ro.build.version.sdk=' $phanvungtam/system/system/build.prop | awk -F= '{print $2}');
 VERS=$(sudo grep 'ro.build.version.release=' $phanvungtam/system/system/build.prop | awk -F= '{print $2}');
 # Thư mục chứa apk,jar đã mod: $TOME/Mod
@@ -23,7 +23,7 @@ VERS=$(sudo grep 'ro.build.version.release=' $phanvungtam/system/system/build.pr
 Caidat() {
 for tjar in Joyose1 Settings1 MIUISystemUIPlugin1 MIUIPackageInstaller1 MiuiSystemUI1; do
 Timfile "$tjar.apk"
-if [[ -f $TOME/Mod/$tjar.apk ]]; then 
+if [[ -f "$TOME/Mod/$tjar.apk" ]]; then 
 echo " Xử lý: $tjar.apk"
 Unpackfile
  if [[ "$tjar" == "Settings" ]]; then 
@@ -61,7 +61,7 @@ Caidat
 #
 tinhnang() {
 for p in $phanvungtam/product $phanvungtam/system/system $phanvungtam/vendor; do 
- if [ -d $p/etc/device_features ]; then
+ if [ -d "$p/etc/device_features" ]; then
   for f in $p/etc/device_features/*.xml; do
    if [ -z "$(sudo grep -m1 'miui_volume_expand_freeland' $f)" ]; then 
 sudo sed -i '/<\/features>/d' $f
@@ -663,7 +663,7 @@ mkdir -p $TOME/tam
 sudo cp -af $TOME/tam/system/vendor/* $phanvungtam/vendor 
 for tt in $(find $TOME/tam/system/vendor -type f); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; done
 for tt in $(find $TOME/tam/system/vendor -type d); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; done
-for i in vfs vfc; do [ -f $TOME/$i ] && sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
+for i in vfs vfc; do [ -f "$TOME/$i" ] && sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
 sudo rm -rf $TOME/tam
 fi 
 #
@@ -689,7 +689,7 @@ if [[ "$tenmamay" == "vili" ]]; then
  if [[ ! -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ]]; then 
   if [[ -n "$(echo "$URL" | grep 'MIXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}gl.zip"; elif [[ -n "$(echo "$URL" | grep 'TWXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}tw.zip"; fi
   Taive "$linkps" "$TOME/persist.zip"
-  [ -s $TOME/persist.zip ] && 7za x -tzip -y $TOME/persist.zip *.img -o$TOME/.github/libpy/Flash2in1/images/persist.img >/dev/null && rm -rf $TOME/persist.zip 2>/dev/null
+  [ -s "$TOME/persist.zip" ] && 7za x -tzip -y $TOME/persist.zip *.img -o$TOME/.github/libpy/Flash2in1/images/persist.img >/dev/null && rm -rf $TOME/persist.zip 2>/dev/null
  fi
 fi
 }
@@ -781,14 +781,14 @@ if [[ "$APPM" == "1" ]]; then
  done
   mv -f $TOME/tam/product/app/FileExplorer $TOME/tam/product/app/MIUIFileExplorer 2>/dev/null
   mv -f $TOME/tam/product/app/MIUIFileExplorer/FileExplorer.apk $TOME/tam/product/app/MIUIFileExplorer/MIUIFileExplorer.apk 2>/dev/null
-  if [[ -d $phanvungtam/product/data-app/MIUIGallery ]]; then 
+  if [[ -d "$phanvungtam/product/data-app/MIUIGallery" ]]; then 
   mkdir -p $TOME/tam/product/data-app
   mv -f $TOME/tam/product/priv-app/MiuiGallery $TOME/tam/product/data-app/MIUIGallery 2>/dev/null
   mv -f $TOME/tam/product/data-app/MIUIGallery/MiuiGallery.apk $TOME/tam/product/data-app/MIUIGallery/MIUIGallery.apk 2>/dev/null
-  elif [[ -d $phanvungtam/product/priv-app/Gallery_T_CN ]]; then 
+  elif [[ -d "$phanvungtam/product/priv-app/Gallery_T_CN" ]]; then 
   mv -f $TOME/tam/product/priv-app/MiuiGallery $TOME/tam/product/priv-app/Gallery_T_CN 2>/dev/null
   mv -f $TOME/tam/product/priv-app/Gallery_T_CN/MiuiGallery.apk $TOME/tam/product/priv-app/Gallery_T_CN/Gallery_T_CN.apk 2>/dev/null
-  elif [[ -d $phanvungtam/product/priv-app/MiuiGallery ]]; then 
+  elif [[ -d "$phanvungtam/product/priv-app/MiuiGallery" ]]; then 
   echo ""
   else rm -rf $TOME/tam/product/priv-app/MiuiGallery
   fi
