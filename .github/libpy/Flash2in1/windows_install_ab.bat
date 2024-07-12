@@ -11,8 +11,9 @@ if not exist %fastboot% echo %fastboot% not found. & pause & exit /B 1
 echo. Dang ket noi thiet bi...
 echo. Waiting for device...
 set device=unknown
+set thietbi=kb
 for /f "tokens=2" %%D in ('%fastboot% getvar product 2^>^&1 ^| findstr /l /b /c:"product:"') do set device=%%D
-if "%device%" neq "vili" echo Danh cho thiet bi. Compatible devices: vili & echo Thiet bi cua ban. Your device: %device% & pause & exit /B 1
+if "%device%" neq "%thietbi%" echo Danh cho thiet bi. Compatible devices: %thietbi% & echo Thiet bi cua ban. Your device: %device% & pause & exit /B 1
 echo.
 if exist images\super.img.zst (
 echo. Bat dau chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
