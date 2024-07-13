@@ -117,6 +117,7 @@ echo '
         <item>12</item>
         <item>96</item>
     </integer-array> 
+<integer-array name="screen_resolution_supported"> <item>1220</item> <item>1080</item> </integer-array> 
 <bool name="support_SR_for_image_display">true</bool>
 <bool name="support_AI_display">true</bool>
 <bool name="support_nature_mode">true</bool>

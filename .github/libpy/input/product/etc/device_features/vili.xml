@@ -572,8 +572,11 @@
     <bool name="support_sound_assist">true</bool>
     <!-- Whether support sunlight mode -->
     <bool name="config_sunlight_mode_available">true</bool>
-
     <bool name="support_high_resolution">true</bool>
+    <integer-array name="screen_resolution_supported">
+        <item>1220</item>
+        <item>1080</item> 
+    </integer-array> 
 
     <bool name="support_edgesuppression_with_sensor">true</bool>
 
