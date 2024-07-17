@@ -1,5 +1,5 @@
 @echo off
-mode con cols=100 lines=30
+mode con cols=140 lines=50
 set fastboot=bin\windows\all\fastboot.exe
 if %PROCESSOR_ARCHITECTURE%==x86 (set cpuArch=x86) else set cpuArch=amd64
 
@@ -8,37 +8,39 @@ echo. |DATE
 echo.
 echo.
 if not exist %fastboot% echo %fastboot% not found. & pause & exit /B 1
-echo. Dang ket noi thiet bi...
-echo. Waiting for device...
+echo. * Dang ket noi thiet bi...
+echo. * Waiting for device...
 set device=unknown
 set thietbi=kb
 for /f "tokens=2" %%D in ('%fastboot% getvar product 2^>^&1 ^| findstr /l /b /c:"product:"') do set device=%%D
-if "%device%" neq "%thietbi%" echo Danh cho thiet bi. Compatible devices: %thietbi% & echo Thiet bi cua ban. Your device: %device% & pause & exit /B 1
+if "%device%" neq "%thietbi%" echo. - Danh cho thiet bi (Compatible devices): %thietbi% & echo. - Thiet bi cua ban (Your device): %device% & pause & exit /B 1
+
+echo. * Thiet bi cua ban (Your device): %device%
 echo.
 if exist images\super.img.zst (
-echo. Bat dau chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
-echo. Start converting super partition. It may take a long time, depending on your computer configuration.
-echo. Luu y: Dung luong trong cua phan vung hien tai cua ban phai lon hon 10GB, neu khong qua trinh chuyen doi super se khong thanh cong. 
-echo. Note: Please ensure that the free size of the current partition is greater than 10GB, otherwise the super conversion will fail.
-echo. Bam phim bat ky de tiep tuc chuyen doi... 
-echo. Press any key to continue...
+echo. - Bat dau chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
+echo.   Start converting super partition. It may take a long time, depending on your computer configuration.
+echo. ! Luu y: Dung luong trong o dia hien tai cua ban phai lon hon 10GB, neu khong qua trinh chuyen doi super se khong thanh cong. 
+echo.   Note: Please ensure that the free size of the current partition is greater than 10GB, otherwise the super conversion will fail.
+echo. - Bam phim bat ky de tiep tuc chuyen doi... 
+echo.   Press any key to continue...
 pause >nul 2>nul
 bin\windows\%cpuArch%\zstd.exe --rm -d images\super.img.zst -o images\super.img
 if %errorlevel% == 1 (
-    echo. Chuyen doi khong thanh cong, nhan phim bat ky de thoat.
-	echo. Conversion process error, press any key to exit...
+    echo. - Chuyen doi khong thanh cong, nhan phim bat ky de thoat.
+	echo.   Conversion process error, press any key to exit...
     pause >nul 2>nul
     exit
 )
-echo. Chuyen doi thanh cong.
-echo. Converted super partition successfully.
+echo. - Chuyen doi thanh cong.
+echo.   Converted super partition successfully.
 echo.
 )
 
 
 :Q1
 echo. 1. Lan cai dat dau tien yeu cau xoa du lieu va bo nho trong cua ban. 
-echo. 1. Flashing the first time will erase data and internal memory. 
+echo.    Flashing the first time will erase data and internal memory. 
 set /p CHOICE1=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
 if /i "%CHOICE1%" == "y" (
     goto Q2
@@ -50,8 +52,9 @@ if /i "%CHOICE1%" == "y" (
 
 :Q2
 echo. 
-echo. 2. Cai dat boot_magisk.img (ROOT)?
-echo. 2. Do you want to flash boot_magisk.img (ROOT)?
+if exist images\boot_magisk.img (
+echo. * Cai dat boot_magisk.img (ROOT)?
+echo.   Do you want to flash boot_magisk.img (ROOT)?
 set /p CHOICE2=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
 if /i "%CHOICE2%" == "y" (
     goto MAIN
@@ -60,7 +63,10 @@ if /i "%CHOICE2%" == "y" (
 ) else (
     goto Q2
 )
-goto MAIN
+) else (
+    set CHOICE2=n
+    goto MAIN
+)
 
 :MAIN
 if exist images\cmnlib64.mbn (
@@ -167,8 +173,8 @@ if /i "%CHOICE2%" == "y" (
     %fastboot% flash boot images\boot.img
 )
 if exist images\super.img (
-echo. Bat dau flash super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban. 
-echo. Start flashing super. This file is large and may take a long time depending on your computer configuration.
+echo. - Bat dau flash phan vung super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban. 
+echo.   Start flash super partition. This file is large and may take a long time depending on your computer configuration.
 %fastboot% flash super images\super.img
 )
 if exist images\cust.img (
