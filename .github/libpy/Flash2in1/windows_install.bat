@@ -69,6 +69,8 @@ if /i "%CHOICE2%" == "y" (
 )
 
 :MAIN
+echo. 2. Cap nhat firmware...
+echo.    Update firmware...
 if exist images\cmnlib64.mbn (
 %fastboot% flash cmnlib64 images\cmnlib64.mbn
 )
