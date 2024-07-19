@@ -18,28 +18,28 @@ if "%device%" neq "%thietbi%" echo. - Danh cho thiet bi (Compatible devices): %t
 echo. * Thiet bi cua ban (Your device): %device%
 echo.
 if exist images\super.img.zst (
-echo. - Bat dau chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
-echo.   Start converting super partition. It may take a long time, depending on your computer configuration.
+echo. - Dang chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
+echo.   Converting super partition. It may take a long time, depending on your computer configuration.
 echo. ! Luu y: Dung luong trong o dia hien tai cua ban phai lon hon 10GB, neu khong qua trinh chuyen doi super se khong thanh cong. 
-echo.   Note: Please ensure that the free size of the current partition is greater than 10GB, otherwise the super conversion will fail.
+echo.   Note: Make sure the free space in your current drive is greater than 10GB, otherwise the super partition conversion process will fail.
 echo. - Bam phim bat ky de tiep tuc chuyen doi... 
 echo.   Press any key to continue...
 pause >nul 2>nul
 bin\windows\%cpuArch%\zstd.exe --rm -d images\super.img.zst -o images\super.img
 if %errorlevel% == 1 (
     echo. - Chuyen doi khong thanh cong, nhan phim bat ky de thoat.
-	echo.   Conversion process error, press any key to exit...
+	echo.   Partition conversion failed, press any key to exit...
     pause >nul 2>nul
     exit
 )
 echo. - Chuyen doi thanh cong.
-echo.   Converted super partition successfully.
+echo.   Partition conversion successful.
 echo.
 )
 
 
 :Q1
-echo. 1. Lan cai dat dau tien yeu cau xoa du lieu va bo nho trong cua ban. 
+echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban. 
 echo.    Flashing the first time will erase data and internal memory. 
 set /p CHOICE1=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
 if /i "%CHOICE1%" == "y" (
@@ -70,7 +70,7 @@ if /i "%CHOICE2%" == "y" (
 
 :MAIN
 echo. 2. Cap nhat firmware...
-echo.    Update firmware...
+echo.    Flashing firmware...
 if exist images\cmnlib64.mbn (
 %fastboot% flash cmnlib64 images\cmnlib64.mbn
 )
@@ -175,8 +175,8 @@ if /i "%CHOICE2%" == "y" (
     %fastboot% flash boot images\boot.img
 )
 if exist images\super.img (
-echo. - Bat dau flash phan vung super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban. 
-echo.   Start flash super partition. This file is large and may take a long time depending on your computer configuration.
+echo. 3. Cap nhat phan vung super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
+echo.    Flashing super partition. This file is large and may take a long time depending on your computer configuration.
 %fastboot% flash super images\super.img
 )
 if exist images\cust.img (
