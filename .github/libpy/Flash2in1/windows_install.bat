@@ -39,8 +39,8 @@ echo.
 
 
 :Q1
-echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban. 
-echo.    Flashing the first time will erase data and internal memory. 
+echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban.
+echo.    Flashing the first time will erase data and internal memory.
 set /p CHOICE1=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
 if /i "%CHOICE1%" == "y" (
     goto Q2
