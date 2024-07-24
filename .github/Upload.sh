@@ -13,7 +13,8 @@ Chatbot '- ROM đang tải lên sever vui lòng chờ...'
 if [ "$SEVERUP" = 1 ];then
 LINKROM=$(curl --upload-file "$TOME/$NEMEROM" https://transfer.sh)
 else
-url2=$(curl -s 'https://api.gofile.io/getServer' | jq -r '.data.server')
+#url2=$(curl -s https://api.gofile.io/getServer | jq -r .data.server)
+url2=$(curl -s 'https://api.gofile.io/servers' | jq -r .data.servers | grep -m1 'name' | tr -d '[:punct:]' | awk '{print $2}')
 eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url2.gofile.io/uploadFile' > $TOME/1.json"
 LINKROM=$(cat "$TOME/1.json" | jq -r '.data.downloadPage')
 fi
