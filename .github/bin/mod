@@ -690,11 +690,12 @@ if [[ "$tenmamay" == "vili" ]]; then
  if [[ ! -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ]]; then 
   if [[ -n "$(echo "$URL" | grep 'MIXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}gl.zip"; elif [[ -n "$(echo "$URL" | grep 'TWXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}tw.zip"; fi
   Taive "$linkps" "$TOME/persist.zip"
-  [ -e "$TOME/persist.zip" ] && 7za e -tzip -y $TOME/persist.zip *.img -o$TOME/.github/libpy/Flash2in1/images/ >/dev/null && rm -rf $TOME/persist.zip 2>/dev/null
+  [[ -s "$TOME/persist.zip" ]] && 7za e -tzip -y $TOME/persist.zip *.img -o$TOME/.github/libpy/Flash2in1/images/ >/dev/null 2>&1 && rm -rf $TOME/persist.zip 2>/dev/null
  fi
 fi
 }
 thempersist
+[ -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ] && echo " * Thêm persist..."
 #
 #linktwrp="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/${tenmamay}/twrp-3.7.0_12-v7.9_A13-${tenmamay}-skkk.img"
  mkdir -p $TOME/twrp
