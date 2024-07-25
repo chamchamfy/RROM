@@ -1,4 +1,4 @@
-# kakathic
+# kakathic chamchamfy
 . .github/Function.sh
 cd $TOME/.github/libpy/Flash2in1
 
@@ -14,9 +14,9 @@ if [ "$SEVERUP" = 1 ];then
 LINKROM=$(curl --upload-file "$TOME/$NEMEROM" https://transfer.adttemp.com.br) || LINKROM=$(curl --upload-file "$TOME/$NEMEROM" https://transfer.sh)
 else
 #url2=$(curl -s https://api.gofile.io/getServer | jq -r .data.server)
-url2=$(curl -s 'https://api.gofile.io/servers' | jq -r .data.servers | grep -m1 'name' | tr -d '[:punct:]' | awk '{print $2}')
+url2=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m1 'name' | tr -d '[:punct:]' | awk '{print $2}')
 eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url2.gofile.io/uploadFile' > $TOME/1.json"
-LINKROM=$(cat "$TOME/1.json" | jq -r '.data.downloadPage')
+LINKROM=$(cat "$TOME/1.json" | jq -r .data.downloadPage)
 fi
 Chatbot '- Tải ROM lên máy chủ khác...'
 tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }

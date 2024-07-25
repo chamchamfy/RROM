@@ -5,6 +5,7 @@ if %PROCESSOR_ARCHITECTURE%==x86 (set cpuArch=x86) else set cpuArch=amd64
 
 echo. ==== FLASH ROM BY @chamchamfy ====
 echo. |DATE
+echo. |TIME
 echo.
 echo.
 if not exist %fastboot% echo %fastboot% not found. & pause & exit /B 1
@@ -38,12 +39,12 @@ echo.
 
 
 :Q1
-echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban.
+echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban. 
 echo.    Flashing the first time will erase data and internal memory. 
 set /p CHOICE1=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
-if /i "%CHOICE1%" == "y" (
+if "%CHOICE1%" == "y" (
     goto Q2
-) else if /i "%CHOICE1%" == "n" (
+) else if "%CHOICE1%" == "n" (
     goto Q2
 ) else (
     goto Q1
@@ -55,9 +56,9 @@ if exist images\boot_magisk.img (
 echo. * Cai dat boot_magisk.img (ROOT)?
 echo.   Do you want to flash boot_magisk.img (ROOT)?
 set /p CHOICE2=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
-if /i "%CHOICE2%" == "y" (
+if "%CHOICE2%" == "y" (
     goto MAIN
-) else if /i "%CHOICE2%" == "n" (
+) else if "%CHOICE2%" == "n" (
     goto MAIN
 ) else (
     goto Q2
@@ -166,11 +167,10 @@ if exist images\xbl_config.img (
 if exist images\xbl.img (
 %fastboot% flash xbl_ab images\xbl.img
 )
-@REM flash firmware done
 
-if /i "%CHOICE2%" == "y" (
+if "%CHOICE2%" == "y" (
     %fastboot% flash boot_ab images\boot_magisk.img
-) else if /i "%CHOICE2%" == "n" (
+) else if "%CHOICE2%" == "n" (
     %fastboot% flash boot_ab images\boot.img
 )
 if exist images\super.img (
@@ -196,14 +196,11 @@ if exist images\splash.img (
 if exist images\recovery.img (
 %fastboot% flash recovery_ab images\recovery.img
 )
-if /i "%CHOICE1%" == "y" (
+if "%CHOICE1%" == "y" (
     %fastboot% erase userdata
     %fastboot% erase metadata
 )
 %fastboot% set_active a
 %fastboot% reboot
 echo.
-echo.
-:Finish
-goto Finish
-:END
+pause
