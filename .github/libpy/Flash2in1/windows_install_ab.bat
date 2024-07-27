@@ -26,17 +26,17 @@ echo. - Bam phim bat ky de tiep tuc chuyen doi...
 echo.   Press any key to continue...
 pause >nul 2>nul
 bin\windows\%cpuArch%\zstd.exe --rm -d images\super.img.zst -o images\super.img
-if %errorlevel% == 1 (
+if "%errorlevel%" equ "0" (
+    echo. - Chuyen doi thanh cong.
+    echo.   Converted partition successfully.
+    echo.
+) else (
     echo. - Chuyen doi khong thanh cong, nhan phim bat ky de thoat...
-	echo.   Partition conversion failed, press any key to exit...
+    echo.   Partition conversion failed, press any key to exit...
     pause >nul 2>nul
     exit
 )
-echo. - Chuyen doi thanh cong.
-echo.   Converted partition successfully.
-echo.
 )
-
 
 :Q1
 echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban. 
