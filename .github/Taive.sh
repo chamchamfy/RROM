@@ -37,11 +37,6 @@ URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | grep -o 'Url:.*<' | sed 's|Url:
 [[ -n "$(grep 'TWRP' $TOME/1.ht)" ]] && RECOVERYMOD="TWRP"
 GITENV MREC $RECOVERYMOD
 
-# Gắn lên git env
-GITENV URL $URLKK
-GITENV NEMEROM "RROM_${URL##*/}"
-GITENV DINHDANG "${URL##*.}"
-
 # Thêm Các tùy chọn: 1=Bật, 0=Tắt
 GITENV TTV "$(checkbox 'Thêm Tiếng Việt')"
 GITENV GAPP "$(checkbox 'Thêm GAPP')"
@@ -62,6 +57,11 @@ GITENV AGPU $DGPU
 [[ -n "$(grep 'Chỉ đọc' $TOME/1.ht)" ]] && DDPV="erofs"
 [[ -n "$(grep 'Cho phép ghi đọc' $TOME/1.ht)" ]] && DDPV="ext4"
 GITENV Dinhdangphanvung $DDPV
+
+# Gắn lên git env
+GITENV URL $URLKK
+GITENV NEMEROM "RROM_${DDPV}_${URL##*/}"
+GITENV DINHDANG "${URL##*.}"
 
 # Thêm tên tác giả khi flash Rom
 GITENV Tacgia "chamchamfy"
