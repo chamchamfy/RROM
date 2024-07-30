@@ -57,6 +57,7 @@ body:
         - label: "Vá hệ thống"
         - label: "Bỏ mã hoá Rom"
         - label: "Vá Permissive"
+        - label: "Cho phép ghi đọc vài phân vùng"
           required: false
   - type: dropdown
     attributes:
