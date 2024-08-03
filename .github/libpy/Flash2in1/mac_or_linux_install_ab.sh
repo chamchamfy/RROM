@@ -6,11 +6,11 @@ not_support() {
     exit
 }
 
- [ "$(uname)" == "Linux" ]; then
+if [ "$(uname)" == "Linux" ]; then
     systemType=linux
 elif [ "$(uname)" == "Darwin" ]; then
     systemType=darwin
-    [[ -z $(command -v zstd) ]] && brew install zstd
+    [[ -z "$(command -v zstd)" ]] && brew install zstd
 else
     not_support
 fi
@@ -36,20 +36,20 @@ fi
 
 q1() {
     read -p "1. Cài đặt lần đầu sẽ xóa dữ liệu và bộ nhớ trong. Bạn đồng ý không？ (1. Flashing the first time will erase data and internal memory. Do you agree?) (Y/N) " choice1
-    if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ]; then
+    if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ] || [ "$choice1" == 'N' ] || [ "$choice1" == 'n' ]; then
         q2
-    elif [ "$choice1" == 'N' ] || [ "$choice1" == 'n' ]; then
-        q2
+    else
+        q1
     fi
-    q1
 }
 
 q2() {
     read -p "2. Bạn muốn cài đặt boot_magisk.img (ROOT) nếu có?  (2. Do you want to flash boot_magisk.img (ROOT))?(Y/N) " choice2
     if [ "$choice2" == 'Y' ] || [ "$choice2" == 'y' ] || [ "$choice2" == 'N' ] || [ "$choice2" == 'n' ]; then
         main
+    else
+        q2
     fi
-    q2
 }
 
 main() {
@@ -116,7 +116,6 @@ main() {
     if [ -f "images/spuservice.img" ]; then
         $fastboot flash spuservice_ab images/spuservice.img
     fi
-    
     if [ -f "images/tz.img" ]; then
         $fastboot flash tz_ab images/tz.img
     fi
@@ -147,7 +146,6 @@ main() {
     if [ -f "images/xbl.img" ]; then
         $fastboot flash xbl_ab images/xbl.img
     fi
-    
     if [ -f "images/init_boot.img" ]; then
         $fastboot flash init_boot_ab images/init_boot.img
     fi
@@ -171,14 +169,6 @@ main() {
         $fastboot flash cust images/cust.img
     fi
     
-    if [ -f "images/cust.img.0" ]; then 
-        $fastboot flash cust images/cust.img.0
-    fi
-    
-    if [ -f "images/cust.img.1" ]; then 
-        $fastboot flash cust images/cust.img.1
-    fi
-
     if [ -f "images/persist.img" ]; then 
         $fastboot flash persistbak images/persist.img
         $fastboot flash persist images/persist.img

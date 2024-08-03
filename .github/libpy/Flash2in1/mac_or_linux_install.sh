@@ -37,20 +37,20 @@ fi
 
 q1() {
     read -p "1. Cài đặt lần đầu sẽ xóa dữ liệu và bộ nhớ trong. Bạn đồng ý không？ (1. Flashing the first time will erase data and internal memory. Do you agree?) (Y/N) " choice1
-    if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ]; then
+    if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ] || [ "$choice1" == 'N' ] || [ "$choice1" == 'n' ]; then
         q2
-    elif [ "$choice1" == 'N' ] || [ "$choice1" == 'n' ]; then
-        q2
+    else
+        q1
     fi
-    q1
 }
 
 q2() {
     read -p "2. Bạn muốn cài đặt boot_magisk.img (ROOT) nếu có?  (2. Do you want to flash boot_magisk.img (ROOT))?(Y/N) " choice2
     if [ "$choice2" == 'Y' ] || [ "$choice2" == 'y' ] || [ "$choice2" == 'N' ] || [ "$choice2" == 'n' ]; then
         main
+    else
+        q2
     fi
-    q2
 }
 
 main() {
@@ -133,7 +133,6 @@ main() {
         $fastboot flash logo images/logo.img
     fi
  
-
     if [ "$choice2" == 'Y' ] || [ "$choice2" == 'y' ]; then
         $fastboot flash boot images/boot_magisk.img
     elif [ "$choice2" == 'N' ] || [ "$choice2" == 'n' ]; then
@@ -151,14 +150,6 @@ main() {
 
     if [ -f "images/cust.img" ]; then 
         $fastboot flash cust images/cust.img
-    fi
-    
-    if [ -f "images/cust.img.0" ]; then 
-        $fastboot flash cust images/cust.img.0
-    fi
-    
-    if [ -f "images/cust.img.1" ]; then 
-        $fastboot flash cust images/cust.img.1
     fi
     
     if [ -f "images/persist.img" ]; then 

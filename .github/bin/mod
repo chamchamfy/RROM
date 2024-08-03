@@ -650,7 +650,7 @@ if [[ -s "$TOME/VH.zip" ]]; then echo " * Thêm ngôn ngữ..."
 7za x -tzip -y "$TOME/VH.zip" -o$TOME/VH >/dev/null
 [[ -e "$phanvungtam/product/overlay" ]] && TMVH=$phanvungtam/product/overlay || TMVH=$phanvungtam/vendor/overlay
 sudo cp -rf $TOME/VH/apk/* $TMVH
-sudo cp -rf $TOME/VH/GmsConfigOverlayCommon.apk $TMVH 2>/dev/null
+#sudo cp -rf $TOME/VH/Gms*.apk $TOME/VH/*Tele*.apk $TMVH 2>/dev/null
 sudo cp -rf $TOME/VH/cc.*.apk $TMVH
 sudo rm -rf $TOME/VH
 fi
@@ -683,7 +683,7 @@ sudo rm -rf $TOME/tam $TOME/AdrenoGPUDriver.zip
 fi 
 #
 #
-[[ "$tenmamay" == "vili" ]] && sudo cp -rf $TOME/.github/libpy/input/* $phanvungtam || tinhnang
+[[ "$tenmamay" == "vili" ]] && sudo cp -rf $TOME/.github/libpy/vili/* $phanvungtam || tinhnang
 #
 thempersist() {
 if [[ "$tenmamay" == "vili" ]]; then 

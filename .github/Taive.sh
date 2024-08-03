@@ -57,7 +57,7 @@ GITENV AGPU $DGPU
 [[ -n "$(grep 'Theo hệ thống' $TOME/1.ht)" ]] && DDPV="0"
 [[ -n "$(grep 'Chỉ đọc' $TOME/1.ht)" ]] && DDPV="erofs"
 [[ -n "$(grep 'Cho phép ghi đọc' $TOME/1.ht)" ]] && DDPV="ext4"
-GITENV Dinhdangphanvung $DDPV
+GITENV Loaihethong $DDPV
 
 # Gắn lên git env
 GITENV URL $URLKK
