@@ -1,4 +1,4 @@
-# kakathic
+# kakathic & chamchamfy
 . .github/Function.sh
 
 # Cài giờ Việt Nam

@@ -1,4 +1,4 @@
-#kakathic & chamchamfy
+# kakathic & chamchamfy
 . .github/Function.sh
 
 sudo rm -rf /usr/share/dotnet

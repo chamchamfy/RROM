@@ -1,4 +1,4 @@
-# kakathic chamchamfy
+# kakathic & chamchamfy
 . .github/Function.sh
 cd $TOME/.github/libpy/Flash2in1
 
