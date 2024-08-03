@@ -2,9 +2,9 @@
 # RROM
 [![REBUILD Rom MIUI](https://github.com/chamchamfy/RROM/actions/workflows/main.yml/badge.svg)](https://github.com/chamchamfy/RROM/actions/workflows/main.yml)
 + Tính năng:
-  - Mặc định Safetynet Pass
-  - Hỗ trợ rom gốc và xiaomi.eu
+  - Thêm Tiếng Việt
   - Tối ưu hệ thống
+  - Bật các tính năng nâng cao
   - Xóa ứng dụng thừa...
 + Donate:
   - Viettel Money: 9704229225265656
