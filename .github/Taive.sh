@@ -44,7 +44,7 @@ GITENV HK "$(checkbox 'Thêm âm thanh HARMAN KARDON')"
 GITENV Vsys "$(checkbox 'Vá hệ thống')"
 GITENV Vfstab "$(checkbox 'Bỏ mã hoá Rom')"
 GITENV Thucthi "$(checkbox 'Vá Permissive')"
-GITENV NRW "$(checkbox 'Cho phép ghi đọc vài phân vùng')"
+GITENV NRW "$(checkbox 'Cho phép ghi-đọc vài phân vùng')"
 GITENV APPM "$(checkbox 'Thêm ứng dụng đã Mod')"
 
 # Tùy chọn Adreno GPU Driver
