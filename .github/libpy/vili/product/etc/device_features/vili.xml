@@ -467,6 +467,7 @@
     <bool name="support_displayfeature_gamemode">true</bool>
     <!-- whether support fps change -->
     <bool name="support_smart_fps">true</bool>
+    <integer name="support_max_fps">144</integer>
     <integer name="smart_fps_value">60</integer> 
     <integer-array name="fpsList">
         <item>144</item>
@@ -669,5 +670,20 @@
 
     <!-- Whether support Google rsa agreement -->
     <bool name="support_google_rsa_protocol">true</bool>
-
+    <bool name="support_dolby_version_brighten">true</bool>
+    <bool name="support_gallery_hdr">true</bool>
+    <bool name="support_manual_brightness_boost">true</bool>
+    <bool name="gallery_support_media_feature">true</bool>
+    <bool name="gallery_support_video_compress">true</bool>
+    <bool name="gallery_support_analytic_face_and_scene">true</bool>
+    <bool name="gallery_support_time_burst_video">true</bool>
+    <bool name="support_local_ocr">true</bool>
+    <bool name="support_hdr_enhance">true</bool>
+    <bool name="gallery_support_dolby">true</bool>
+    <bool name="gallery_support_print">true</bool>
+    <bool name="support_power_save_new">true</bool>
+    <bool name="support_ui_orientation_v2">true</bool>
+    <bool name="support_wild_boost">true</bool>
+    <bool name="support_wild_boost_bat_perf">true</bool>
+    <bool name="support_backlight_bit_switch">true</bool>
 </features>
