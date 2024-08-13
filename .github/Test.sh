@@ -49,8 +49,22 @@ else echo "- Không có tập tin rom"
 fi 
 }
 
-Taidulieu
-ls $TOME/$Tenrom
-ls $TOME/Unzip
+xoaw() {
+repo=RROM
+user=chamchamfy
+WORKFLOW_RUN_IDS=$(gh api /repos/${user}/${repo}/actions/runs | jq -r ".workflow_runs[] | [.id] | @tsv")
+
+for id in ${WORKFLOW_RUN_IDS}
+do
+    echo "Workflow ID: ${id}"
+    gh api -X DELETE "/repos/${user}/${repo}/actions/runs/${id}"
+done
+}
+
+#Taidulieu
+#ls $TOME/$Tenrom
+#ls $TOME/Unzip
 #. $TOME/Option.md
+# Xóa workflow_run
+xoaw
 echo "- Kết thúc" 
