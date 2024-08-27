@@ -1,6 +1,6 @@
-.class public final Landroid/preference/SettingsCCHelper;
+.class public final Landroidx/preference/SettingsCCXHelper;
 .super Ljava/lang/Object;
-.source "SettingsCCHelper.java"
+.source "SettingsCCXHelper.java"
 
 
 # static fields
@@ -135,7 +135,7 @@
 .method public static gKPI(Ljava/lang/String;)I
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -169,7 +169,7 @@
 
     const-string v4, "system_animation"
 
-    invoke-static {v4}, Landroid/preference/SettingsCCHelper;->getStringofSettings(Ljava/lang/String;)Ljava/lang/String;
+    invoke-static {v4}, Landroidx/preference/SettingsCCXHelper;->getStringofSettings(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v2
 
@@ -183,7 +183,7 @@
 
     if-nez v4, :cond_52
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCon()Landroid/content/Context;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCon()Landroid/content/Context;
 
     move-result-object v4
 
@@ -260,7 +260,7 @@
 
     const/4 v1, 0x0
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v2
 
@@ -284,7 +284,7 @@
 
     const/4 v0, 0x1
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v1
 
@@ -306,11 +306,11 @@
 .method private static getCR()Landroid/content/ContentResolver;
     .registers 1
 
-    sget-object v0, Landroid/preference/SettingsCCHelper;->sCR:Landroid/content/ContentResolver;
+    sget-object v0, Landroidx/preference/SettingsCCXHelper;->sCR:Landroid/content/ContentResolver;
 
     if-nez v0, :cond_e
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCon()Landroid/content/Context;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCon()Landroid/content/Context;
 
     move-result-object v0
 
@@ -318,10 +318,10 @@
 
     move-result-object v0
 
-    sput-object v0, Landroid/preference/SettingsCCHelper;->sCR:Landroid/content/ContentResolver;
+    sput-object v0, Landroidx/preference/SettingsCCXHelper;->sCR:Landroid/content/ContentResolver;
 
     :cond_e
-    sget-object v0, Landroid/preference/SettingsCCHelper;->sCR:Landroid/content/ContentResolver;
+    sget-object v0, Landroidx/preference/SettingsCCXHelper;->sCR:Landroid/content/ContentResolver;
 
     return-object v0
 .end method
@@ -329,18 +329,18 @@
 .method public static getCon()Landroid/content/Context;
     .registers 1
 
-    sget-object v0, Landroid/preference/SettingsCCHelper;->sCon:Landroid/content/Context;
+    sget-object v0, Landroidx/preference/SettingsCCXHelper;->sCon:Landroid/content/Context;
 
     if-nez v0, :cond_a
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->createContext()Landroid/content/Context;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->createContext()Landroid/content/Context;
 
     move-result-object v0
 
-    sput-object v0, Landroid/preference/SettingsCCHelper;->sCon:Landroid/content/Context;
+    sput-object v0, Landroidx/preference/SettingsCCXHelper;->sCon:Landroid/content/Context;
 
     :cond_a
-    sget-object v0, Landroid/preference/SettingsCCHelper;->sCon:Landroid/content/Context;
+    sget-object v0, Landroidx/preference/SettingsCCXHelper;->sCon:Landroid/content/Context;
 
     return-object v0
 .end method
@@ -348,7 +348,7 @@
 .method public static getIntofSettings(Ljava/lang/String;)I
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -364,7 +364,7 @@
 .method public static getIntofSettings(Ljava/lang/String;I)I
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -378,7 +378,7 @@
 .method public static getIntofSettingsEnd(Ljava/lang/String;)I
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -394,7 +394,7 @@
 .method public static getIntofSettingsForUser(Ljava/lang/String;II)I
     .registers 4
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -408,7 +408,7 @@
 .method public static getIntofSettingsStart(Ljava/lang/String;)I
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -424,7 +424,7 @@
 .method public static getIntofSettingss(Ljava/lang/String;)I
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -473,7 +473,7 @@
 .method public static getLongofSettings(Ljava/lang/String;)J
     .registers 5
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -489,7 +489,7 @@
 .method public static getLongofSettings(Ljava/lang/String;J)J
     .registers 6
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -503,7 +503,7 @@
 .method public static getStringofSettings(Ljava/lang/String;)Ljava/lang/String;
     .registers 2
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -517,7 +517,7 @@
 .method public static getStringofSettings(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
     .registers 4
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v1
 
@@ -539,7 +539,7 @@
 .method public static putBoolinSettings(Ljava/lang/String;Z)V
     .registers 4
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v1
 
@@ -561,7 +561,7 @@
 .method public static putIntinSettings(Ljava/lang/String;I)V
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -573,7 +573,7 @@
 .method public static putIntinSettingsGlobal(Ljava/lang/String;I)V
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -585,7 +585,7 @@
 .method public static putLonginSettings(Ljava/lang/String;J)V
     .registers 4
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 
@@ -597,7 +597,7 @@
 .method public static putStringinSettings(Ljava/lang/String;Ljava/lang/String;)V
     .registers 3
 
-    invoke-static {}, Landroid/preference/SettingsCCHelper;->getCR()Landroid/content/ContentResolver;
+    invoke-static {}, Landroidx/preference/SettingsCCXHelper;->getCR()Landroid/content/ContentResolver;
 
     move-result-object v0
 

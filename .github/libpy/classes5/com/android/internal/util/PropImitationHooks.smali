@@ -651,7 +651,7 @@
 
     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
 
-    const-string v1, "Setting ASUS_X00HD fingerprint for: "
+    const-string v1, "Setting Pixel 8a fingerprint for: "
 
     invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
@@ -944,28 +944,28 @@
     .line 150
     const-string v0, "FINGERPRINT"
 
-    const-string v1, "asus/WW_Phone/ASUS_X00HD_4:7.1.1/NMF26F/14.2016.1801.372-20180119:user/release-keys"
+    const-string v1, "google/akita_beta/akita:15/AP31.240617.015/12207491:user/release-keys"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 
     .line 151
     const-string v0, "PRODUCT"
 
-    const-string v1, "WW_Phone"
+    const-string v1, "akita_beta"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 
     .line 152
     const-string v0, "DEVICE"
 
-    const-string v1, "ASUS_X00HD_4"
+    const-string v1, "akita"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 
     .line 153
     const-string v0, "MODEL"
 
-    const-string v1, "ASUS_X00HD"
+    const-string v1, "Pixel 8a"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 

@@ -49,12 +49,13 @@ body:
   - type: checkboxes
     attributes:
       label: Tùy chọn
-      description: Tích vào ô bên dưới để thêm tính năng khi build rom.
+      description: Tích vào ô bên dưới để thêm tính năng khi build rom. Vá chứng chỉ chạy khi vá hệ thống được tích chọn. Nếu rom tùy chỉnh không nên chọn vá chứng chỉ do có thể không khởi động được!
       options:
         - label: "Thêm Tiếng Việt"
         - label: "Thêm GAPP"
         - label: "Thêm âm thanh HARMAN KARDON"
         - label: "Vá hệ thống"
+        - label: "Vá chứng chỉ"
         - label: "Bỏ mã hoá Rom"
         - label: "Vá Permissive"
         - label: "Cho phép đọc ghi vài phân vùng"
