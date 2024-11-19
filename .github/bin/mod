@@ -694,12 +694,12 @@ if [[ "$tenmamay" == "vili" ]]; then
  fi
 fi
 }
-thempersist
+#thempersist
 [ -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ] && echo " * Thêm persist..."
 #
 #linktwrp="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/${tenmamay}/twrp-3.7.0_12-v7.9_A13-${tenmamay}-skkk.img"
  mkdir -p $TOME/twrp
- taivetwrp() { kkurl="recovery-for-xiaomi-devices"; Taive "$(Xem "$(Xem "https://sourceforge.net/projects/$kkurl/files/$tenmamay" | grep -om1 "https://.*./$kkurl/files/$tenmamay/.*$1.*" | cut -d '"' -f1)?use_mirror=zenlayer&amp=&use_mirror=zenlayer&r=" | grep -om1 "https://.*./$kkurl/.*$1.*" | cut -d '"' -f1)" "$2"; }
+ taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$tenmamay"; Taive "$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')" "$2"; } 
 if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then 
  if [[ "$MREC" == "1" ]]; then 
   taivetwrp "OrangeFox-" "$TOME/twrp/fox.zip" 
@@ -720,9 +720,9 @@ du -m $TOME/twrp/*.img 2>/dev/null
 #
 if [[ "$GAPP" == "1" ]]; then 
 if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "$VERS" == "14" ]; then PB=U; elif [ "$VERS" == "15" ]; then PB=V; elif [ "$VERS" == "16" ]; then PB=W; elif [ "$VERS" == "17" ]; then PB=X; elif [ "$VERS" == "18" ]; then PB=Y; elif [ "$VERS" == "19" ]; then PB=Z; fi
- tainikgapp() { LURL="https://sourceforge.net/projects/nikgapps/files/Releases/NikGapps-${PB}"; Taive "$(Xem "$LURL/$(Xem "$LURL" | grep 'net.sf.files' | awk -F'"' '{print $2}')" | grep 'net.sf.files' | awk -F'"' '{print $286}')" "$TOME/$1"; } 
- taigapp() { LURL="https://sourceforge.net/projects/litegapps/files/litegapps/arm64/$2/$1"; Taive "$(Xem "$LURL/$(Xem "$LURL" | grep 'net.sf.files' | awk -F'"' '{print $2}')" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
- taigboad() { LURL="https://sourceforge.net/projects/litegapps/files/addon/arm64/$2/$1/GoogleKeyboard"; Taive "$(Xem "$LURL" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
+ tainikgapp() { LURL="https://sourceforge.net/projects/nikgapps/files/Releases/Android-${PB}"; Taive "$(curl -s "$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $2}')/" | grep 'net.sf.files' | awk -F'"' '{print $286}')" "$TOME/$1"; } 
+ taigapp() { LURL="https://sourceforge.net/projects/litegapps/files/litegapps/arm64/$2/$1"; Taive "$(curl -s "$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $2}')/" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
+ taigboad() { LURL="https://sourceforge.net/projects/litegapps/files/addon/arm64/$2/$1/GoogleKeyboard"; Taive "$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
  taigapp "core" "$API" "gapp.zip" || tainikgapp "nikgapp.zip"
  taigboad "gapps" "$API" "gboad.zip"
  
