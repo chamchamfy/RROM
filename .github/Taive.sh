@@ -12,9 +12,12 @@ Chatbot 'Bắt đầu xây dựng, vui lòng chờ...<br/><br/>Sau khi xong link
 # CÁC TÙY CHỌN WEB
 Xem "https://github.com/chamchamfy/RROM/issues/$NUMBIE" > $TOME/1.ht
 
-echo "Tùy chọn" && cat $TOME/1.ht
-
 # get delete app
+#grep -A1 'Xoá ứng dụng' $TOME/1.ht | awk -F'>' '{print $3}' | awk -F'<' '{print $1}' > $TOME/Delete_apps.md
+if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" = 1 ]; then 
+grep -m1 'data-snippet-clipboard-copy-content="' $TOME/1.ht | awk -F'<' '{print $2}' | awk -F'"' '{print $6}' > $TOME/Delete_apps.md
+fi
+aaaaaaaa() {
 if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" == 1 ];then
 kjgghh=0
 while true; do
@@ -28,6 +31,7 @@ sed -i -e '1d' -e '$d' $TOME/Delete_apps.md
 echo "$uc1
 $uc2" >> $TOME/Delete_apps.md
 fi
+}
 
 echo " Xóa: " && cat $TOME/Delete_apps.md
 
