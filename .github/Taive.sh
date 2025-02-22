@@ -13,32 +13,14 @@ Chatbot 'Bắt đầu xây dựng, vui lòng chờ...<br/><br/>Sau khi xong link
 Xem "https://github.com/chamchamfy/RROM/issues/$NUMBIE" > $TOME/1.ht
 
 # get delete app
-#grep -A1 'Xoá ứng dụng' $TOME/1.ht | awk -F'>' '{print $3}' | awk -F'<' '{print $1}' > $TOME/Delete_apps.md
 if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" = 1 ]; then 
 grep -m1 'data-snippet-clipboard-copy-content="' $TOME/1.ht | awk -F'<' '{print $2}' | awk -F'"' '{print $6}' > $TOME/Delete_apps.md
 fi
-aaaaaaaa() {
-if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" == 1 ];then
-kjgghh=0
-while true; do
-grep -A"$kjgghh" -m2 'data-snippet-clipboard-copy-content=' $TOME/1.ht > $TOME/Delete_apps.md
-kjgghh=$(($kjgghh + 1))
-[ "$(grep -c '">' $TOME/Delete_apps.md)" == 1 ] && break
-done
-uc1="$(head -n1 $TOME/Delete_apps.md | grep -o 'data-snippet-clipboard-copy-content=.*' | cut -d '"' -f2)"
-[ "$(wc -l < $TOME/Delete_apps.md)" -gt 1 ] && uc2="$(tail -n1 $TOME/Delete_apps.md | cut -d '"' -f1)"
-sed -i -e '1d' -e '$d' $TOME/Delete_apps.md
-echo "$uc1
-$uc2" >> $TOME/Delete_apps.md
-fi
-}
-
-echo " Xóa: " && cat $TOME/Delete_apps.md
+echo " Xóa app: $(cat $TOME/Delete_apps.md)"
 
 # link url rom và size 
 #URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | grep -o 'Url:.*<' | sed 's|Url:<||' | cut -d '"' -f2)"
 #SIZEKK="$(grep -o 'dir="auto">.*GB' $TOME/1.ht | cut -d '>' -f2 | sed 's|GB||')"
-echo " Xem link"
 URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | awk -F'"' '{print $4}')"
 
 # Thêm recovery mod
