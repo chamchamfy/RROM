@@ -11,7 +11,7 @@ Chatbot 'Bắt đầu xây dựng, vui lòng chờ...<br/><br/>Sau khi xong link
 
 # CÁC TÙY CHỌN WEB
 Xem "https://github.com/chamchamfy/RROM/issues/$NUMBIE" > $TOME/1.ht
-
+echo "Tùy chọn"
 # get delete app
 if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" == 1 ];then
 kjgghh=0
@@ -30,6 +30,7 @@ fi
 # link url rom và size 
 URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | grep -o 'Url:.*<' | sed 's|Url:<||' | cut -d '"' -f2)"
 #SIZEKK="$(grep -o 'dir="auto">.*GB' $TOME/1.ht | cut -d '>' -f2 | sed 's|GB||')"
+echo " Xem link"
 
 # Thêm recovery mod
 [[ -n "$(grep 'Không thêm' $TOME/1.ht)" ]] && RECOVERYMOD="0"
