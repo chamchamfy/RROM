@@ -16,8 +16,10 @@ eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > 
 #curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "$TOME/$NEMEROM" 
 LINKROM="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
 else
-url2=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m1 'name' | tr -d '[:punct:]' | awk '{print $2}')
-eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url2.gofile.io/uploadFile' > $TOME/1.json"
+#url10=$(curl -s https://api.gofile.io/servers | jq -r '.data.serversAllZone' | grep -m10 'name' | awk -F'"' '{print $4}')
+url1=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m1 'name' | awk -F'"' '{print $4}')
+url2=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m2 'name' | awk -F'"' '{print $4}')
+eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url1.gofile.io/uploadFile' > $TOME/1.json" || eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url2.gofile.io/uploadFile' > $TOME/1.json"
 LINKROM=$(cat "$TOME/1.json" | jq -r .data.downloadPage)
 fi
 echo "Link download: $LINKROM"
