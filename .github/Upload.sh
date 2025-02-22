@@ -10,7 +10,7 @@ zip -qr $TOME/$NEMEROM *
 echo
 Chatbot '- ROM đang tải lên sever vui lòng chờ...'
 
-if [ "$SEVERUP" = 1 ];then
+if [ "$SEVERUP" = 1 ]; then
 APIK='440b20a6-90c0-40c7-9081-313b91c29456'
 eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > $TOME/1.json"
 #curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "$TOME/$NEMEROM" 
@@ -23,6 +23,7 @@ eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url1.gofile.io/uploadFile' > $TOM
 LINKROM=$(cat "$TOME/1.json" | jq -r .data.downloadPage)
 fi
 echo "Link download: $LINKROM"
+Chatbot " Link tải về: $LINKROM"
 Chatbot '- Tải ROM lên máy chủ khác...'
 tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
 . $TOME/mk.sh
@@ -32,7 +33,6 @@ echo "Link download (sourceforge.net): https://sourceforge.net/projects/$TTK/fil
 echo
 closechat "Tạo rom thành công <br/><br/>Link Download: "$LINKROM" <br/><br/>Link Download (sourceforge.net): https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 #addlabel "Hoàn thành"
-
 else
 closechat "Tạo rom thất bại, Xem log: 📱[Actions runs](https://github.com/chamchamfy/RROM/actions/runs/$GITHUB_RUN_ID)"
 #addlabel "Thất bại"
