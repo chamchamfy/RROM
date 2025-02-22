@@ -4,8 +4,11 @@ export User="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWe
 
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up}
 
-Xem () { curl -s -L -G -N -H "$User" "$1"; }
-Taive () { curl -s -L "$1" -o "$2"; }
+#Xem () { curl -s -L -G -N -H "$User" "$1"; }
+#Taive () { curl -s -L "$1" -o "$2"; }
+Xem () { curl -s -L -G -N -H "$User" --connect-timeout 20 "$1"; }
+Taive () { curl -s -L -k -H "$User" --connect-timeout 20 "$1" -o "$2"; }
+
 Taiver () { curl -S -k "$1" -o "$2"; }
 Taivewget() { wget "$1" -O "$2"; }
 Taivewgetr() { wget --no-check-certificate "$1" -O "$2"; }
