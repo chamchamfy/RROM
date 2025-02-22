@@ -42,9 +42,9 @@ echo " Xem link"
 URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | awk -F'"' '{print $4}')"
 
 # Thêm recovery mod
-[[ -n "$(grep 'Không thêm' $TOME/1.ht)" ]] && RECOVERYMOD="0"
-[[ -n "$(grep 'OrangeFox' $TOME/1.ht)" ]] && RECOVERYMOD="1"
-[[ -n "$(grep 'TWRP' $TOME/1.ht)" ]] && RECOVERYMOD="TWRP"
+[ -n "$(grep 'Không thêm' $TOME/1.ht)" ] && RECOVERYMOD="0"
+[ -n "$(grep 'OrangeFox' $TOME/1.ht)" ] && RECOVERYMOD="1"
+[ -n "$(grep 'TWRP' $TOME/1.ht)" ] && RECOVERYMOD="TWRP"
 GITENV MREC $RECOVERYMOD
 
 # Thêm Các tùy chọn: 1=Bật, 0=Tắt
@@ -59,15 +59,15 @@ GITENV NRW "$(checkbox 'Cho phép đọc ghi vài phân vùng')"
 GITENV APPM "$(checkbox 'Thêm ứng dụng đã Mod')"
 
 # Tùy chọn Adreno GPU Driver
-[[ -n "$(grep 'Mặc định' $TOME/1.ht)" ]] && DGPU="0"
-[[ -n "$(grep 'Phiên bản GPU 725' $TOME/1.ht)" ]] && DGPU="725"
-[[ -n "$(grep 'Phiên bản GPU 615' $TOME/1.ht)" ]] && DGPU="615"
+[ -n "$(grep 'Mặc định' $TOME/1.ht)" ] && DGPU="0"
+[ -n "$(grep 'Phiên bản GPU 725' $TOME/1.ht)" ] && DGPU="725"
+[ -n "$(grep 'Phiên bản GPU 615' $TOME/1.ht)" ] && DGPU="615"
 GITENV AGPU $DGPU
 
 # Tùy chọn loại hệ thống
-[[ -n "$(grep 'Theo hệ thống' $TOME/1.ht)" ]] && DDPV="0"
-[[ -n "$(grep 'Chỉ đọc' $TOME/1.ht)" ]] && DDPV="erofs"
-[[ -n "$(grep 'Cho phép ghi đọc' $TOME/1.ht)" ]] && DDPV="ext4"
+[ -n "$(grep 'Theo hệ thống' $TOME/1.ht)" ] && DDPV="0"
+[ -n "$(grep 'Chỉ đọc' $TOME/1.ht)" ] && DDPV="erofs"
+[ -n "$(grep 'Cho phép ghi đọc' $TOME/1.ht)" ] && DDPV="ext4"
 GITENV Loaihethong $DDPV
 
 # Gắn lên git env
@@ -119,7 +119,7 @@ done
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [[ -e "$TOME/$NEMEROM" ]] && [[ -s "$TOME/$NEMEROM" ]]; then
+if [ -e "$TOME/$NEMEROM" ] && [ -s "$TOME/$NEMEROM" ]; then
  if [ "$DINHDANG" == "zip" ]; then
  unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
