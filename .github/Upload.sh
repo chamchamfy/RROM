@@ -13,7 +13,7 @@ Chatbot '- ROM đang tải lên sever vui lòng chờ...'
 if [ "$SEVERUP" = 1 ];then
 APIK='440b20a6-90c0-40c7-9081-313b91c29456'
 eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > $TOME/1.json"
-#curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "/sdcard/lpsuper" 
+#curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "$TOME/$NEMEROM" 
 LINKROM="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
 else
 url2=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m1 'name' | tr -d '[:punct:]' | awk '{print $2}')
