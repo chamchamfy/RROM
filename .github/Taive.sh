@@ -69,7 +69,7 @@ GITENV DINHDANG "${URL##*.}"
 GITENV Tacgia "chamchamfy"
 
 # Chọn sv upload
-GITENV SEVERUP "$(checktc Transfer)"
+GITENV SEVERUP "$(checktc Pixeldrain)"
 
 # check url
 if [ "$URL" ]; then

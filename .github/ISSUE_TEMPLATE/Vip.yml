@@ -77,7 +77,7 @@ body:
       description: Chọn sever để tải rom lên, thời gian lưu trữ files tùy sever 10 - 30 ngày.
       options:
         - Gofile
-        - Transfer
+        - Pixeldrain
       default: 0
     validations:
       required: true
