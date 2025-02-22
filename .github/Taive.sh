@@ -72,6 +72,7 @@ GITENV Tacgia "chamchamfy"
 GITENV SEVERUP "$(checktc Pixeldrain)"
 
 # check url
+echo "Link rom: $URL"
 if [ "$URL" ]; then
 
 (
