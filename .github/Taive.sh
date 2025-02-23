@@ -13,10 +13,10 @@ Chatbot 'Bắt đầu xây dựng, vui lòng chờ...<br/><br/>Sau khi xong link
 Xem "https://github.com/chamchamfy/RROM/issues/$NUMBIE" > $TOME/1.ht
 
 # get delete app
-if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" = 1 ]; then 
+if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" = 1 ]; then
 grep -m1 'data-snippet-clipboard-copy-content="' $TOME/1.ht | awk -F'<' '{print $2}' | awk -F'"' '{print $6}' > $TOME/Delete_apps.md
 fi
-echo " Xóa app: $(cat $TOME/Delete_apps.md)"
+echo " Xoá app: $(cat $TOME/Delete_apps.md)"
 
 # link url rom và size 
 #URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | grep -o 'Url:.*<' | sed 's|Url:<||' | cut -d '"' -f2)"
@@ -61,10 +61,9 @@ GITENV DINHDANG "${URL##*.}"
 GITENV Tacgia "chamchamfy"
 
 # Chọn sv upload
-GITENV SEVERUP "$(checktc Pixeldrain)"
+GITENV SEVERUP "$(checktc Sourceforge)"
 
 # check url
-echo "Link rom: $URL"
 if [ "$URL" ]; then
 
 (
