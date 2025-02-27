@@ -23,6 +23,27 @@ eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > 
 #curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "$TOME/$NEMEROM" 
 LINKROM2="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
 }
+sv3() {
+#file.io#M4GB
+curl -F "file=@$TOME/$NEMEROM" 'https://file.io/?expires=y' > $TOME/1.json
+LINKROM3=$(cat "$TOME/1.json" | jq -r .link)
+}
+sv4() {
+#filebin.net#6D
+curl -F "file=@$TOME/$NEMEROM" 'https://filebin.net' > $TOME/1.json
+LINKROM4=$(grep -m1 'filebin.net/' $TOME/1.json | awk -F'"' '{print $4}')
+}
+sv5() {
+#easyupload.io#30D
+curl -F "file=@$TOME/$NEMEROM" 'https://easyupload.io' > $TOME/1.json
+LINKROM5=$(grep -m1 'text:' $TOME/1.json | awk -F'"' '{print $2}')
+}
+sv6() {
+#wetransfer.com#M2GB#7D
+}
+sv7() {
+#www.filemail.com#M5GB
+}
 svsfg() {
 tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
 . $TOME/mk.sh
@@ -32,6 +53,8 @@ LINKROMSFG="https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 
 sv1 && Chatbot " Link tải về: $LINKROM1"
 sv2 && Chatbot " Link tải về: $LINKROM2"
+sv4 && Chatbot " Link tải về: $LINKROM4"
+sv5 && Chatbot " Link tải về: $LINKROM5"
 if [ "$SEVERUP" = 1 ]; then Chatbot '- Tải ROM lên máy chủ sourceforge.net ...' && svsfg; fi
  
 # Link download 
