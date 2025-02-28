@@ -53,8 +53,8 @@ LINKROMSFG="https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 
 sv1 && Chatbot " Link tải về: $LINKROM1"
 sv2 && Chatbot " Link tải về: $LINKROM2"
-sv4 && Chatbot " Link tải về: $LINKROM4"
-sv5 && Chatbot " Link tải về: $LINKROM5"
+#sv4 && Chatbot " Link tải về: $LINKROM4"
+#sv5 && Chatbot " Link tải về: $LINKROM5"
 if [ "$SEVERUP" = 1 ]; then Chatbot '- Tải ROM lên máy chủ sourceforge.net ...' && svsfg; fi
  
 # Link download 
