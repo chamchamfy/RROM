@@ -37,10 +37,12 @@ sv5() {
 LINKROM5=$(grep -m1 'text:' $TOME/1.json | awk -F'"' '{print $2}')
 }
 sv6() {
-#wetransfer.com#M2GB#7D
+#https://wetransfer.com#M2GB#7D
+LINKROM6=$(grep -m1 'wetransfer.com/' $TOME/1.json | awk -F'"' '{print $4}')
 }
 sv7() {
 #https://filetransfer.io#21D#M6GB
+LINKROM7=$(grep -m1 'filetransfer.io/' $TOME/1.json | awk -F'"' '{print $4}')
 }
 svsfg() {
 tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
