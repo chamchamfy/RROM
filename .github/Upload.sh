@@ -24,7 +24,7 @@ LINKROM2="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
 }
 sv3() {
 #https://file.io|4G
-LINKROM3=$(cat "$TOME/1.json" | jq -r .link)
+LINKROM3=$(cat "$TOME/1.json" | grep -m1 'link' $TOME/1.json | awk -F'"' '{print $4}')
 }
 sv4() {
 #https://filebin.net|6D
