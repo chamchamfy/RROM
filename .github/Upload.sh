@@ -11,9 +11,8 @@ echo
 Chatbot '- ROM đang tải lên sever vui lòng chờ...'
 
 sv1() { 
-#url10=$(curl -s https://api.gofile.io/servers | jq -r '.data.serversAllZone' | grep -m10 'name' | awk -F'"' '{print $4}')
 url1=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m1 'name' | awk -F'"' '{print $4}')
-url2=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m2 'name' | awk -F'"' '{print $4}')
+url2=$(curl -s https://api.gofile.io/servers | jq -r '.data.serversAllZone' | grep -m1 'name' | awk -F'"' '{print $4}')
 eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url1.gofile.io/uploadFile' > $TOME/1.json" || eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url2.gofile.io/uploadFile' > $TOME/1.json"
 LINKROM1=$(cat "$TOME/1.json" | jq -r .data.downloadPage)
 }
@@ -24,24 +23,24 @@ eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > 
 LINKROM2="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
 }
 sv3() {
-#https://file.io#M4GB
+#https://file.io|4G
 LINKROM3=$(cat "$TOME/1.json" | jq -r .link)
 }
 sv4() {
-#https://filebin.net#6D
+#https://filebin.net|6D
 LINKROM4=$(curl -s 'https://filebin.net' | grep -m1 'filebin.net/' | awk -F'"' '{print $4}')
 curl -F "file=@$TOME/$NEMEROM" "$LINKROM4"
 }
 sv5() {
-#https://easyupload.io#30D
+#https://easyupload.io|30D
 LINKROM5=$(grep -m1 'text:' $TOME/1.json | awk -F'"' '{print $2}')
 }
 sv6() {
-#https://wetransfer.com#M2GB#7D
+#https://wetransfer.com|2G|7D
 LINKROM6=$(grep -m1 'wetransfer.com/' $TOME/1.json | awk -F'"' '{print $4}')
 }
 sv7() {
-#https://filetransfer.io#21D#M6GB
+#https://filetransfer.io|21D|6G
 LINKROM7=$(grep -m1 'filetransfer.io/' $TOME/1.json | awk -F'"' '{print $4}')
 }
 svsfg() {
