@@ -1,6 +1,6 @@
 ### Chỉnh sửa rom online
 # RROM
-[![REBUILD Rom MIUI](https://github.com/chamchamfy/RROM/actions/workflows/main.yml/badge.svg)](https://github.com/chamchamfy/RROM/actions/workflows/main.yml)
+[![REBUILD Rom MIUI|HYPEROS](https://github.com/chamchamfy/RROM/actions/workflows/main.yml/badge.svg)](https://github.com/chamchamfy/RROM/actions/workflows/main.yml)
 + Tính năng:
   - Thêm Tiếng Việt
   - Tối ưu hệ thống
