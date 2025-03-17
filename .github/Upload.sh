@@ -29,7 +29,7 @@ LINKROM3=$(cat "$TOME/1.json" | grep -m1 'link' $TOME/1.json | awk -F'"' '{print
 sv4() {
 #https://filebin.net|6D
 LINKROM4=$(curl -s 'https://filebin.net' | grep -m1 'filebin.net/' | awk -F'"' '{print $4}')
-curl -F "file=@$TOME/$NEMEROM" "$LINKROM4"
+curl -T "$TOME/$NEMEROM" "$LINKROM4/$NEMEROM"
 }
 sv5() {
 #https://easyupload.io|30D
