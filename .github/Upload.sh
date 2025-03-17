@@ -10,6 +10,18 @@ zip -qr $TOME/$NEMEROM *
 echo
 Chatbot '- ROM đang tải lên sever vui lòng chờ...'
 
+svsfg() {
+tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
+. $TOME/mk.sh
+tailenr "frs.sourceforge.net:/home/frs/project" "$TND" "$MK" "rroms"
+LINKROMSFG="https://sourceforge.net/projects/$TTK/files/$NEMEROM"
+}
+svpx() {
+APIK='440b20a6-90c0-40c7-9081-313b91c29456'
+eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > $TOME/1.json"
+#curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "$TOME/$NEMEROM" 
+LINKROMPX="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
+}
 sv1() { 
 url1=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers' | grep -m1 'name' | awk -F'"' '{print $4}')
 url2=$(curl -s https://api.gofile.io/servers | jq -r '.data.serversAllZone' | grep -m1 'name' | awk -F'"' '{print $4}')
@@ -17,47 +29,27 @@ eval "curl -F 'file=@$TOME/$NEMEROM' 'https://$url1.gofile.io/uploadFile' > $TOM
 LINKROM1=$(cat "$TOME/1.json" | jq -r .data.downloadPage)
 }
 sv2() {
-APIK='440b20a6-90c0-40c7-9081-313b91c29456'
-eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > $TOME/1.json"
-#curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "$TOME/$NEMEROM" 
-LINKROM2="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
+#https://file.io|4G
+LINKROM2=$(cat "$TOME/1.json" | grep -m1 'link' $TOME/1.json | awk -F'"' '{print $4}')
 }
 sv3() {
-#https://file.io|4G
-LINKROM3=$(cat "$TOME/1.json" | grep -m1 'link' $TOME/1.json | awk -F'"' '{print $4}')
+#https://filebin.net|6D
+LINKROM3=$(curl -s 'https://filebin.net' | grep -m1 'filebin.net/' | awk -F'"' '{print $4}')
+curl -T "$TOME/$NEMEROM" "$LINKROM3/$NEMEROM"
 }
 sv4() {
-#https://filebin.net|6D
-LINKROM4=$(curl -s 'https://filebin.net' | grep -m1 'filebin.net/' | awk -F'"' '{print $4}')
-curl -F "file=@$TOME/$NEMEROM" "$LINKROM4"
-}
-sv5() {
 #https://easyupload.io|30D
-LINKROM5=$(grep -m1 'text:' $TOME/1.json | awk -F'"' '{print $2}')
-}
-sv6() {
-#https://wetransfer.com|2G|7D
-LINKROM6=$(grep -m1 'wetransfer.com/' $TOME/1.json | awk -F'"' '{print $4}')
-}
-sv7() {
-#https://filetransfer.io|21D|6G
-LINKROM7=$(grep -m1 'filetransfer.io/' $TOME/1.json | awk -F'"' '{print $4}')
-}
-svsfg() {
-tailenr() { TTK=$4; curl -1 -v -k "sftp://$1/$4/$NEMEROM" --user "$2:$3" -T "$TOME/$NEMEROM"; }
-. $TOME/mk.sh
-tailenr "frs.sourceforge.net:/home/frs/project" "$TND" "$MK" "rroms"
-LINKROMSFG="https://sourceforge.net/projects/$TTK/files/$NEMEROM"
+LINKROM4=$(grep -m1 'text:' $TOME/1.json | awk -F'"' '{print $2}')
 }
 
 sv1 && Chatbot " Link tải về: $LINKROM1"
-sv2 && Chatbot " Link tải về: $LINKROM2"
+#sv2 && Chatbot " Link tải về: $LINKROM2"
+sv3 && Chatbot " Link tải về: $LINKROM3"
 #sv4 && Chatbot " Link tải về: $LINKROM4"
-if [ "$SEVERUP" = 1 ]; then Chatbot '- Tải ROM lên máy chủ sourceforge.net ...' && svsfg; fi
+if [ "$SEVERUP" = 1 ]; then Chatbot '- Tải ROM lên máy chủ sourceforge.net ...' && svsfg; else Chatbot '- Tải ROM lên máy chủ pixeldrain.com ...' && svpx; fi
  
 # Link download 
-echo
-closechat "Tạo rom thành công <br/><br/>Link Download: "$LINKROM1" <br/><br/>Link Download: "$LINKROM2" <br/><br/>Link Download (sourceforge.net): $LINKROMSFG"; 
+closechat "Tạo rom thành công <br/><br/>Link Download (pixeldrain.com): "$LINKROMPX" <br/><br/>Link Download (sourceforge.net): "$LINKROMSFG" <br/><br/>Link Download: "$LINKROM1" <br/><br/>Link Download: "$LINKROM2" <br/><br/>Link Download: "$LINKROM3" <br/><br/>Link Download: "$LINKROM4" "; 
 #addlabel "Hoàn thành"
 else
 closechat "Tạo rom thất bại, Xem log: 📱[Actions runs](https://github.com/chamchamfy/RROM/actions/runs/$GITHUB_RUN_ID)"

@@ -13,12 +13,100 @@ VERS=$(sudo grep 'ro.build.version.release=' $phanvungtam/system/system/build.pr
 # Đường dẫn thư mục product: $phanvungtam/product 
 # Đường dẫn thư mục system_ext: $phanvungtam/system_ext
 ########
-#suasmalis 
-#thayphuongthuc '1: tên.smali hoặc phương thức' '2: phương thức' '3: giới hạn tìm đầu' '4: nội dung tìm đầu' '5: giới hạn tìm cuối' '6: nội dung tìm cuối' '7: nội dung thay 1' '8: nội dung thay 2'
+cuphap1() {
+echo " => Sử dụng theo cú pháp sau: suasmali1 <Tùy chỉnh>
+      -Thay dòng:
+       noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandong='Số dòng cần tìm'; noidungtim='Nội dung cần tìm'; noidung='Nội dung cần thay'; thaydong
+       
+       -Thay dòng biến [x1 vx2, x3]:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandong='Số dòng cần tìm'; noidungtim='Nội dung cần tìm'; biendau='Nội dung biến đầu'; biencuoi='Nội dung biến cuối'; thaydongbien 
+
+	  -Thay đoạn:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandau='Số dòng cần tìm đầu'; timdau='Nội dung cần tìm đầu'; gioihancuoi='Số dòng cần tìm cuối'; timcuoi='Nội dung cần tìm cuối'; noidung='Nội dung thay'; thaydoan
+
+	  -Thay đoạn biến [x1 vx2, x3]:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandau='Số dòng cần tìm đầu'; timdau='Nội dung cần tìm đầu'; gioihancuoi='Số dòng cần tìm cuối'; timcuoi='Nội dung cần tìm cuối'; biendau='Nội dung biến đầu'; biencuoi='Nội dung biến cuối'; thaydoanbien
+
+	  -Thay đoạn cuối phương thức:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; cuoi='.end method'; noidung='Nội dung cần thay'; thaydoancuoi
+
+	  -Thay chuỗi:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; noidungtim='Nội dung cần tìm'; noidung='Nội dung thay'; thaychuoi
+
+	  -Thay nội dung:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; noidung='Nội dung thay'; thaynoidung
+
+	  -Thay phương thức:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; cuoi='.end method'; noidung='Nội dung thay'; thayphuongthuc
+
+	  -Chèn trước nội dung:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; noidung='Nội dung chèn trước'; chentruoc
+
+	  -Chèn sau nội dung:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; noidung='Nội dung chèn sau'; chensau
+
+	  -Chèn trước dòng:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandong='Số dòng cần tìm'; noidungtim='Nội dung tìm'; noidung='Nội dung chèn trước dòng'; chentruocdong
+
+	  -Chèn sau dòng:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandong='Số dòng cần tìm'; noidungtim='Nội dung tìm'; noidung='Nội dung chèn sau dòng'; chensaudong
+
+	  -Chèn trước dòng biến [x1 vx2, x3]:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandong='Số dòng cần tìm'; noidungtim='Nội dung tìm'; biendau='Nội dung biến đầu'; biencuoi='Nội dung biến cuối'; chentruocdongbien
+
+	  -Chèn sau dòng biến [x1 vx2, x3]:
+	   noichua='Tên smali'; phuongthuc='Phương thức tìm'; gioihandong='Số dòng cần tìm'; noidungtim='Nội dung tìm'; biendau='Nội dung biến đầu'; biencuoi='Nội dung biến cuối'; chensaudongbien
+     "
+}
+cuphap2() {
+echo " => Sử dụng theo cú pháp sau: suasmali2 <Tùy chỉnh>
+	  -Thay dòng:
+	   thaydong 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm' 'Nội dung cần tìm' '0' '' 'Nội dung thay' 
+
+	  -Thay dòng biến [x1 vx2, x3]:
+	   thaydongbien 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm đầu' 'Nội dung cần tìm đầu' '0' '' 'Nội dung biến đầu' 'Nội dung biến cuối' 
+
+	  -Thay đoạn:
+	   thaydoan 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm đầu' 'Nội dung cần tìm đầu' 'Số dòng cần tìm cuối' 'Nội dung cần tìm cuối' 'Nội dung thay' 
+
+	  -Thay đoạn biến [x1 vx2, x3]:
+	   thaydoanbien 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm đầu' 'Nội dung cần tìm đầu' 'Số dòng cần tìm cuối' 'Nội dung cần tìm cuối' 'Nội dung biến đầu' 'Nội dung biến cuối'
+
+	  -Thay đoạn cuối phương thức:
+	   thaydoancuoi 'Tên smali' 'Phương thức tìm' '0' '' '0' '.end method' 'Nội dung thay' 
+
+	  -Thay chuỗi:
+	   thaychuoi 'Tên smali' 'Phương thức tìm' '0' 'Nội dung cần tìm' '0' '' 'Nội dung thay'
+
+	  -Thay nội dung:
+	   thaynoidung 'Tên smali' 'Phương thức tìm' 'Nội dung thay' 
+
+	  -Thay phương thức:
+	   thayphuongthuc 'Tên smali' 'Phương thức tìm' '0' '' '0' '.end method' 'Nội dung thay' 
+
+	  -Chèn trước nội dung:
+	   chentruoc 'Tên smali' 'Phương thức tìm' '0' '' '0' '' 'Nội dung chèn trước' 
+
+	  -Chèn sau nội dung:
+	   chensau 'Tên smali' 'Phương thức tìm' '0' '' '0' '' 'Nội dung chèn sau' 
+
+	  -Chèn trước dòng:
+	   chentruocdong 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm' 'Nội dung tìm' '0' '' 'Nội dung chèn trước dòng'
+
+	  -Chèn sau dòng:
+	   chensaudong 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm' 'Nội dung tìm' '0' '' 'Nội dung chèn sau dòng' 
+
+	  -Chèn trước dòng biến [x1 vx2, x3]:
+	   chentruocdongbien 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm đầu' 'Nội dung tìm đầu' 'Số dòng cần tìm cuối' 'Nội dung tìm cuối' 'Nội dung biến đầu' 'Nội dung biến cuối' 
+
+	  -Chèn sau dòng biến [x1 vx2, x3]:
+	   chensaudongbien 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm đầu' 'Nội dung tìm đầu' 'Số dòng cần tìm cuối' 'Nội dung tìm cuối' 'Nội dung biến đầu' 'Nội dung biến cuối' 
+	"
+}
 #
-#VD1: suasmalis; thaydong 'StrictJarVerifier.smali' 'Ljava/security/MessageDigest;->isEqual' '20' 'const/4 v1, 0x0' '0' '0' 'const/4 v1, 0x1'
+#VD1: suasmali2; thaydong 'StrictJarVerifier.smali' 'Ljava/security/MessageDigest;->isEqual' '20' 'const/4 v1, 0x0' '0' '0' 'const/4 v1, 0x1'
 #
-#VD2: suasmalis; thayphuongthuc 'PackageManagerServiceImpl.smali' '.method public static isCTS()Z' '0' '0' '0' '.end method' 'const/4 v0, 0x1\n return v0\n'
+#VD2: suasmali2; thayphuongthuc 'PackageManagerServiceImpl.smali' '.method public static isCTS()Z' '0' '0' '0' '.end method' 'const/4 v0, 0x1\n return v0\n'
 ########
 Caidat() {
 for tjar in Joyose1 Settings1 MIUISystemUIPlugin1 MIUIPackageInstaller1 MiuiSystemUI1; do
@@ -39,19 +127,19 @@ sudo sed -i 's/"ro.build.host"/"CC "/g' $TOME/Mod/$tjar/classes*/com/android/set
 [[ "$TKM" == "1" ]] && Tkm
  fi
  if [[ "$tjar" == "Joyose" ]]; then 
-   suasmalis; thaydong "GPUTUNER_SWITCH" 'GPUTUNER_SWITCH' '20' 'const/4 v0, 0x0' '0' '0' 'const/4 v0, 0x1'
+   suasmali2; thaydong "GPUTUNER_SWITCH" 'GPUTUNER_SWITCH' '20' 'const/4 v0, 0x0' '0' '0' 'const/4 v0, 0x1'
  fi
  if [[ "$tjar" == "MIUISystemUIPlugin" ]]; then 
-  suasmalis; thayphuongthuc 'MiPlayController.smali' 'supportMiPlayAudio()' '0' '0' '0' '.end method' 'const/4 p0, 0x1\n return p0\n'
+  suasmali2; thayphuongthuc 'MiPlayController.smali' 'supportMiPlayAudio()' '0' '0' '0' '.end method' 'const/4 p0, 0x1\n return p0\n'
  fi
  if [[ "$tjar" == "MIUIPackageInstaller" ]]; then 
   for taptin in $(find $TOME/Mod/$tjar -type f -name '*.smali'); do
    noichua=${taptin##*/}
-   suasmalis; chensaudongn "$noichua" '.method public static a(Landroid/content/pm/ApplicationInfo;)Z' '2' '.register' '0' '0' 'const/4 v0, 0x0\n return v0'
+   suasmali2; chensaudong "$noichua" '.method public static a(Landroid/content/pm/ApplicationInfo;)Z' '2' '.register' '0' '0' 'const/4 v0, 0x0\n return v0'
   done
  fi
  if [[ "$tjar" == "MiuiSystemUI" ]]; then 
-  suasmalis; thaydong "PrivacyItemControllerler.smali" '20' 'isMicicCameraAndabled(' '0' '0' 'move-result p0' '0' 'const/4 p0, 0x0'
+  suasmali2; thaydong "PrivacyItemControllerler.smali" '20' 'isMicicCameraAndabled(' '0' '0' 'move-result p0' '0' 'const/4 p0, 0x0'
  fi
 Repackfile
 fi 
