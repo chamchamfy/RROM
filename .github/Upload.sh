@@ -17,7 +17,7 @@ tailenr "frs.sourceforge.net:/home/frs/project" "$TND" "$MK" "rroms"
 LINKROMSFG="https://sourceforge.net/projects/$TTK/files/$NEMEROM"
 }
 svpx() {
-APIK='440b20a6-90c0-40c7-9081-313b91c29456'
+APIK='fc200943-6990-403d-b187-dcf57dfb7526'
 eval "curl -T '$TOME/$NEMEROM' -u :'$APIK' 'https://pixeldrain.com/api/file/' > $TOME/1.json"
 #curl -1 -v -k "https://pixeldrain.com/api/user/files" --user "*:*" -T "$TOME/$NEMEROM" 
 LINKROMPX="https://pixeldrain.com/u/$(cat "$TOME/1.json" | jq -r .id)"
