@@ -388,7 +388,7 @@
 
     move-result-object p0
 
-    const-string v0, "DroidGuard"
+    const-string v0, "droidguard"
 
     invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
 
@@ -944,28 +944,28 @@
     .line 150
     const-string v0, "FINGERPRINT"
 
-    const-string v1, "google/akita_beta/akita:15/AP31.240617.015/12207491:user/release-keys"
+const-string v1, "google/oriole_beta/oriole:16/BP22.250221.015/13278879:user/release-keys"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 
     .line 151
     const-string v0, "PRODUCT"
 
-    const-string v1, "akita_beta"
+const-string v1, "oriole_beta"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 
     .line 152
     const-string v0, "DEVICE"
 
-    const-string v1, "akita"
+const-string v1, "oriole"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 
     .line 153
     const-string v0, "MODEL"
 
-    const-string v1, "Pixel 8a"
+const-string v1, "Pixel 6"
 
     invoke-static {v0, v1}, Lcom/android/internal/util/PropImitationHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 
