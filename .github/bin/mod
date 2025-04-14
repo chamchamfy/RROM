@@ -104,9 +104,9 @@ echo " => Sử dụng theo cú pháp sau: suasmali2 <Tùy chỉnh>
 	"
 }
 #
-#VD1: suasmali2; thaydong 'StrictJarVerifier.smali' 'Ljava/security/MessageDigest;->isEqual' '20' 'const/4 v1, 0x0' '0' '0' 'const/4 v1, 0x1'
+#VD1: suasmali2; thaydong 'StrictJarVerifier.smali' 'Ljava/security/MessageDigest;->isEqual' '20' 'const/4 v1, 0x0' '0' '' 'const/4 v1, 0x1'
 #
-#VD2: suasmali2; thayphuongthuc 'PackageManagerServiceImpl.smali' '.method public static isCTS()Z' '0' '0' '0' '.end method' 'const/4 v0, 0x1\n return v0\n'
+#VD2: suasmali2; thayphuongthuc 'PackageManagerServiceImpl.smali' '.method public static isCTS()Z' '0' '' '0' '.end method' 'const/4 v0, 0x1\n return v0\n'
 ########
 Caidat() {
 for tjar in Joyose1 Settings1 MIUISystemUIPlugin1 MIUIPackageInstaller1 MiuiSystemUI1; do
@@ -127,19 +127,19 @@ sudo sed -i 's/"ro.build.host"/"CC "/g' $TOME/Mod/$tjar/classes*/com/android/set
 [[ "$TKM" == "1" ]] && Tkm
  fi
  if [[ "$tjar" == "Joyose" ]]; then 
-   suasmali2; thaydong "GPUTUNER_SWITCH" 'GPUTUNER_SWITCH' '20' 'const/4 v0, 0x0' '0' '0' 'const/4 v0, 0x1'
+   suasmali2; thaydong "GPUTUNER_SWITCH" 'GPUTUNER_SWITCH' '20' 'const/4 v0, 0x0' '0' '' 'const/4 v0, 0x1'
  fi
  if [[ "$tjar" == "MIUISystemUIPlugin" ]]; then 
-  suasmali2; thayphuongthuc 'MiPlayController.smali' 'supportMiPlayAudio()' '0' '0' '0' '.end method' 'const/4 p0, 0x1\n return p0\n'
+  suasmali2; thayphuongthuc 'MiPlayController.smali' 'supportMiPlayAudio()' '0' '' '0' '.end method' 'const/4 p0, 0x1\n return p0\n'
  fi
  if [[ "$tjar" == "MIUIPackageInstaller" ]]; then 
   for taptin in $(find $TOME/Mod/$tjar -type f -name '*.smali'); do
    noichua=${taptin##*/}
-   suasmali2; chensaudong "$noichua" '.method public static a(Landroid/content/pm/ApplicationInfo;)Z' '2' '.register' '0' '0' 'const/4 v0, 0x0\n return v0'
+   suasmali2; chensaudong "$noichua" '.method public static a(Landroid/content/pm/ApplicationInfo;)Z' '2' '.register' '0' '' 'const/4 v0, 0x0\n return v0'
   done
  fi
  if [[ "$tjar" == "MiuiSystemUI" ]]; then 
-  suasmali2; thaydong "PrivacyItemControllerler.smali" '20' 'isMicicCameraAndabled(' '0' '0' 'move-result p0' '0' 'const/4 p0, 0x0'
+  suasmali2; thaydong 'PrivacyItemControllerler.smali' 'isMicicCameraAndabled(' '20' 'move-result p0' '0' '' 'const/4 p0, 0x0'
  fi
 Repackfile
 fi 

@@ -388,7 +388,7 @@
 
     move-result-object p0
 
-    const-string v0, "DroidGuard"
+    const-string v0, "droidguard"
 
     invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
 
