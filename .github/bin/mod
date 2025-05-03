@@ -116,10 +116,9 @@ echo " Xử lý: $tjar.apk"
 Unpackfile
  if [[ "$tjar" == "Settings" ]]; then 
 Tkm() {
-sed -i 's/IS_INTERNATIONAL_BUILD:Z/IS_ALPHA_BUILD:Z/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/DeviceBasicInfoPresenter.smali 2>/dev/null 
-sed -i 's/IS_INTERNATIONAL_BUILD:Z/IS_ALPHA_BUILD:Z/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/DeviceBasicInfoPresenter\$4.smali 2>/dev/null 
-sed -i 's/IS_INTERNATIONAL_BUILD:Z/IS_ALPHA_BUILD:Z/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/DeviceDetailOnClickListener.smali 2>/dev/null 
-sed -i 's/IS_INTERNATIONAL_BUILD:Z/IS_ALPHA_BUILD:Z/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiMyDeviceDetailSettings.smali 2>/dev/null 
+suasmali2
+thaychuoi 'MiuiSettings.smali' 'micloud_settings' '8' 'IS_INTERNATIONAL_BUILD' '0' '' 'IS_ALPHA_BUILD'
+thaychuoi 'MiuiSettings.smali' 'mi_account_settings' '8' 'IS_INTERNATIONAL_BUILD' '0' '' 'IS_ALPHA_BUILD'
 }
 sudo sed -i 's/"MIUI "/"MIUICC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null
 sudo sed -i 's/"by xiaomi.eu"/"by MIUICC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null
