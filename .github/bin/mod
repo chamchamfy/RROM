@@ -765,10 +765,12 @@ fi
 #
 if [[ "$AP" == "1" ]]; then 
 mkdir -p $TOME/tam
-Taive "https://sourceforge.net/projects/RROM/files/apex.tar.zst" "$TOME/tam/apex.tar.zst"
-7z e -y $TOME/tam/apex.tar.zst -o$TOME/tam >/dev/null
-7z e -y $TOME/tam/apex.tar -o$TOME/tam >/dev/null
-sudo cp -rf $TOME/tam/*.apex $phanvungtam/system_ext/apex 
+Taive "https://sourceforge.net/projects/rrom/files/apex.tar.zst" "$TOME/tam/apex.tar.zst"
+ if [ "$(sha1sum "$TOME/tam/apex.tar.zst" | awk '{OFMT="%.0f"; print $1}')" = "e6eecdd5476857ad124a20cbc0b44b19aac3c996" ]; then echo " * Thêm APEX..."
+ 7z e -y $TOME/tam/apex.tar.zst -o$TOME/tam >/dev/null
+ 7z e -y $TOME/tam/apex.tar -o$TOME/tam >/dev/null
+ sudo cp -rf $TOME/tam/*.apex $phanvungtam/system_ext/apex 
+ fi
 sudo rm -rf $TOME/tam
 fi
 
