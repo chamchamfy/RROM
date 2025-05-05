@@ -2,7 +2,7 @@
 . .github/Function.sh
 
 # Cài giờ Việt Nam
-sudo apt-get install curl > /dev/null;
+sudo apt-get install curl >/dev/null;
 sudo cp /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 
 # chat bot chào & thêm nhãn chờ
@@ -38,6 +38,7 @@ GITENV Vccg "$(checkbox 'Vá chứng chỉ')"
 GITENV Vfstab "$(checkbox 'Bỏ mã hoá Rom')"
 GITENV Thucthi "$(checkbox 'Vá Permissive')"
 GITENV NRW "$(checkbox 'Cho phép đọc ghi vài phân vùng')"
+GITENV AP "$(checkbox 'Thêm APEX')"
 GITENV APPM "$(checkbox 'Thêm ứng dụng đã Mod')"
 
 # Tùy chọn Adreno GPU Driver

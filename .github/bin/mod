@@ -463,7 +463,11 @@ productfc="/product u:object_r:system_file:s0
 /product/priv-app/PrebuiltGmsCore/m/optional/MlkitBarcodeUIPrebuilt\.apk u:object_r:system_file:s0
 /product/priv-app/PrebuiltGmsCore/m/optional/VisionBarcodePrebuilt\.apk u:object_r:system_file:s0"
 #
-system_extfc="/system_ext/etc/cust_prop_white_keys_list u:object_r:system_file:s0"
+system_extfc="/system_ext/etc/cust_prop_white_keys_list u:object_r:system_file:s0
+/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0
+/system_ext/apex/com\.android\.vndk\.v31\.apex u:object_r:system_file:s0
+/system_ext/apex/com\.android\.vndk\.v32\.apex u:object_r:system_file:s0
+/system_ext/apex/com\.android\.vndk\.v33\.apex u:object_r:system_file:s0"
 #
 # Thêm fsconfig
 systemfs=''
@@ -725,7 +729,11 @@ product/priv-app/PrebuiltGmsCore/m/optional 0 0 0755
 product/priv-app/PrebuiltGmsCore/m/optional/MlkitBarcodeUIPrebuilt.apk 0 0 0644
 product/priv-app/PrebuiltGmsCore/m/optional/VisionBarcodePrebuilt.apk 0 0 0644"
 #
-system_extfs="system_ext/etc/cust_prop_white_keys_list 0 0 0644"
+system_extfs="system_ext/etc/cust_prop_white_keys_list 0 0 0644
+system_ext/apex/com.android.vndk.v30.apex 0 0 0644
+system_ext/apex/com.android.vndk.v31.apex 0 0 0644
+system_ext/apex/com.android.vndk.v32.apex 0 0 0644
+system_ext/apex/com.android.vndk.v33.apex 0 0 0644"
 }
 #
 ngonngu() { 
@@ -755,7 +763,14 @@ for i in vfs vfc; do [ -f "$TOME/$i" ] && sudo sed -i -e 's/\r$//g; /^$/d' $TOME
 sudo rm -rf $TOME/tam
 fi 
 #
-
+if [[ "$AP" == "1" ]]; then 
+mkdir -p $TOME/tam
+Taive "https://sourceforge.net/projects/RROM/files/apex.tar.zst" "$TOME/tam/apex.tar.zst"
+7z e -y $TOME/tam/apex.tar.zst -o$TOME/tam >/dev/null
+7z e -y $TOME/tam/apex.tar -o$TOME/tam >/dev/null
+sudo cp -rf $TOME/tam/*.apex $phanvungtam/system_ext/apex 
+sudo rm -rf $TOME/tam
+fi
 
 if [[ "$AGPU" == "725" ]]; then 
  Taive "https://github.com/chamchamfy/toolcc/raw/main/AdrenoGPUDriver725.zip" "$TOME/AdrenoGPUDriver.zip"

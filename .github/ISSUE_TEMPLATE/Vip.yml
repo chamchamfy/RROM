@@ -59,6 +59,7 @@ body:
         - label: "Bỏ mã hoá Rom"
         - label: "Vá Permissive"
         - label: "Cho phép đọc ghi vài phân vùng"
+        - label: "Thêm APEX"
           required: false
   - type: dropdown
     attributes:
