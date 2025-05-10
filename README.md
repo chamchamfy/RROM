@@ -10,9 +10,13 @@
   - Xóa ứng dụng thừa...
 + Buy me coffee:
   - Viettel Money: 
-       9704229225265656
+
+        9704229225265656
+    
   - Paypal: 
-       paypal.me/chamchamfy
+
+        paypal.me/chamchamfy
+    
 + Rom Vili: 
 ### https://xiaomirom.com/en/series
 ### https://bn.d.miui.com/OS1.0.10.0.UKDMIXM/miui_VILIGlobal_OS1.0.10.0.UKDMIXM_0a1d5a3368_14.0.zip
