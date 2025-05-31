@@ -5,8 +5,7 @@
   - Thêm Tiếng Việt
   - Tối ưu hệ thống
   - Bật các tính năng nâng cao
-  - Bật giả mạo khóa bootloader
-  - Vá Play Integrity => MEETS_DEVICE_INTEGRITY
+  - Fix failure...
   - Xóa ứng dụng thừa...
 + Buy me coffee:
   - Viettel Money: 
