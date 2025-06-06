@@ -6,7 +6,7 @@
   - Tối ưu hệ thống
   - Bật các tính năng nâng cao
   - Bật giả mạo khóa bootloader
-  - Vá Play Integrity => MEETS_DEVICE_INTEGRITY
+  - Vá Play Integrity
   - Xóa ứng dụng thừa...
 + Buy me coffee:
   - Viettel Money: 
