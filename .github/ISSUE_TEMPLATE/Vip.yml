@@ -21,11 +21,11 @@ body:
     attributes:
       label: Dùng Recovery mod
       description: |
-        Dùng `TWRP`, hoặc `OrangeFox`, hoặc `PBRP`
+        Dùng `twrp`, hoặc `OrangeFox`, hoặc `pbrp`
         Lưu ý: Một số ROM sẽ không có sẵn recovery.
       options:
         - Không thêm
-        - OrangeFox
+        - OFox
         - TWRP
         - PBRP
       default: 0
