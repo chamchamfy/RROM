@@ -262,22 +262,30 @@ fi
 #thempersist
 #[ -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ] && echo " * Thêm persist..."
 #
-#linktwrp="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/${tenmamay}/twrp-3.7.0_12-v7.9_A13-${tenmamay}-skkk.img"
- mkdir -p $TOME/twrp
- taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$tenmamay"; Taive "$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')" "$2"; } 
+mkdir -p $TOME/twrp
+taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$tenmamay"; TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; Taive "$TURL" "$2$duoi"; } 
+txrec() { [ -f $TOME/twrp/recovery.zip ] && 7za x -tzip -y $TOME/twrp/recovery.zip *.img -o$TOME/twrp/recovery.img >/dev/null && rm -f $TOME/twrp/recovery.zip 2>/dev/null; }
+txtwrp() { [ -f $TOME/twrp/twrp.zip ] && 7za x -tzip -y $TOME/twrp/twrp.zip *.img -o$TOME/twrp/twrp.img >/dev/null && rm -f $TOME/twrp/twrp.zip 2>/dev/null; }
 if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then 
  if [[ "$MREC" == "1" ]]; then 
-  taivetwrp "OrangeFox-" "$TOME/twrp/fox.zip" 
-  7za x -tzip -y $TOME/twrp/fox.zip *.img -o$TOME/twrp/recovery.img >/dev/null && rm -rf $TOME/twrp/fox.zip 2>/dev/null
+  taivetwrp "OrangeFox-" "$TOME/twrp/recovery" 
+  txrec
  elif [[ "$MREC" == "TWRP" ]]; then 
-  taivetwrp "twrp-" "$TOME/twrp/recovery.img"
+  taivetwrp "twrp-" "$TOME/twrp/recovery" || taivetwrp "boot" "$TOME/twrp/recovery"
+  txrec
+ elif [[ "$MREC" == "PBRB" ]]; then 
+  taivetwrp "PBRP-" "$TOME/twrp/recovery"
+  txrec
  fi
 else 
  if [[ "$MREC" == "1" ]]; then 
-  taivetwrp "OrangeFox-" "$TOME/twrp/fox.zip" 
-  7za x -tzip -y $TOME/twrp/fox.zip *.img -o$TOME/twrp/twrp.img >/dev/null && rm -rf $TOME/twrp/fox.zip 2>/dev/null
+  taivetwrp "OrangeFox-" "$TOME/twrp/twrp" 
+  txtwrp
  elif [[ "$MREC" == "TWRP" ]]; then 
-  taivetwrp "twrp-" "$TOME/twrp/twrp.img"
+  taivetwrp "twrp-" "$TOME/twrp/twrp" || taivetwrp "boot" "$TOME/twrp/twrp"
+ elif [[ "$MREC" == "PBRP" ]]; then 
+  taivetwrp "PBRP-" "$TOME/twrp/twrp"
+  txtwrp
  fi
 fi
 [[ -n "$(ls $TOME/twrp/*.img 2>/dev/null)" ]] && echo " * Thêm Recovery $tenmamay..."
@@ -357,6 +365,5 @@ if [[ "$APPM" == "1" ]]; then
   sudo rm -rf $TOME/tam $TOME/appm.zip
  fi
 fi
-
 #
 themcauhinh
