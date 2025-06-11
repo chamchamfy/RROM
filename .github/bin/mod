@@ -267,7 +267,7 @@ taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices
 txrec() { [ -f $TOME/twrp/recovery.zip ] && 7za x -tzip -y $TOME/twrp/recovery.zip *.img -o$TOME/twrp/recovery.img >/dev/null && rm -f $TOME/twrp/recovery.zip 2>/dev/null; }
 txtwrp() { [ -f $TOME/twrp/twrp.zip ] && 7za x -tzip -y $TOME/twrp/twrp.zip *.img -o$TOME/twrp/twrp.img >/dev/null && rm -f $TOME/twrp/twrp.zip 2>/dev/null; }
 if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then 
- if [[ "$MREC" == "1" ]]; then 
+ if [[ "$MREC" == "OFOX" ]]; then 
   taivetwrp "OrangeFox-" "$TOME/twrp/recovery" 
   txrec
  elif [[ "$MREC" == "TWRP" ]]; then 
@@ -278,7 +278,7 @@ if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then
   txrec
  fi
 else 
- if [[ "$MREC" == "1" ]]; then 
+ if [[ "$MREC" == "OFOX" ]]; then 
   taivetwrp "OrangeFox-" "$TOME/twrp/twrp" 
   txtwrp
  elif [[ "$MREC" == "TWRP" ]]; then 
