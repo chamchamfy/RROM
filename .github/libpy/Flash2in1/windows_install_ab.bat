@@ -1,11 +1,12 @@
 @echo off
 mode con cols=140 lines=50
+::color 0a
 set fastboot=bin\windows\all\fastboot.exe
 if %PROCESSOR_ARCHITECTURE%==x86 (set cpuArch=x86) else set cpuArch=amd64
 
-echo. ==== FLASH ROM BY @chamchamfy ====
+echo.==== FLASH ROM BY @chamchamfy ==== 
 echo. |DATE
-echo. |TIME
+echo.==================================
 echo.
 echo.
 if not exist %fastboot% echo %fastboot% not found. & pause & exit /B 1
@@ -31,7 +32,7 @@ if "%errorlevel%" equ "0" (
     echo.   Converted partition successfully.
     echo.
 ) else (
-    echo. - Chuyen doi khong thanh cong, nhan phim bat ky de thoat...
+    echo. - Chuyen doi loi, nhan phim bat ky de thoat...
     echo.   Partition conversion failed, press any key to exit...
     pause >nul 2>nul
     exit
@@ -88,6 +89,9 @@ if exist images\cmnlib64.img (
 )
 if exist images\cmnlib.img (
 %fastboot% flash cmnlib_ab images\cmnlib.img
+)
+if exist images\countrycode.img (
+%fastboot% flash countrycode_ab images\countrycode.img
 )
 if exist images\cpucp.img (
 %fastboot% flash cpucp_ab images\cpucp.img
@@ -152,6 +156,9 @@ if exist images\vbmeta.img (
 if exist images\vbmeta_system.img (
 %fastboot% flash vbmeta_system_ab images\vbmeta_system.img
 )
+if exist images\vbmeta_vendor.img (
+%fastboot% flash vbmeta_vendor_ab images\vbmeta_vendor.img
+)
 if exist images\vendor_boot.img (
 %fastboot% flash vendor_boot_ab images\vendor_boot.img
 )
@@ -185,7 +192,7 @@ if exist images\cust.img.0 (
 %fastboot% flash cust images\cust.img.0
 %fastboot% flash cust images\cust.img.1
 )
-)
+
 if exist images\persist.img (
 %fastboot% flash persist images\persist.img
 %fastboot% flash persistbak images\persistbak.img
@@ -197,8 +204,15 @@ if exist images\recovery.img (
 %fastboot% flash recovery_ab images\recovery.img
 )
 if "%CHOICE1%" == "y" (
+    %fastboot% format userdata
+ if exist images\userdata.img (
     %fastboot% erase userdata
+    %fastboot% flash userdata images\userdata.img
+ )
+ if exist images\metadata.img (
     %fastboot% erase metadata
+    %fastboot% flash metadata images\metadata.img
+ )
 )
 %fastboot% set_active a
 %fastboot% reboot

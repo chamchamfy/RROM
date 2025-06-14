@@ -25,8 +25,9 @@ URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | awk -F'"' '{print $4}')"
 
 # Thêm recovery mod
 [ -n "$(grep 'Không thêm' $TOME/1.ht)" ] && RECOVERYMOD="0"
-[ -n "$(grep 'OrangeFox' $TOME/1.ht)" ] && RECOVERYMOD="1"
+[ -n "$(grep 'OFOX' $TOME/1.ht)" ] && RECOVERYMOD="OFOX"
 [ -n "$(grep 'TWRP' $TOME/1.ht)" ] && RECOVERYMOD="TWRP"
+[ -n "$(grep 'PBRP' $TOME/1.ht)" ] && RECOVERYMOD="TWRP"
 GITENV MREC $RECOVERYMOD
 
 # Thêm Các tùy chọn: 1=Bật, 0=Tắt
