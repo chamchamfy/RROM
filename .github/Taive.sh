@@ -27,7 +27,7 @@ URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | awk -F'"' '{print $4}')"
 [ -n "$(grep 'Không thêm' $TOME/1.ht)" ] && RECOVERYMOD="0"
 [ -n "$(grep 'OFOX' $TOME/1.ht)" ] && RECOVERYMOD="OFOX"
 [ -n "$(grep 'TWRP' $TOME/1.ht)" ] && RECOVERYMOD="TWRP"
-[ -n "$(grep 'PBRP' $TOME/1.ht)" ] && RECOVERYMOD="TWRP"
+[ -n "$(grep 'PBRP' $TOME/1.ht)" ] && RECOVERYMOD="PBRP"
 GITENV MREC $RECOVERYMOD
 
 # Thêm Các tùy chọn: 1=Bật, 0=Tắt
