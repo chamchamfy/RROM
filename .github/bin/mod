@@ -251,7 +251,7 @@ fi
 #[ -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ] && echo " * Thêm persist..."
 #
 mkdir -p $TOME/twrp
-taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$tenmamay"; TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; Taive "$TURL" "$2$duoi"; } 
+taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$tenmamay"; [ -n "$(curl -s "$LURL/" | grep 'net.sf.files' | grep 'skkk')" ] && TURL="$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | grep -oP 'twrp[^"]*skkk\.img' | head -n1)" || TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; Taive "$TURL" "$2$duoi"; } 
 txrec() { [ -f $TOME/twrp/recovery.zip ] && 7za x -tzip -y $TOME/twrp/recovery.zip *.img -o$TOME/twrp/recovery.img >/dev/null && rm -f $TOME/twrp/recovery.zip 2>/dev/null; }
 txtwrp() { [ -f $TOME/twrp/twrp.zip ] && 7za x -tzip -y $TOME/twrp/twrp.zip *.img -o$TOME/twrp/twrp.img >/dev/null && rm -f $TOME/twrp/twrp.zip 2>/dev/null; }
 if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then 
