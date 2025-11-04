@@ -34,13 +34,30 @@ Xem () { curl -s -G -L -N -H "$User" "$1"; }
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up} 
 
 Taidulieu() { 
+
 Tenrom=${URL##*/} && Tenr=${Tenrom%.*} && Dinhdang=${URL##*.}; 
 echo "- Link Rom: $URL"
 echo "TENZ=$Tenr" >> $GITHUB_ENV
 
 echo "- Tải về" 
-Taive "$URL" "$TOME/$Tenrom" 
-[ $? -ne 0 ] && Taivewget "$URL" "$TOME/$Tenrom"
+
+Taiver "$URL" "$TOME/rom.x" 
+[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+[ ! -s "$TOME/rom.x" ] && exit 0
+if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then DUOI=zip;
+ [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
+fi
+if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ]; then DUOI=gz;
+ [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
+fi
+if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ]; then DUOI=tgz;
+ [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
+fi
+echo "$TROM"
+echo "$DUOI"
+
+
+mv -f $TOME/rom.x $TOME/$TROM
 
 echo "- Giải nén rom" 
 if [[ -s $TOME/$Tenrom ]]; then 
