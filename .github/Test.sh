@@ -53,7 +53,7 @@ TROM="${URL##*/}.${DUOI}"
 echo "$TROM"
 echo "$DUOI"
 echo "Dinhdang=$DUOI" >> $GITHUB_ENV
-echo "NEMROM="RROM_$TROM" >> $GITHUB_ENV
+echo "NEMROM="RROM_$TROM"" >> $GITHUB_ENV
 
 mv -f $TOME/rom.x $TOME/$NEMROM
 
