@@ -73,8 +73,9 @@ pip3 install -r requirements.txt >/dev/null;
 ) & ( 
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-Taive "$URL" "$TOME/rom.zip" 
-[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.zip"
+Taiver "$URL" "$TOME/rom.x" 
+[ ! -f "$TOME/rom.x" ] && Taive "$URL" "$TOME/rom.x"
+[ -f "$TOME/rom.x" -a "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
 
 
 ) & (
@@ -85,7 +86,7 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -f "$TOME/rom.zip" ] && break
+[ -f "$TOME/rom.x" ] && break
 fi
 done
 )
@@ -93,12 +94,12 @@ done
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -f "$TOME/rom.zip" ]; then
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.zip | grep '504b')" ] && DINHDANG=.zip;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.zip | grep '1f8b 0808')" ] && DINHDANG=.gz;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.zip | grep '1f8b 0800')" ] && DINHDANG=.tgz;
+if [ -f "$TOME/rom.x" ]; then
+[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && DINHDANG=.zip;
+[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DINHDANG=.gz;
+[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DINHDANG=.tgz;
 NEMEROM="RROM_${DDPV}_${URL##*/}${DINHDANG}"
-mv -f $TOME/rom.zip $TOME/$NEMEROM
+mv -f $TOME/rom.x $TOME/$NEMEROM
 echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
 echo "DINHDANG=$DINHDANG" >> $GITHUB_ENV
  if [ "$DINHDANG" == ".zip" ]; then
