@@ -51,11 +51,12 @@ Taiver "$URL" "$TOME/rom.x"
 TROM="${URL##*/}.${DUOI}"
 echo "$TROM"
 echo "$DUOI"
+TENR=RROM_${TROM}
 echo "Dinhdang=$DUOI" >> $GITHUB_ENV
-echo "NEMROM=RROM_${TROM}" >> $GITHUB_ENV
+echo "NEMROM=$TENR" >> $GITHUB_ENV
 
-echo "$Dinhdang"
-echo "$NEMROM"
+echo "Định dạng: $Dinhdang"
+echo "Tên rom: $NEMROM"
 mv -f $TOME/rom.x $TOME/$NEMROM
 
 echo "- Giải nén rom" 
