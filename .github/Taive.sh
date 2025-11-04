@@ -63,6 +63,7 @@ GITENV SEVERUP "$(checktc Sourceforge)"
 # check url
 GITENV URL $URLKK
 if [ "$URL" ]; then
+
 (
 sudo apt-get update >/dev/null
 sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip >/dev/null
