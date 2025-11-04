@@ -49,11 +49,11 @@ Taiver "$URL" "$TOME/rom.x"
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DUOI=gz;
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DUOI=tgz;
 TROM="${URL##*/}.${DUOI}"
-echo "$TROM"
-echo "$DUOI"
-TENR=RROM_${TROM}
-echo "Dinhdang=$DUOI" >> $GITHUB_ENV
-echo "NEMROM=$TENR" >> $GITHUB_ENV
+
+NEMROM=RROM_${TROM}
+Dinhdang=$DUOI
+echo "Dinhdang=$Dinhdang" >> $GITHUB_ENV
+echo "NEMROM=$NEMROM" >> $GITHUB_ENV
 
 echo "Định dạng: $Dinhdang"
 echo "Tên rom: $NEMROM"
