@@ -70,16 +70,12 @@ pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome >/
 echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
+
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 Taiver "$URL" "$TOME/romz" 
 [ "$(du -m $TOME/romz | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/romz"
-[ -s "$TOME/romz" ] || exit 0
-[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '504b')" ] && DINHDANG=zip;
-[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '1f8b 0808')" ] && DINHDANG=gz;
-[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '1f8b 0800')" ] && DINHDANG=tgz;
-NEMEROM="RROM_${DDPV}_${URL##*/}.${DINHDANG}"
-mv -f "$TOME/romz" "$TOME/$NEMEROM"
-[ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
+[ -s "$TOME/romz" ] || echo "$TOME/lag"
+
 ) & (
 # Tải rom và tải file khác
 while true; do
@@ -88,23 +84,28 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$TOME/$NEMEROM" ] && break
+[ -e "$TOME/romz" ] && break
 [ -e "$TOME/lag" ] && break
 sleep 10
 fi
 done
 )
 
-echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
-echo "DINHDANG=$DINHDANG" >> $GITHUB_ENV
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -s "$TOME/$NEMEROM" ]; then
- if [ "$DINHDANG" == "zip" ]; then
+if [ -s "$TOME/romz" ]; then
+[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '504b')" ] && DINHDANG=.zip;
+[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '1f8b 0808')" ] && DINHDANG=.gz;
+[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '1f8b 0800')" ] && DINHDANG=.tgz;
+NEMEROM="RROM_${DDPV}_${URL##*/}${DINHDANG}"
+mv -f $TOME/romz $TOME/$NEMEROM
+echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
+echo "DINHDANG=$DINHDANG" >> $GITHUB_ENV
+ if [ "$DINHDANG" == ".zip" ]; then
  unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
- elif [ "$DINHDANG" == "tgz" ] || [ "$DINHDANG" == "gz" ]; then
+ elif [ "$DINHDANG" == ".tgz" ] || [ "$DINHDANG" == ".gz" ]; then
  tar -xf "$TOME/$NEMEROM" -C "$TOME/Unzip"
  else
  bug "- Rom không phải file zip hoặc tgz, gz"
