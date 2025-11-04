@@ -46,6 +46,7 @@ echo "- Tải về"
 Taiver "$URL" "$TOME/rom.x" 
 [ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
 [ ! -s "$TOME/rom.x" ] && exit 0
+echo " Đuôi: ${URL##*.}"
 if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then DUOI=zip;
  [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
 fi
@@ -62,7 +63,7 @@ echo "Dinhdang=$DUOI" >> $GITHUB_ENV
 mv -f $TOME/rom.x $TOME/$TROM
 
 echo "- Giải nén rom" 
-if [[ -s $TOME/$TROM ]]; then 
+if [[ -s $TOME/$TROM ]]; then echo " giải nén"
 [[ "$Dinhdang" == "zip" ]] && unzip -qo "$TOME/$TROM" -d "$TOME/Unzip"
 else echo "- Không có tập tin rom"
 fi 
