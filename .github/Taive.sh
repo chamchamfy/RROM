@@ -73,9 +73,9 @@ pip3 install -r requirements.txt >/dev/null;
 ) & ( 
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-Taiver "$URL" "$TOME/rom.zip" 
-[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
-[ -s "$TOME/rom.zip" ] || echo "$TOME/lag"
+Taive "$URL" "$TOME/rom.zip" 
+[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.zip"
+
 
 ) & (
 # Tải rom và tải file khác
@@ -85,9 +85,7 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$TOME/rom.zip" ] && break
-[ -e "$TOME/lag" ] && break
-sleep 10
+[ -f "$TOME/rom.zip" ] && break
 fi
 done
 )
@@ -95,7 +93,7 @@ done
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -s "$TOME/rom.zip" ]; then
+if [ -f "$TOME/rom.zip" ]; then
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.zip | grep '504b')" ] && DINHDANG=.zip;
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.zip | grep '1f8b 0808')" ] && DINHDANG=.gz;
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.zip | grep '1f8b 0800')" ] && DINHDANG=.tgz;
