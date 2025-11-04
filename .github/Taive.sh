@@ -85,6 +85,8 @@ fi
 if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ]; then DUOI=tgz;
  [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
 fi
+echo "$TROM"
+echo "$DUOI"
 GITENV NEMEROM "RROM_${DDPV}_$TROM"
 GITENV DINHDANG "$DUOI"
 mv -f "$TOME/rom.x" "$TOME/$NEMEROM"
