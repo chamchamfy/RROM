@@ -14,7 +14,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # Rom Rebuild
-          export SIZE='8.5'; export URL='https://orig.bigota.d.miui.com/V14.0.3.0.TKDTWXM/miui_VILITWGlobal_V14.0.3.0.TKDTWXM_3bfd41caa1_13.0.zip'
+          export SIZE='8.5'; export URL='https://pixeldrain.com/api/file/eqha2c2w'
           chmod -R 777 .github/bin/* >/dev/null
           export PATH="$GITHUB_WORKSPACE/.github/bin:$PATH"
           chmod -R 777 .github/*.sh >/dev/null
