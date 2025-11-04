@@ -86,7 +86,8 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -f "$TOME/rom.x" ] && break
+[ -e "$TOME/rom.x" ] && break
+sleep 10
 fi
 done
 )
@@ -95,25 +96,23 @@ echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
 if [ -f "$TOME/rom.x" ]; then
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && DINHDANG=.zip;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DINHDANG=.gz;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DINHDANG=.tgz;
-NEMEROM="RROM_${DDPV}_${URL##*/}${DINHDANG}"
-mv -f $TOME/rom.x $TOME/$NEMEROM
+ if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then
+#mv -f "$TOME/rom.x" "$TOME/rom.zip"
+unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
+cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
+ elif [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ]; then 
+#mv -f "$TOME/rom.x" "$TOME/rom.gz"
+tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
+ elif [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0880')" ]; then 
+#mv -f "$TOME/rom.x" "$TOME/rom.tgz"
+tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
+ else bug "- Rom không phải file zip hoặc tgz, gz"
+ fi
+NEMEROM="RROM_${DDPV}_${URL##*/}.zip"
 echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
-echo "DINHDANG=$DINHDANG" >> $GITHUB_ENV
- if [ "$DINHDANG" == ".zip" ]; then
- unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
- cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
- elif [ "$DINHDANG" == ".tgz" ] || [ "$DINHDANG" == ".gz" ]; then
- tar -xf "$TOME/$NEMEROM" -C "$TOME/Unzip"
- else
- bug "- Rom không phải file zip hoặc tgz, gz"
- fi 
-fi
 
 # Xoá tập tin rom sau khi giải nén 
-sudo rm -f $TOME/$NEMEROM 2>/dev/null
+sudo rm -f $TOME/rom.x 2>/dev/null
 else
 bug "- Liên kết tải lỗi..."
 fi
