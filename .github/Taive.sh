@@ -71,13 +71,10 @@ pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome >/
 echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
-
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 Taiver "$URL" "$TOME/rom.x" 
 [ ! -f "$TOME/rom.x" ] && Taive "$URL" "$TOME/rom.x"
 [ -f "$TOME/rom.x" -a "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
-
-
 ) & (
 # Tải rom và tải file khác
 while true; do
@@ -90,30 +87,27 @@ else
 sleep 10
 fi
 done
-)
-
-echo
+) & (
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-
 if [ -f "$TOME/rom.x" ]; then
  if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then
- #mv -f "$TOME/rom.x" "$TOME/rom.zip"
- unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
+ mv -f "$TOME/rom.x" "$TOME/rom.zip"
+ unzip -qo "$TOME/rom.zip" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
  elif [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ]; then 
- #mv -f "$TOME/rom.x" "$TOME/rom.gz"
- tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
+ mv -f "$TOME/rom.x" "$TOME/rom.gz"
+ tar -xf "$TOME/rom.gz" -C "$TOME/Unzip"
  elif [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0880')" ]; then 
- #mv -f "$TOME/rom.x" "$TOME/rom.tgz"
- tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
+ mv -f "$TOME/rom.x" "$TOME/rom.tgz"
+ tar -xf "$TOME/rom.tgz" -C "$TOME/Unzip"
  else bug "- Rom không phải file zip hoặc tgz, gz"
  fi
  NEMEROM="RROM_${DDPV}_${URL##*/}.zip"
  echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
 fi
-
+)
 # Xoá tập tin rom sau khi giải nén 
-sudo rm -f $TOME/rom.x 2>/dev/null
+sudo rm -f $TOME/rom.* 2>/dev/null
 else
 bug "- Liên kết tải lỗi..."
 fi
