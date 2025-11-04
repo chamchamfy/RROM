@@ -28,9 +28,11 @@ danhsach='system vendor system_ext product odm mi_ext system_dlkm vendor_dlkm';
 Boot="boot boot_a vendor_boot vendor_boot_a"; 
 
 User="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
-Taive() { curl -S -k "$1" -o "$2"; }
-Taivewget() { wget --no-check-certificate "$1" -O "$2"; }
-Xem () { curl -s -G -L -N -H "$User" "$1"; }
+Xem() { curl -s -L -G -N -H "$User" --connect-timeout 20 "$1"; }
+Taive() { curl -s -L -k -H "$User" --connect-timeout 20 "$1" -o "$2"; }
+Taiver() { curl -S -k "$1" -o "$2"; }
+Taivewget() { wget "$1" -O "$2"; }
+Taivewgetr() { wget --no-check-certificate "$1" -O "$2"; }
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up} 
 
 Taidulieu() { 
@@ -55,13 +57,13 @@ if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ]; then DUOI=tgz;
 fi
 echo "$TROM"
 echo "$DUOI"
-
+echo "Dinhdang=$DUOI" >> $GITHUB_ENV
 
 mv -f $TOME/rom.x $TOME/$TROM
 
 echo "- Giải nén rom" 
-if [[ -s $TOME/$Tenrom ]]; then 
-[[ "$Dinhdang" == "zip" ]] && unzip -qo "$TOME/$Tenrom" -d "$TOME/Unzip"
+if [[ -s $TOME/$TROM ]]; then 
+[[ "$Dinhdang" == "zip" ]] && unzip -qo "$TOME/$TROM" -d "$TOME/Unzip"
 else echo "- Không có tập tin rom"
 fi 
 }
