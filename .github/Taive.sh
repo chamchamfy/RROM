@@ -97,19 +97,20 @@ Chatbot "- Giải nén ROM ${URL##*/} ..."
 
 if [ -f "$TOME/rom.x" ]; then
  if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then
-#mv -f "$TOME/rom.x" "$TOME/rom.zip"
-unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
-cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
+ #mv -f "$TOME/rom.x" "$TOME/rom.zip"
+ unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
+ cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
  elif [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ]; then 
-#mv -f "$TOME/rom.x" "$TOME/rom.gz"
-tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
+ #mv -f "$TOME/rom.x" "$TOME/rom.gz"
+ tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
  elif [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0880')" ]; then 
-#mv -f "$TOME/rom.x" "$TOME/rom.tgz"
-tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
+ #mv -f "$TOME/rom.x" "$TOME/rom.tgz"
+ tar -xf "$TOME/rom.x" -C "$TOME/Unzip"
  else bug "- Rom không phải file zip hoặc tgz, gz"
  fi
-NEMEROM="RROM_${DDPV}_${URL##*/}.zip"
-echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
+ NEMEROM="RROM_${DDPV}_${URL##*/}.zip"
+ echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
+fi
 
 # Xoá tập tin rom sau khi giải nén 
 sudo rm -f $TOME/rom.x 2>/dev/null
