@@ -46,31 +46,26 @@ echo "- Tải về"
 Taiver "$URL" "$TOME/rom.x" 
 [ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
 [ ! -s "$TOME/rom.x" ] && exit 0
-echo " Đuôi: ${URL##*.}"
-if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then DUOI=zip;
- [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
-fi
-if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ]; then DUOI=gz;
- [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
-fi
-if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ]; then DUOI=tgz;
- [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
-fi
+[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && DUOI=zip;
+[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DUOI=gz;
+[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DUOI=tgz;
+TROM="${URL##*/}.${DUOI}"
 echo "$TROM"
 echo "$DUOI"
 echo "Dinhdang=$DUOI" >> $GITHUB_ENV
+echo "NEMROM="RROM_$TROM" >> $GITHUB_ENV
 
-mv -f $TOME/rom.x $TOME/$TROM
+mv -f $TOME/rom.x $TOME/$NEMROM
 
 echo "- Giải nén rom" 
-if [[ -s $TOME/$TROM ]]; then echo " giải nén"
-[[ "$Dinhdang" == "zip" ]] && unzip -qo "$TOME/$TROM" -d "$TOME/Unzip"
+if [[ -s $TOME/$NEMROM ]]; then echo " giải nén: $NEMROM"
+[[ "$Dinhdang" == "zip" ]] && unzip -qo "$TOME/$NEMROM" -d "$TOME/Unzip"
 else echo "- Không có tập tin rom"
 fi 
 }
 
 Taidulieu
-ls $TOME/$Tenrom
+ls $TOME/$NEMROM
 ls $TOME/Unzip
 #. $TOME/Option.md
 echo "- Kết thúc" 
