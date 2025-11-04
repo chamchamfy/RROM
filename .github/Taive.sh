@@ -54,11 +54,6 @@ GITENV AGPU $DGPU
 [ -n "$(grep 'Cho phép ghi đọc' $TOME/1.ht)" ] && DDPV="ext4"
 GITENV Loaihethong $DDPV
 
-# Gắn lên git env
-GITENV URL $URLKK
-GITENV NEMEROM "RROM_${DDPV}_${URL##*/}"
-GITENV DINHDANG "${URL##*.}"
-
 # Thêm tên tác giả khi flash Rom
 GITENV Tacgia "chamchamfy"
 
@@ -66,6 +61,7 @@ GITENV Tacgia "chamchamfy"
 GITENV SEVERUP "$(checktc Sourceforge)"
 
 # check url
+GITENV URL $URLKK
 if [ "$URL" ]; then
 
 (
@@ -76,14 +72,23 @@ echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
 
-
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-Taiver "$URL" "$TOME/rom.zip" 
-[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
-[ ! -s "$TOME/rom.zip" ] && exit 0
-mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
+Taiver "$URL" "$TOME/rom.x" 
+[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+[ ! -s "$TOME/rom.x" ] && exit 0
+if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then DUOI=zip;
+ [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
+fi
+if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ]; then DUOI=gz;
+ [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
+fi
+if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ]; then DUOI=tgz;
+ [ -z "${URL##*.}" ] && TROM=${URL##*/}.${DUOI} || TROM=${URL##*/}
+fi
+GITENV NEMEROM "RROM_${DDPV}_$TROM"
+GITENV DINHDANG "$DUOI"
+mv -f "$TOME/rom.x" "$TOME/$NEMEROM"
 [ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
-
 ) & (
 # Tải rom và tải file khác
 while true; do
