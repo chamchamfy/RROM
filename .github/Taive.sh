@@ -63,7 +63,6 @@ GITENV SEVERUP "$(checktc Sourceforge)"
 # check url
 GITENV URL $URLKK
 if [ "$URL" ]; then
-
 (
 sudo apt-get update >/dev/null
 sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip >/dev/null
@@ -71,7 +70,6 @@ pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome >/
 echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
-
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 Taiver "$URL" "$TOME/rom.x" 
 [ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
@@ -79,9 +77,10 @@ Taiver "$URL" "$TOME/rom.x"
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && DUOI=zip;
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DUOI=gz;
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DUOI=tgz;
-TROM="${URL##*/}.${DUOI}"
-GITENV NEMEROM "RROM_${DDPV}_$TROM"
-GITENV DINHDANG "$DUOI"
+NEMEROM="RROM_${DDPV}_${URL##*/}.${DUOI}"
+DINHDANG=$DUOI
+echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
+echo "DINHDANG=$DINHDANG" >> $GITHUB_ENV
 mv -f "$TOME/rom.x" "$TOME/$NEMEROM"
 [ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
 ) & (
