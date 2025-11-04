@@ -71,17 +71,14 @@ echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-Taiver "$URL" "$TOME/rom.x" 
-[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
-[ ! -s "$TOME/rom.x" ] && exit 0
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && DUOI=zip;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DUOI=gz;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DUOI=tgz;
-NEMEROM="RROM_${DDPV}_${URL##*/}.${DUOI}"
-DINHDANG=$DUOI
-echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
-echo "DINHDANG=$DINHDANG" >> $GITHUB_ENV
-mv -f "$TOME/rom.x" "$TOME/$NEMEROM"
+Taiver "$URL" "$TOME/romz" 
+[ "$(du -m $TOME/romz | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/romz"
+[ -s "$TOME/romz" ] || exit 0
+[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '504b')" ] && DINHDANG=zip;
+[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '1f8b 0808')" ] && DINHDANG=gz;
+[ -n "$(xxd -l 4 -c 4 $TOME/romz | grep '1f8b 0800')" ] && DINHDANG=tgz;
+NEMEROM="RROM_${DDPV}_${URL##*/}.${DINHDANG}"
+mv -f "$TOME/romz" "$TOME/$NEMEROM"
 [ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
 ) & (
 # Tải rom và tải file khác
@@ -98,10 +95,12 @@ fi
 done
 )
 
+echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
+echo "DINHDANG=$DINHDANG" >> $GITHUB_ENV
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -e "$TOME/$NEMEROM" ] && [ -s "$TOME/$NEMEROM" ]; then
+if [ -s "$TOME/$NEMEROM" ]; then
  if [ "$DINHDANG" == "zip" ]; then
  unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
