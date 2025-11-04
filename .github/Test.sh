@@ -37,9 +37,8 @@ mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up}
 
 Taidulieu() { 
 
-Tenrom=${URL##*/} && Tenr=${Tenrom%.*} && Dinhdang=${URL##*.}; 
+#Tenrom=${URL##*/} && Tenr=${Tenrom%.*} && Dinhdang=${URL##*.}; 
 echo "- Link Rom: $URL"
-echo "TENZ=$Tenr" >> $GITHUB_ENV
 
 echo "- Tải về" 
 
@@ -53,8 +52,10 @@ TROM="${URL##*/}.${DUOI}"
 echo "$TROM"
 echo "$DUOI"
 echo "Dinhdang=$DUOI" >> $GITHUB_ENV
-echo "NEMROM="RROM_$TROM"" >> $GITHUB_ENV
+echo "NEMROM=RROM_${TROM}" >> $GITHUB_ENV
 
+echo "$Dinhdang"
+echo "$NEMROM"
 mv -f $TOME/rom.x $TOME/$NEMROM
 
 echo "- Giải nén rom" 
