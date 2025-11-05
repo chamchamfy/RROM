@@ -75,6 +75,7 @@ Chatbot "- Bắt đầu tải ROM: $URL ...";
 Taiver "$URL" "$TOME/rom.x" 
 [ ! -f "$TOME/rom.x" ] && Taive "$URL" "$TOME/rom.x"
 [ -f "$TOME/rom.x" -a "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+[ -s "$TOME/rom.x " ] || echo "$TOME/lag"
 ) & (
 # Tải rom và tải file khác
 while true; do
@@ -84,12 +85,13 @@ cancelrun
 exit 0
 else
 [ -e "$TOME/rom.x" ] && break
+[ -e "$TOME/lag" ] && break
 sleep 10
 fi
 done
-) & (
+) 
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-if [ -f "$TOME/rom.x" ]; then
+if [ -s "$TOME/rom.x" ]; then
  if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then
  mv -f "$TOME/rom.x" "$TOME/rom.zip"
  unzip -qo "$TOME/rom.zip" -d "$TOME/Unzip" 2>/dev/null
@@ -105,7 +107,6 @@ if [ -f "$TOME/rom.x" ]; then
  NEMEROM="RROM_${DDPV}_${URL##*/}.zip"
  echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
 fi
-)
 # Xoá tập tin rom sau khi giải nén 
 sudo rm -f $TOME/rom.* 2>/dev/null
 else
