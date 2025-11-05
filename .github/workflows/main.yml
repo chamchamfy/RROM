@@ -20,6 +20,7 @@ jobs:
       - name: 'Tải về'
         run: |
           # Taive
+          sed -i -e 's/\r$//' .github/*.sh >/dev/null
           chmod -R 777 .github/*.sh >/dev/null
           bash .github/Taive.sh 2>&1 | tee -a log.txt
       - name: 'Xem build ROM'
