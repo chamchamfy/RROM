@@ -74,10 +74,9 @@ pip3 install -r requirements.txt >/dev/null;
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 
 #Taiver "$URL" "$TOME/rom.x" 
-#[ ! -f "$TOME/rom.x" ] && Taive "$URL" "$TOME/rom.x"
-#[ -f "$TOME/rom.x" -a "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+#[ -s "$TOME/rom.x" ] || Taive "$URL" "$TOME/rom.x"
 aria2c -x 16 -s 16 -o "$TOME/rom.x" "$URL"
-[ -e "$TOME/rom.x" ] && ls "$TOME/rom.x" || touch "$TOME/lag"
+[ -e "$TOME/rom.x" ] || touch "$TOME/lag"
 ) & (
 # Tải rom và tải file khác
 while true; do
