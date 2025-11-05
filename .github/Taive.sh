@@ -92,7 +92,7 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$GOME/$NEMEROM" ] && break
+#[ -e "$GOME/$NEMEROM" ] && break
 [ -e "$GOME/lag" ] && break
 sleep 10
 fi
