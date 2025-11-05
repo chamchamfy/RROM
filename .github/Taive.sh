@@ -72,10 +72,12 @@ echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-Taiver "$URL" "$TOME/rom.x" 
-[ ! -f "$TOME/rom.x" ] && Taive "$URL" "$TOME/rom.x"
-[ -f "$TOME/rom.x" -a "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
-[ -s "$TOME/rom.x " ] || echo "$TOME/lag"
+
+#Taiver "$URL" "$TOME/rom.x" 
+#[ ! -f "$TOME/rom.x" ] && Taive "$URL" "$TOME/rom.x"
+#[ -f "$TOME/rom.x" -a "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+aria2c -x 16 -s 16 -o "$TOME/rom.x" "$URL"
+[ -e "$TOME/rom.x" ] && ls "$TOME/rom.x" || touch "$TOME/lag"
 ) & (
 # Tải rom và tải file khác
 while true; do
@@ -83,11 +85,14 @@ if [ "$(gh issue view $NUMBIE | grep -cm1 CLOSED)" == 1 ]; then
 Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
+else
+[ -e "$TOME/rom.x" ] && break
+[ -e "$TOME/lag" ] && break
 fi
 done
 ) 
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-if [ -s "$TOME/rom.x" ]; then
+if [ -e "$TOME/rom.x" ]; then
  if [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ]; then
  mv -f "$TOME/rom.x" "$TOME/rom.zip"
  unzip -qo "$TOME/rom.zip" -d "$TOME/Unzip" 2>/dev/null
