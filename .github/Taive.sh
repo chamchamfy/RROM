@@ -1,5 +1,6 @@
 # kakathic & chamchamfy
 . .github/Function.sh
+TOME="$GITHUB_WORKSPACE"
 
 # Cài giờ Việt Nam
 sudo apt-get install curl >/dev/null;
@@ -75,7 +76,6 @@ pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome >/
 echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
-
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 #Taiver "$URL" "$TOME/rom.zip" 
