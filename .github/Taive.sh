@@ -83,10 +83,6 @@ if [ "$(gh issue view $NUMBIE | grep -cm1 CLOSED)" == 1 ]; then
 Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
-else
-[ -e "$TOME/rom.x" ] && break
-[ -e "$TOME/lag" ] && break
-sleep 10
 fi
 done
 ) 
