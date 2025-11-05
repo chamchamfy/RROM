@@ -101,10 +101,10 @@ done
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -e "$TOME/$NEMEROM" ]; then ls $TOME/$NEMEROM
- [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '504b')" ] && echo " -> Đang giải nén:" && unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
+if [ -e "$TOME/$NEMEROM" ]; then 
+ [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '504b')" ] && echo " -> Đang giải nén:" && unzip -o "$TOME/$NEMEROM" -d "$TOME/Unzip"
  [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '1f8b')" ] && echo " -> Đang giải nén:" && tar -xf "$TOME/$NEMEROM" -C "$TOME/Unzip" 2>/dev/null
- [ -z "$(ls $TOME/Unzip)" ] && bug "- Rom không phải file zip hoặc tgz, gz"
+ [ -z "$(ls $TOME/Unzip)" ] && bug "- Rom không phải file zip hoặc tgz, gz" || echo " -> Các tập tin: $(ls $TOME/Unzip)"
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
 fi
 
