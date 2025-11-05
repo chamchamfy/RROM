@@ -98,15 +98,13 @@ fi
 done
 )
 
-echo
+sleep 10
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -e "$TOME/rom.x" ]; then 
- [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && echo " -> Đang giải nén:" && unzip -o "$TOME/rom.x" -d "$TOME/Unzip"
- [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b')" ] && echo " -> Đang giải nén:" && tar -xf "$TOME/rom.x" -C "$TOME/Unzip" 2>/dev/null
+ file "$TOME/rom.x" | grep -q 'Zip archive data' && echo " -> Đang giải nén:" && unzip -o "$TOME/rom.x" -d "$TOME/Unzip"
+ file "$TOME/rom.x" | grep -q 'gzip compressed' && && echo " -> Đang giải nén:" && tar -xzf "$TOME/rom.x" -C "$TOME/Unzip" 2>/dev/null
  [ -z "$(ls $TOME/Unzip)" ] && bug "- Rom không phải file zip hoặc tgz, gz" || echo " -> Các tập tin: $(ls $TOME/Unzip)"
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
-fi
 
 # Xoá tập tin rom sau khi giải nén 
 sudo rm -f $TOME/rom.* 2>/dev/null
