@@ -80,8 +80,8 @@ pip3 install -r requirements.txt >/dev/null;
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 #Taiver "$URL" "$TOME/rom.zip" 
 #[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
-aria2c -x 16 -s 16 -d "$TOME" -o "$NEMEROM" "$URL"
-[ -e "$TOME/$NEMEROM" ] || touch "$TOME/lag"
+aria2c -x 16 -s 16 -d "$TOME" -o "rom.x" "$URL"
+[ -e "$TOME/rom.x" ] || touch "$TOME/lag"
 
 ) & (
 # Tải rom và tải file khác
@@ -91,7 +91,7 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$TOME/$NEMEROM" ] && break
+[ -e "$TOME/rom.x" ] && break
 [ -e "$TOME/lag" ] && break
 sleep 10
 fi
@@ -101,15 +101,15 @@ done
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -e "$TOME/$NEMEROM" ]; then 
- [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '504b')" ] && echo " -> Đang giải nén:" && unzip -o "$TOME/$NEMEROM" -d "$TOME/Unzip"
- [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '1f8b')" ] && echo " -> Đang giải nén:" && tar -xf "$TOME/$NEMEROM" -C "$TOME/Unzip" 2>/dev/null
+if [ -e "$TOME/rom.x" ]; then 
+ [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && echo " -> Đang giải nén:" && unzip -o "$TOME/rom.x" -d "$TOME/Unzip"
+ [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b')" ] && echo " -> Đang giải nén:" && tar -xf "$TOME/rom.x" -C "$TOME/Unzip" 2>/dev/null
  [ -z "$(ls $TOME/Unzip)" ] && bug "- Rom không phải file zip hoặc tgz, gz" || echo " -> Các tập tin: $(ls $TOME/Unzip)"
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
 fi
 
 # Xoá tập tin rom sau khi giải nén 
-sudo rm -f $TOME/$NEMEROM 2>/dev/null
+sudo rm -f $TOME/rom.* 2>/dev/null
 else
 bug "- Liên kết tải lỗi..."
 fi
