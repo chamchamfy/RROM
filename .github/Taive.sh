@@ -54,6 +54,11 @@ GITENV AGPU $DGPU
 [ -n "$(grep 'Cho phép ghi đọc' $TOME/1.ht)" ] && DDPV="ext4"
 GITENV Loaihethong $DDPV
 
+# Gắn lên git env
+GITENV URL $URLKK
+GITENV NEMEROM "RROM_${DDPV}_${URL##*/}.zip"
+#GITENV DINHDANG "${URL##*.}"
+
 # Thêm tên tác giả khi flash Rom
 GITENV Tacgia "chamchamfy"
 
@@ -61,8 +66,8 @@ GITENV Tacgia "chamchamfy"
 GITENV SEVERUP "$(checktc Sourceforge)"
 
 # check url
-GITENV URL $URLKK
 if [ "$URL" ]; then
+
 (
 sudo apt-get update >/dev/null
 sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip >/dev/null
@@ -70,11 +75,15 @@ pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome >/
 echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
+
+
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-#Taiver "$URL" "$TOME/rom" 
-#[ -s "$TOME/rom" ] || Taive "$URL" "$TOME/rom"
-aria2c -x 16 -s 16 -o "$TOME/${URL##*/}" "$URL"
-[ -e "$TOME/${URL##*/}" ] || touch "$TOME/lag"
+#Taiver "$URL" "$TOME/rom.zip" 
+#[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
+aria2c -x 16 -s 16 -o "$TOME/rom.zip" "$URL"
+mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
+[ -e "$TOME/$NEMEROM" ] || touch "$TOME/lag"
+
 ) & (
 # Tải rom và tải file khác
 while true; do
@@ -83,22 +92,25 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$TOME/${URL##*/}" ] && break
+[ -e "$TOME/$NEMEROM" ] && break
 [ -e "$TOME/lag" ] && break
+sleep 10
 fi
 done
-) 
+)
+
+echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-if [ -e "$TOME/${URL##*/}" ]; then
- [ -n "$(xxd -l 4 -c 4 $TOME/${URL##*/} | grep '504b')" ] && unzip -qo "$TOME/${URL##*/}" -d "$TOME/Unzip" 2>/dev/null
- [ -n "$(xxd -l 4 -c 4 $TOME/${URL##*/} | grep '1f8b')" ] && tar -xf "$TOME/${URL##*/}" -C "$TOME/Unzip" 2>/dev/null
+
+if [ -e "$TOME/$NEMEROM" ]; then
+ [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '504b')" ] && unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
+ [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '1f8b')" ] && tar -xf "$TOME/$NEMEROM" -C "$TOME/Unzip" 2>/dev/null
  [ $? -ne 0 ] && bug "- Rom không phải file zip hoặc tgz, gz"
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
- NEMEROM="RROM_${DDPV}_${URL##*/}.zip"
- echo "NEMEROM=$NEMEROM" >> $GITHUB_ENV
 fi
+
 # Xoá tập tin rom sau khi giải nén 
-sudo rm -f $TOME/${URL##*/} 2>/dev/null
+sudo rm -f $TOME/$NEMEROM 2>/dev/null
 else
 bug "- Liên kết tải lỗi..."
 fi
