@@ -11,24 +11,24 @@ Chatbot 'Bắt đầu xây dựng, vui lòng chờ...<br/><br/>Sau khi xong link
 #addlabel "Wait"
 
 # CÁC TÙY CHỌN WEB
-Xem "https://github.com/chamchamfy/RROM/issues/$NUMBIE" > $TOME/1.ht
+Xem "https://github.com/chamchamfy/RROM/issues/$NUMBIE" > $GOME/1.ht
 
 # get delete app
-if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $TOME/1.ht)" = 1 ]; then
-grep -m1 'data-snippet-clipboard-copy-content="' $TOME/1.ht | awk -F'<' '{print $2}' | awk -F'"' '{print $6}' > $TOME/Delete_apps.md
+if [ "$(grep -cm1 'data-snippet-clipboard-copy-content=' $GOME/1.ht)" = 1 ]; then
+grep -m1 'data-snippet-clipboard-copy-content="' $GOME/1.ht | awk -F'<' '{print $2}' | awk -F'"' '{print $6}' > $GOME/Delete_apps.md
 fi
-echo " Xoá app: $(cat $TOME/Delete_apps.md)"
+echo " Xoá app: $(cat $GOME/Delete_apps.md)"
 
 # link url rom và size 
-#URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | grep -o 'Url:.*<' | sed 's|Url:<||' | cut -d '"' -f2)"
-#SIZEKK="$(grep -o 'dir="auto">.*GB' $TOME/1.ht | cut -d '>' -f2 | sed 's|GB||')"
-URLKK="$(grep -m1 'dir="auto">Url:' $TOME/1.ht | awk -F'"' '{print $4}')"
+#URLKK="$(grep -m1 'dir="auto">Url:' $GOME/1.ht | grep -o 'Url:.*<' | sed 's|Url:<||' | cut -d '"' -f2)"
+#SIZEKK="$(grep -o 'dir="auto">.*GB' $GOME/1.ht | cut -d '>' -f2 | sed 's|GB||')"
+URLKK="$(grep -m1 'dir="auto">Url:' $GOME/1.ht | awk -F'"' '{print $4}')"
 
 # Thêm recovery mod
-[ -n "$(grep 'Không thêm' $TOME/1.ht)" ] && RECOVERYMOD="0"
-[ -n "$(grep 'OFOX' $TOME/1.ht)" ] && RECOVERYMOD="OFOX"
-[ -n "$(grep 'TWRP' $TOME/1.ht)" ] && RECOVERYMOD="TWRP"
-[ -n "$(grep 'PBRP' $TOME/1.ht)" ] && RECOVERYMOD="PBRP"
+[ -n "$(grep 'Không thêm' $GOME/1.ht)" ] && RECOVERYMOD="0"
+[ -n "$(grep 'OFOX' $GOME/1.ht)" ] && RECOVERYMOD="OFOX"
+[ -n "$(grep 'TWRP' $GOME/1.ht)" ] && RECOVERYMOD="TWRP"
+[ -n "$(grep 'PBRP' $GOME/1.ht)" ] && RECOVERYMOD="PBRP"
 GITENV MREC $RECOVERYMOD
 
 # Thêm Các tùy chọn: 1=Bật, 0=Tắt
@@ -44,15 +44,15 @@ GITENV AP "$(checkbox 'Thêm APEX')"
 GITENV APPM "$(checkbox 'Thêm ứng dụng đã Mod')"
 
 # Tùy chọn Adreno GPU Driver
-[ -n "$(grep 'Mặc định' $TOME/1.ht)" ] && DGPU="0"
-[ -n "$(grep 'Phiên bản GPU 725' $TOME/1.ht)" ] && DGPU="725"
-[ -n "$(grep 'Phiên bản GPU 615' $TOME/1.ht)" ] && DGPU="615"
+[ -n "$(grep 'Mặc định' $GOME/1.ht)" ] && DGPU="0"
+[ -n "$(grep 'Phiên bản GPU 725' $GOME/1.ht)" ] && DGPU="725"
+[ -n "$(grep 'Phiên bản GPU 615' $GOME/1.ht)" ] && DGPU="615"
 GITENV AGPU $DGPU
 
 # Tùy chọn loại hệ thống
-[ -n "$(grep 'Theo hệ thống' $TOME/1.ht)" ] && DDPV="0"
-[ -n "$(grep 'Chỉ đọc' $TOME/1.ht)" ] && DDPV="erofs"
-[ -n "$(grep 'Cho phép ghi đọc' $TOME/1.ht)" ] && DDPV="ext4"
+[ -n "$(grep 'Theo hệ thống' $GOME/1.ht)" ] && DDPV="0"
+[ -n "$(grep 'Chỉ đọc' $GOME/1.ht)" ] && DDPV="erofs"
+[ -n "$(grep 'Cho phép ghi đọc' $GOME/1.ht)" ] && DDPV="ext4"
 GITENV Loaihethong $DDPV
 
 # Gắn lên git env
@@ -78,11 +78,11 @@ pip3 install -r requirements.txt >/dev/null;
 ) & ( 
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-#Taiver "$URL" "$TOME/rom.zip" 
-#[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
-aria2c -x 16 -s 16 -o "$TOME/rom.zip" "$URL"
-mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
-[ -e "$TOME/$NEMEROM" ] || touch "$TOME/lag"
+#Taiver "$URL" "$GOME/rom.zip" 
+#[ "$(du -m $GOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$GOME/rom.zip"
+aria2c -x 16 -s 16 -d "$GOME" -o "rom.zip" "$URL"
+mv -f "$GOME/rom.zip" "$GOME/$NEMEROM"
+[ -e "$GOME/$NEMEROM" ] || touch "$GOME/lag"
 
 ) & (
 # Tải rom và tải file khác
@@ -92,8 +92,8 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$TOME/$NEMEROM" ] && break
-[ -e "$TOME/lag" ] && break
+[ -e "$GOME/$NEMEROM" ] && break
+[ -e "$GOME/lag" ] && break
 sleep 10
 fi
 done
@@ -102,15 +102,15 @@ done
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
 
-if [ -e "$TOME/$NEMEROM" ]; then
- [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '504b')" ] && unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
- [ -n "$(xxd -l 4 -c 4 $TOME/$NEMEROM | grep '1f8b')" ] && tar -xf "$TOME/$NEMEROM" -C "$TOME/Unzip" 2>/dev/null
+if [ -e "$GOME/$NEMEROM" ]; then
+ [ -n "$(xxd -l 4 -c 4 $GOME/$NEMEROM | grep '504b')" ] && unzip -qo "$GOME/$NEMEROM" -d "$GOME/Unzip" 2>/dev/null
+ [ -n "$(xxd -l 4 -c 4 $GOME/$NEMEROM | grep '1f8b')" ] && tar -xf "$GOME/$NEMEROM" -C "$GOME/Unzip" 2>/dev/null
  [ $? -ne 0 ] && bug "- Rom không phải file zip hoặc tgz, gz"
- cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
+ cp -rf $GOME/Unzip/META-INF/com/android $GOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
 fi
 
 # Xoá tập tin rom sau khi giải nén 
-sudo rm -f $TOME/$NEMEROM 2>/dev/null
+sudo rm -f $GOME/$NEMEROM 2>/dev/null
 else
 bug "- Liên kết tải lỗi..."
 fi
