@@ -1,6 +1,6 @@
 # kakathic & chamchamfy
 . .github/Function.sh
-TOME="$GITHUB_WORKSPACE"
+GOME="$GITHUB_WORKSPACE"
 
 # Cài giờ Việt Nam
 sudo apt-get install curl >/dev/null;
