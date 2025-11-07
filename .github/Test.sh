@@ -68,7 +68,6 @@ fi
 }
 
 Taidulieu
-ls $TOME/$NEMROM
 ls $TOME/Unzip
 #. $TOME/Option.md
 echo "- Kết thúc" 
