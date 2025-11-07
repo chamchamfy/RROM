@@ -45,28 +45,23 @@ echo "- Tải về"
 
 #Taiver "$URL" "$TOME/rom.x" 
 #[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
-aria2c -x 16 -s 16 -d "$TOME" -o "rom.x" "$URL"
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && DUOI=zip;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DUOI=gz;
-[ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DUOI=tgz;
-TROM="${URL##*/}.${DUOI}"
+aria2c -x 16 -s 16 -d "$TOME" -o "rom.zip" "$URL"
+TROM="${URL##*/}.zip"
 
 NEMROM=RROM_${TROM}
-Dinhdang=$DUOI
-echo "Dinhdang=$Dinhdang" >> $GITHUB_ENV
 echo "NEMROM=$NEMROM" >> $GITHUB_ENV
 
-echo "Định dạng: $Dinhdang"
+
 echo "Tên rom: $NEMROM"
 #mv -f $TOME/rom.x $TOME/$NEMROM
 
 echo "- Giải nén rom" 
-echo "$(file $TOME/rom.x)"
-if [ "$(file $TOME/rom.x | grep 'Zip archive')" ]; then echo " Giải nén: $(ls $TOME/rom.x)"
- unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
+echo "$(file $TOME/rom.zip)"
+if [ "$(file $TOME/rom.zip | grep 'Zip archive')" ]; then echo " Giải nén: $(ls $TOME/rom.zip)"
+ unzip -qo "$TOME/rom.zip" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
- elif [ "$(file $TOME/rom.x | grep 'gzip compressed')" ]; then
- tar -xvf "$TOME/rom.x" -C "$TOME/Unzip"
+ elif [ "$(file $TOME/rom.zip | grep 'gzip compressed')" ]; then
+ tar -xvf "$TOME/rom.zip" -C "$TOME/Unzip"
  else
  bug "- Rom không phải file zip hoặc tgz, gz"
 fi 
