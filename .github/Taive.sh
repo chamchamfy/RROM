@@ -78,11 +78,11 @@ pip3 install -r requirements.txt >/dev/null;
 
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-#Taiver "$URL" "$TOME/rom.zip" 
-#[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
-aria2c --continue=true --enable-http-pipelining=true --max-tries=0 --retry-wait=3 -x16 -s16 -d $TOME -o "rom.zip" "$URL"
-mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
-[ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
+aria2c --continue=true -x16 -s16 -d $TOME -o "rom.x" "$URL"
+[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.x"
+[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+#mv -f "$TOME/rom.x" "$TOME/$NEMEROM"
+[ -s "$TOME/rom.x" ] || echo "$TOME/lag"
 
 ) & (
 # Tải rom và tải file khác
@@ -92,7 +92,7 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$TOME/$NEMEROM" ] && break
+[ -e "$TOME/rom.x" ] && break
 [ -e "$TOME/lag" ] && break
 sleep 10
 fi
@@ -101,18 +101,17 @@ done
 
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-echo "$(file $TOME/$NEMEROM)"
-if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" ]; then echo " Giải nén: $(ls $TOME/$NEMEROM)"
- unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
+if [ "$(file $TOME/rom.x | grep 'Zip archive')" -o "$(file $TOME/rom.x | grep 'Java archive')" ]; then echo " Giải nén: $(ls $TOME/rom.x)"
+ unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
- elif [ "$(file $TOME/$NEMEROM | grep 'gzip compressed')" ]; then
- tar -xvf "$TOME/$NEMEROM" -C "$TOME/Unzip"
+ elif [ "$(file $TOME/rom.x | grep 'gzip compressed')" ]; then
+ tar -xvf "$TOME/rom.x" -C "$TOME/Unzip"
  else
- bug "- Rom không phải file zip hoặc tgz, gz"
+ bug "- Rom không phải file zip hoặc tgz, tar.gz"
 fi 
 
 # Xoá tập tin rom sau khi giải nén 
-sudo rm -f $TOME/$NEMEROM 2>/dev/null
+sudo rm -f $TOME/rom.* 2>/dev/null
 else
 bug "- Liên kết tải lỗi..."
 fi
