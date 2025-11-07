@@ -43,9 +43,10 @@ echo "- Link Rom: $URL"
 
 echo "- Tải về" 
 
-#Taiver "$URL" "$TOME/rom.x" 
-#[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
 aria2c -x 16 -s 16 -d "$TOME" -o "rom.zip" "$URL"
+[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
+[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.zip"
+du -m $TOME/rom.zip | awk '{print $1}'
 TROM="${URL##*/}.zip"
 
 NEMROM=RROM_${TROM}
