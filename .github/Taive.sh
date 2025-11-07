@@ -56,7 +56,7 @@ GITENV Loaihethong $DDPV
 
 # Gắn lên git env
 GITENV URL $URLKK
-GITENV NEMEROM "RROM_${DDPV}_${URL##*/}"
+GITENV NEMEROM "RROM_${DDPV}_${URL##*/}.zip"
 GITENV DINHDANG "${URL##*.}"
 
 # Thêm tên tác giả khi flash Rom
@@ -78,11 +78,11 @@ pip3 install -r requirements.txt >/dev/null;
 
 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-aria2c --continue=true -x16 -s16 -d $TOME -o "rom.x" "$URL"
-[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.x"
-[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+aria2c --continue=true -x16 -s16 -d $TOME -o "$NEMEROM" "$URL"
+[ "$(du -m $TOME/$NEMEROM | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/$NEMEROM"
+[ "$(du -m $TOME/$NEMEROM | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/$NEMEROM"
 #mv -f "$TOME/rom.x" "$TOME/$NEMEROM"
-[ -s "$TOME/rom.x" ] || echo "$TOME/lag"
+[ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
 
 ) & (
 # Tải rom và tải file khác
@@ -92,7 +92,7 @@ Chatbot "Đã nhận được lệnh hủy quá trình."
 cancelrun
 exit 0
 else
-[ -e "$TOME/rom.x" ] && break
+[ -e "$TOME/$NEMEROM" ] && break
 [ -e "$TOME/lag" ] && break
 sleep 10
 fi
@@ -101,17 +101,17 @@ done
 
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-if [ "$(file $TOME/rom.x | grep 'Zip archive')" -o "$(file $TOME/rom.x | grep 'Java archive')" ]; then echo " Giải nén: $(ls $TOME/rom.x)"
- unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
+if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" -o "$(file $TOME/$NEMEROM | grep 'Java archive')" ]; then echo " Giải nén: $(ls $TOME/$NEMEROM)"
+ unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
- elif [ "$(file $TOME/rom.x | grep 'gzip compressed')" ]; then
- tar -xvf "$TOME/rom.x" -C "$TOME/Unzip"
+ elif [ "$(file $TOME/$NEMEROM | grep 'gzip compressed')" ]; then
+ tar -xvf "$TOME/$NEMEROM" -C "$TOME/Unzip"
  else
  bug "- Rom không phải file zip hoặc tgz, tar.gz"
 fi 
 
 # Xoá tập tin rom sau khi giải nén 
-sudo rm -f $TOME/rom.* 2>/dev/null
+sudo rm -f $TOME/$NEMEROM 2>/dev/null
 else
 bug "- Liên kết tải lỗi..."
 fi
