@@ -42,9 +42,9 @@ echo "- Link Rom: $URL"
 
 echo "- Tải về" 
 
-Taiver "$URL" "$TOME/rom.x" 
-[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
-[ ! -s "$TOME/rom.x" ] && exit 0
+#Taiver "$URL" "$TOME/rom.x" 
+#[ "$(du -m $TOME/rom.x | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.x"
+aria2c -x 16 -s 16 -d "$TOME" -o "rom.x" "$URL"
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '504b')" ] && DUOI=zip;
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0808')" ] && DUOI=gz;
 [ -n "$(xxd -l 4 -c 4 $TOME/rom.x | grep '1f8b 0800')" ] && DUOI=tgz;
