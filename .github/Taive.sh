@@ -104,7 +104,7 @@ if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" -o "$(file $TOME/$NEMEROM | g
  else
  bug "- Rom không phải file zip hoặc tgz, tar.gz"
 fi 
-
+ls $TOME/Unzip
 # Xoá tập tin rom sau khi giải nén 
 sudo rm -f $TOME/$NEMEROM 2>/dev/null
 else
