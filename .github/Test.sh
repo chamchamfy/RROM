@@ -36,7 +36,7 @@ Taivewgetr() { wget --no-check-certificate "$1" -O "$2"; }
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up} 
 
 
-pyhton3 /$TOME/.github/libpy/apikey_pixeldrain.py 
+python3 /$TOME/.github/libpy/apikey_pixeldrain.py 
 
 APIK='799eaf26-ba1b-4b7a-b385-0190e3e57e09'
 
