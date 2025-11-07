@@ -38,7 +38,7 @@ mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up}
 Taidulieu() { 
 
 #Tenrom=${URL##*/} && Tenr=${Tenrom%.*} && Dinhdang=${URL##*.}; 
-URL="https://filebin.net/ajf58lcwqqopcryi"
+URL="https://gofile.io/d/JgQae1"
 echo "- Link Rom: $URL"
 
 echo "- Tải về" 
