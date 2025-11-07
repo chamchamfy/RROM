@@ -38,14 +38,13 @@ mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up}
 Taidulieu() { 
 
 #Tenrom=${URL##*/} && Tenr=${Tenrom%.*} && Dinhdang=${URL##*.}; 
-URL="https://gofile.io/d/JgQae1"
+URL="https://cold8.gofile.io/download/web/0eb50b3f-1e4a-4177-8bf2-56d667dc2472/RROM_ext4_miui_VILITWGlobal_OS1.0.20.0.UKDTWXM_071a550596_14.0.zip"
 echo "- Link Rom: $URL"
 
 echo "- Tải về" 
-if [ "$(echo $URL | grep '.io')" ]; then
-curl -s "https://api.gofile.io/getContent?contentId=${URL##*/}&cache=true"| jq -r '.data.contents[].link' > links.txt
-aria2c --header="Referer: https://gofile.io/" --continue=true --enable-http-pipelining=true --max-tries=0 --retry-wait=3 -x16 -s16 -d "$TOME" -o "rom.zip" -i links.txt
-fi
+
+aria2c --header="Referer: https://gofile.io/" --continue=true --enable-http-pipelining=true --max-tries=0 --retry-wait=3 -x16 -s16 -d "$TOME" -o "rom.zip" "$URL"
+
 
 [ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
 [ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.zip"
