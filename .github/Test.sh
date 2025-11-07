@@ -38,7 +38,7 @@ mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up}
 Taidulieu() { 
 
 #Tenrom=${URL##*/} && Tenr=${Tenrom%.*} && Dinhdang=${URL##*.}; 
-URL="https://cold8.gofile.io/download/web/0eb50b3f-1e4a-4177-8bf2-56d667dc2472/RROM_ext4_miui_VILITWGlobal_OS1.0.20.0.UKDTWXM_071a550596_14.0.zip"
+URL="https://bn.d.miui.com/OS1.0.20.0.UKDTWXM/miui_VILITWGlobal_OS1.0.20.0.UKDTWXM_071a550596_14.0.zip"
 echo "- Link Rom: $URL"
 
 echo "- Tải về" 
