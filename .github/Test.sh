@@ -66,7 +66,7 @@ if [ "$(file $TOME/rom.zip | grep 'Zip archive')" -o "$(file $TOME/rom.zip | gre
  elif [ "$(file $TOME/rom.zip | grep 'gzip compressed')" ]; then
  tar -xvf "$TOME/rom.zip" -C "$TOME/Unzip"
  else
- bug "- Rom không phải file zip hoặc tgz, gz"
+ bug "- Rom không phải file zip hoặc tgz, tar.gz"
 fi 
 }
 
