@@ -101,7 +101,7 @@ done
 
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" -o "$(file $TOME/$NEMEROM | grep 'Java archive')" ]; then echo " Giải nén: $(ls $TOME/$NEMEROM)"
+if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" -o "$(file $TOME/$NEMEROM | grep 'Java archive')" ]; then
  unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
  elif [ "$(file $TOME/$NEMEROM | grep 'gzip compressed')" ]; then
