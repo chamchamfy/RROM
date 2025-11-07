@@ -57,7 +57,6 @@ GITENV Loaihethong $DDPV
 # Gắn lên git env
 GITENV URL $URLKK
 GITENV NEMEROM "RROM_${DDPV}_${URL##*/}.zip"
-GITENV DINHDANG "${URL##*.}"
 
 # Thêm tên tác giả khi flash Rom
 GITENV Tacgia "chamchamfy"
@@ -67,7 +66,6 @@ GITENV SEVERUP "$(checktc Sourceforge)"
 
 # check url
 if [ "$URL" ]; then
-
 (
 sudo apt-get update >/dev/null
 sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip >/dev/null
@@ -75,15 +73,12 @@ pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome >/
 echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
-
-
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 aria2c --continue=true -x16 -s16 -d $TOME -o "rom.zip" "$URL"
 [ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.zip"
 [ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
 mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
 [ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
-
 ) & (
 # Tải rom và tải file khác
 while true; do
