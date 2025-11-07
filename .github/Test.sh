@@ -26,7 +26,6 @@ TOME="$GITHUB_WORKSPACE"
 Phanvung="system system_a vendor vendor_a product product_a system_ext odm odm_a mi_ext mi_ext_a system_dlkm system_dlkm_a vendor_dlkm vendor_dlkm_a"; 
 danhsach='system vendor system_ext product odm mi_ext system_dlkm vendor_dlkm'; 
 Boot="boot boot_a vendor_boot vendor_boot_a"; 
-k3=Dai;k4=duong
 
 User="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
 Xem() { curl -s -L -G -N -H "$User" --connect-timeout 20 "$1"; }
@@ -36,9 +35,7 @@ Taivewget() { wget "$1" -O "$2"; }
 Taivewgetr() { wget --no-check-certificate "$1" -O "$2"; }
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up} 
 
-ND=chamchamfy
-MK=$k3${k4}910
-python3 $TOME/.github/libpy/apikey_pixeldrain.py -u "$ND" -p "$MK"
+python3 $TOME/.github/libpy/apikey_pixeldrain.py -u "chamchamfy" -p "${ND}15365"
 
 
 
