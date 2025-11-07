@@ -43,8 +43,7 @@ echo "- Link Rom: $URL"
 
 echo "- Tải về" 
 if [ "$(echo $URL | grep '.io')" ]; then
-curl -s "https://api.gofile.io/getContent?contentId=${URL##*/}&cache=true" \
-| jq -r '.data.contents[].link' > links.txt
+curl -s "https://api.gofile.io/getContent?contentId=${URL##*/}&cache=true"| jq -r '.data.contents[].link' > links.txt
 aria2c --header="Referer: https://gofile.io/" --continue=true --enable-http-pipelining=true --max-tries=0 --retry-wait=3 -x16 -s16 -d "$TOME" -o "rom.zip" -i links.txt
 fi
 
