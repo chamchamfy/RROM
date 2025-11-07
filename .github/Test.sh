@@ -56,7 +56,7 @@ echo "NEMROM=$NEMROM" >> $GITHUB_ENV
 
 
 echo "Tên rom: $NEMROM"
-#mv -f $TOME/rom.x $TOME/$NEMROM
+#mv -f $TOME/rom.zip $TOME/$NEMROM
 
 echo "- Giải nén rom" 
 echo "$(file $TOME/rom.zip)"
