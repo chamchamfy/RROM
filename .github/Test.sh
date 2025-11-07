@@ -44,11 +44,15 @@ echo "- Link Rom: $URL"
 echo "- Tải về" 
 
 aria2c --header="Referer: https://gofile.io/" --continue=true --enable-http-pipelining=true --max-tries=0 --retry-wait=3 -x16 -s16 -d "$TOME" -o "rom.zip" "$URL"
+Taiver "$URL" "$TOME/rom1.zip" 
+Taive "$URL" "$TOME/rom2.zip"
 
-
-[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
-[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.zip"
 du -m $TOME/rom.zip | awk '{print $1}'
+file $TOME/rom.zip
+du -m $TOME/rom1.zip | awk '{print $1}'
+file $TOME/rom1.zip
+du -m $TOME/rom2.zip | awk '{print $1}'
+file $TOME/rom2.zip
 TROM="${URL##*/}.zip"
 
 NEMROM=RROM_${TROM}
