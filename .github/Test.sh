@@ -35,9 +35,6 @@ Taivewget() { wget "$1" -O "$2"; }
 Taivewgetr() { wget --no-check-certificate "$1" -O "$2"; }
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up} 
 
-python3 $TOME/.github/libpy/apikey_pixeldrain.py -u "chamchamfy" -p "${ND}15365"
-
-
 
 Taidulieu() { 
 
@@ -74,7 +71,7 @@ if [ "$(file $TOME/rom.zip | grep 'Zip archive')" -o "$(file $TOME/rom.zip | gre
 fi 
 }
 
-#Taidulieu
-#ls $TOME/Unzip
+Taidulieu
+ls $TOME/Unzip
 #. $TOME/Option.md
 echo "- Kết thúc" 
