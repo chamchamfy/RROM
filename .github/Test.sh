@@ -58,15 +58,15 @@ echo "NEMROM=$NEMROM" >> $GITHUB_ENV
 
 echo "Định dạng: $Dinhdang"
 echo "Tên rom: $NEMROM"
-mv -f $TOME/rom.x $TOME/$NEMROM
+#mv -f $TOME/rom.x $TOME/$NEMROM
 
 echo "- Giải nén rom" 
-echo "$(file $TOME/$NEMEROM)"
-if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" ]; then echo " Giải nén: $(ls $TOME/$NEMEROM)"
- unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
+echo "$(file $TOME/rom.x)"
+if [ "$(file $TOME/rom.x | grep 'Zip archive')" ]; then echo " Giải nén: $(ls $TOME/rom.x)"
+ unzip -qo "$TOME/rom.x" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
- elif [ "$(file $TOME/$NEMEROM | grep 'gzip compressed')" ]; then
- tar -xvf "$TOME/$NEMEROM" -C "$TOME/Unzip"
+ elif [ "$(file $TOME/rom.x | grep 'gzip compressed')" ]; then
+ tar -xvf "$TOME/rom.x" -C "$TOME/Unzip"
  else
  bug "- Rom không phải file zip hoặc tgz, gz"
 fi 
