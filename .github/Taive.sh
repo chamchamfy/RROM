@@ -80,7 +80,7 @@ pip3 install -r requirements.txt >/dev/null;
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 #Taiver "$URL" "$TOME/rom.zip" 
 #[ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
-aria2c -x 16 -s 16 -d "$TOME" -o "rom.zip" "$URL"
+aria2c -x 16 -s 16 -d $TOME -o "rom.zip" "$URL"
 mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
 [ -s "$TOME/$NEMEROM" ] || echo "$TOME/lag"
 
@@ -101,16 +101,15 @@ done
 
 echo
 Chatbot "- Giải nén ROM ${URL##*/} ..."
-
- if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" ]; then echo " Giải nén: $(ls $TOME/$NEMEROM)"
+echo "$(file $TOME/$NEMEROM)"
+if [ "$(file $TOME/$NEMEROM | grep 'Zip archive')" ]; then echo " Giải nén: $(ls $TOME/$NEMEROM)"
  unzip -qo "$TOME/$NEMEROM" -d "$TOME/Unzip" 2>/dev/null
  cp -rf $TOME/Unzip/META-INF/com/android $TOME/.github/libpy/Flash2in1/META-INF/com 2>/dev/null
  elif [ "$(file $TOME/$NEMEROM | grep 'gzip compressed')" ]; then
  tar -xvf "$TOME/$NEMEROM" -C "$TOME/Unzip"
  else
  bug "- Rom không phải file zip hoặc tgz, gz"
- fi 
-
+fi 
 
 # Xoá tập tin rom sau khi giải nén 
 sudo rm -f $TOME/$NEMEROM 2>/dev/null
