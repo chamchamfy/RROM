@@ -162,15 +162,8 @@ main() {
     fi
 
     if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ]; then
-        $fastboot format userdata
-     if [ -f "images/metadata.img" ]; then 
-        $fastboot erase userdata 
-        $fastboot flash userdata images/userdata.img
-     fi
-     if [ -f "images/metadata.img" ]; then 
-        $fastboot erase metadata 
-        $fastboot flash metadata images/metadata.img
-     fi
+        $fastboot erase userdata
+        $fastboot erase metadata
     fi
     $fastboot reboot
     exit

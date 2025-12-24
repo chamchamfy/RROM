@@ -71,14 +71,14 @@ main() {
     if [ -f "images/cmnlib.img" ]; then
         $fastboot flash cmnlib_ab images/cmnlib.img
     fi
-    if [ -f "images/countrycode.img" ]; then
-        $fastboot flash countrycode_ab images/countrycode.img
-    fi
     if [ -f "images/cpucp.img" ]; then
         $fastboot flash cpucp_ab images/cpucp.img
     fi
     if [ -f "images/cpucp_dtb.img" ]; then
         $fastboot flash cpucp_dtb images/cpucp_dtbl.img
+    fi
+    if [ -f "images/countrycode.img" ]; then
+        $fastboot flash countrycode_ab images/countrycode.img
     fi
     if [ -f "images/devcfg.img" ]; then
         $fastboot flash devcfg_ab images/devcfg.img
@@ -134,6 +134,9 @@ main() {
     if [ -f "images/vbmeta_system.img" ]; then
         $fastboot flash vbmeta_system_ab images/vbmeta_system.img
     fi
+    if [ -f "images/vbmeta_vendor.img" ]; then
+        $fastboot flash vbmeta_vendor_ab images/vbmeta_vendor.img
+    fi
     if [ -f "images/vendor_boot.img" ]; then
         $fastboot flash vendor_boot_ab images/vendor_boot.img
     fi
@@ -182,15 +185,8 @@ main() {
     fi
 
     if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ]; then
-        $fastboot format userdata
-     if [ -f "images/metadata.img" ]; then 
-        $fastboot erase userdata 
-        $fastboot flash userdata images/userdata.img
-     fi
-     if [ -f "images/metadata.img" ]; then 
-        $fastboot erase metadata 
-        $fastboot flash metadata images/metadata.img
-     fi
+        $fastboot erase userdata
+        $fastboot erase metadata
     fi
     
     $fastboot set_active a
