@@ -1,9 +1,9 @@
 #!/bin/bash
 TOME="$GITHUB_WORKSPACE"
 phanvungtam=$TOME/Unpack
-[[ -f "$phanvungtam/odm/etc/build.prop" ]] && tenmamay=$(sudo grep 'ro.product.odm.device' $phanvungtam/odm/etc/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}') || tenmamay=$(sudo grep 'ro.product.vendor.device' $phanvungtam/vendor/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}')
-API=$(sudo grep 'ro.build.version.sdk=' $phanvungtam/system/system/build.prop | awk -F= '{print $2}');
-VERS=$(sudo grep 'ro.build.version.release=' $phanvungtam/system/system/build.prop | awk -F= '{print $2}');
+[[ -f "$phanvungtam/odm/etc/build.prop" ]] && tenmamay=$(grep 'ro.product.odm.device' $phanvungtam/odm/etc/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}') || tenmamay=$(grep 'ro.product.vendor.device' $phanvungtam/vendor/build.prop | awk -F= '{print $2}' | awk '{$1=$1}{print}')
+API=$(grep 'ro.build.version.sdk=' $phanvungtam/system/system/build.prop | awk -F= '{print $2}');
+VERS=$(grep 'ro.build.version.release=' $phanvungtam/system/system/build.prop | awk -F= '{print $2}');
 # Thư mục chứa apk,jar đã mod: $TOME/Mod
 # Tìm tập tin apk,jar chép vào $TOME/Mod: [ Timfile *.apk/*.jar ]
 # Giải nén dex trong apk/jar từ thư mục $TOME/Mod: [ Unpackfile ] 
@@ -120,9 +120,9 @@ suasmali2
 thaychuoi 'MiuiSettings.smali' 'micloud_settings' '8' 'IS_INTERNATIONAL_BUILD' '0' '' 'IS_ALPHA_BUILD'
 thaychuoi 'MiuiSettings.smali' 'mi_account_settings' '8' 'IS_INTERNATIONAL_BUILD' '0' '' 'IS_ALPHA_BUILD'
 }
-sudo sed -i 's/"MIUI "/"MIUICC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null
-sudo sed -i 's/"by xiaomi.eu"/"by MIUICC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null
-sudo sed -i 's/"ro.build.host"/"CC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null 
+sed -i 's/"MIUI "/"MIUICC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null
+sed -i 's/"by xiaomi.eu"/"by MIUICC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null
+sed -i 's/"ro.build.host"/"CC "/g' $TOME/Mod/$tjar/classes*/com/android/settings/device/MiuiAboutPhoneUtils.smali 2>/dev/null 
 [[ "$TKM" == "1" ]] && Tkm
  fi
  if [[ "$tjar" == "Joyose" ]]; then 
@@ -190,9 +190,9 @@ Taive "https://github.com/chamchamfy/toolcc/raw/main/overlay.zip" "$TOME/VH.zip"
 if [[ -s "$TOME/VH.zip" ]]; then echo " * Thêm ngôn ngữ..."
 7za x -tzip -y "$TOME/VH.zip" -o$TOME/VH >/dev/null
 [[ -e "$phanvungtam/product/overlay" ]] && TMVH=$phanvungtam/product/overlay || TMVH=$phanvungtam/vendor/overlay
-sudo cp -rf $TOME/VH/apk/* $TMVH
-sudo cp -rf $TOME/VH/cc.*.apk $TMVH
-sudo rm -rf $TOME/VH
+cp -rf $TOME/VH/apk/* $TMVH
+cp -rf $TOME/VH/cc.*.apk $TMVH
+rm -rf $TOME/VH
 fi
 fi
 } 
@@ -201,11 +201,11 @@ ngonngu
 if [[ "$HK" == "1" ]]; then echo " * Thêm Harman Kardon..."
 mkdir -p $TOME/tam
 7za x -tzip -y $TOME/.github/HarmanKardon.zip -o$TOME/tam >/dev/null
-sudo cp -rf $TOME/tam/system/vendor/* $phanvungtam/vendor 
-for tt in $(find $TOME/tam/system/vendor -type f); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; done
-for tt in $(find $TOME/tam/system/vendor -type d); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; done
-for i in vfs vfc; do [ -f "$TOME/$i" ] && sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
-sudo rm -rf $TOME/tam
+cp -rf $TOME/tam/system/vendor/* $phanvungtam/vendor 
+for tt in $(find $TOME/tam/system/vendor -type f); do bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; done
+for tt in $(find $TOME/tam/system/vendor -type d); do bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; done
+for i in vfs vfc; do [ -f "$TOME/$i" ] && sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
+rm -rf $TOME/tam
 fi 
 #
 if [[ "$AP" == "1" ]]; then 
@@ -214,11 +214,11 @@ Taive "https://sourceforge.net/projects/rrom/files/apex.tar.zst" "$TOME/tam/apex
  if [ "$(sha1sum "$TOME/tam/apex.tar.zst" | awk '{OFMT="%.0f"; print $1}')" = "e6eecdd5476857ad124a20cbc0b44b19aac3c996" ]; then echo " * Thêm APEX..."
  zstd -d $TOME/tam/apex.tar.zst -o $TOME/tam/apex.tar >/dev/null
  7z e -y $TOME/tam/apex.tar -o$TOME/tam/cauhinh/system_ext/apex >/dev/null
- sudo cp -rf $TOME/tam/cauhinh/system_ext/* $phanvungtam/system_ext
- for tt in $(find $TOME/tam/cauhinh/system_ext -type f); do sudo bash -c "echo '${tt//$TOME\/tam\/cauhinh\//} 0 0 0644' >> $TOME/sefs"; ttm="${tt//$TOME\/tam\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
- for i in sefs sefc; do [ -f "$TOME/$i" ] && sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
+ cp -rf $TOME/tam/cauhinh/system_ext/* $phanvungtam/system_ext
+ for tt in $(find $TOME/tam/cauhinh/system_ext -type f); do bash -c "echo '${tt//$TOME\/tam\/cauhinh\//} 0 0 0644' >> $TOME/sefs"; ttm="${tt//$TOME\/tam\/cauhinh/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
+ for i in sefs sefc; do [ -f "$TOME/$i" ] && sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
  fi
-sudo rm -rf $TOME/tam
+rm -rf $TOME/tam
 fi
 
 if [[ "$AGPU" == "725" ]]; then 
@@ -229,11 +229,11 @@ if [[ "$AGPU" == "725" ]]; then
 if [[ -s "$TOME/AdrenoGPUDriver.zip" ]]; then echo " * Thêm Adreno GPU Driver $AGPU..."
 mkdir -p $TOME/tam
 7za x -tzip -y $TOME/AdrenoGPUDriver.zip -o$TOME/tam >/dev/null
-sudo cp -rf $TOME/tam/system/vendor/* $phanvungtam/vendor 
-for tt in $(find $TOME/tam/system/vendor -type f); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; ttm="${tt//$TOME\/tam\/system/}"; if [ -n "$(echo $ttm | grep '/firmware')" ]; then sudo bash -c "echo '${ttm//./\\.} u:object_r:vendor_firmware_file:s0' >> $TOME/vfc"; elif [ -n "$(echo $ttm | grep 'egl/')" -o -n "$(echo $ttm | grep 'libdmabufheap.so')" ]; then sudo bash -c "echo '${ttm//./\\.} u:object_r:system_lib_file:s0' >> $TOME/vfc"; else sudo bash -c "echo '$(echo ${ttm//./\\.} | sed -z 's/+/\\+/g') u:object_r:same_process_hal_file:s0' >> $TOME/vfc"; fi; done
-for tt in $(find $TOME/tam/system/vendor -type d); do sudo bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; ttm="${tt//$TOME\/tam\/system/}"; [ -n "$(echo $ttm | grep '/firmware')" ] && sudo bash -c "echo '${ttm//./\\.} u:object_r:vendor_firmware_file:s0' >> $TOME/vfc" || sudo bash -c "echo '$(echo ${ttm//./\\.} | sed -z 's/+/\\+/g') u:object_r:same_process_hal_file:s0' >> $TOME/vfc"; done
-for i in vfs vfc; do [ -f "$TOME/$i" ] && sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
-sudo rm -rf $TOME/tam $TOME/AdrenoGPUDriver.zip
+cp -rf $TOME/tam/system/vendor/* $phanvungtam/vendor 
+for tt in $(find $TOME/tam/system/vendor -type f); do bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0644' >> $TOME/vfs"; ttm="${tt//$TOME\/tam\/system/}"; if [ -n "$(echo $ttm | grep '/firmware')" ]; then bash -c "echo '${ttm//./\\.} u:object_r:vendor_firmware_file:s0' >> $TOME/vfc"; elif [ -n "$(echo $ttm | grep 'egl/')" -o -n "$(echo $ttm | grep 'libdmabufheap.so')" ]; then bash -c "echo '${ttm//./\\.} u:object_r:system_lib_file:s0' >> $TOME/vfc"; else bash -c "echo '$(echo ${ttm//./\\.} | sed -z 's/+/\\+/g') u:object_r:same_process_hal_file:s0' >> $TOME/vfc"; fi; done
+for tt in $(find $TOME/tam/system/vendor -type d); do bash -c "echo '${tt//$TOME\/tam\/system\//} 0 0 0755' >> $TOME/vfs"; ttm="${tt//$TOME\/tam\/system/}"; [ -n "$(echo $ttm | grep '/firmware')" ] && bash -c "echo '${ttm//./\\.} u:object_r:vendor_firmware_file:s0' >> $TOME/vfc" || bash -c "echo '$(echo ${ttm//./\\.} | sed -z 's/+/\\+/g') u:object_r:same_process_hal_file:s0' >> $TOME/vfc"; done
+for i in vfs vfc; do [ -f "$TOME/$i" ] && sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
+rm -rf $TOME/tam $TOME/AdrenoGPUDriver.zip
 fi 
 #
 #tinhnang
@@ -289,23 +289,23 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
  
  if [[ "$(du -m $TOME/gboad.zip | awk '{print $1}')" -gt 30 ]]; then 
  #7za x -tzip -y $TOME/gboad.zip -o$TOME/gapp >/dev/null
- #sudo cp -rf $TOME/gapp/system/* $TOME/cauhinh 2>/dev/null 
+ #cp -rf $TOME/gapp/system/* $TOME/cauhinh 2>/dev/null 
  7za e -tzip -y $TOME/gboad.zip -o$TOME/gapp >/dev/null
  mkdir -p $TOME/cauhinh/product/app/LatinIMEGoogle
- sudo cp -rf $TOME/gapp/*.apk $TOME/cauhinh/product/app/LatinIMEGoogle/LatinIMEGoogle.apk 2>/dev/null 
+ cp -rf $TOME/gapp/*.apk $TOME/cauhinh/product/app/LatinIMEGoogle/LatinIMEGoogle.apk 2>/dev/null 
  fi
  if [[ "$(du -m $TOME/gapp.zip | awk '{print $1}')" -gt 80 ]]; then echo " * Thêm Gói Gapp..."
  mkdir -p $TOME/gapp $TOME/cauhinh
  7za x -tzip -y $TOME/gapp.zip -o$TOME/gapp >/dev/null
  tar -xJf $TOME/gapp/files/files.tar.xz -C $TOME/gapp 2>/dev/null 
- sudo cp -rf $TOME/gapp/arm64/*/system/* $TOME/cauhinh 2>/dev/null 
- sudo cp -rf $TOME/cauhinh/* $phanvungtam
- for tt in $(find $TOME/cauhinh/product -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for tt in $(find $TOME/cauhinh/product -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for tt in $(find $TOME/cauhinh/system_ext -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
- for tt in $(find $TOME/cauhinh/system_ext -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
- for i in sefc sefs pfs pfc; do sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
- sudo rm -rf $TOME/{gapp,cauhinh} $TOME/gapp.zip $TOME/gboad.zip
+ cp -rf $TOME/gapp/arm64/*/system/* $TOME/cauhinh 2>/dev/null 
+ cp -rf $TOME/cauhinh/* $phanvungtam
+ for tt in $(find $TOME/cauhinh/product -type f); do bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for tt in $(find $TOME/cauhinh/product -type d); do bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for tt in $(find $TOME/cauhinh/system_ext -type f); do bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
+ for tt in $(find $TOME/cauhinh/system_ext -type d); do bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/sefs"; ttm="${tt//$TOME\/cauhinh/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/sefc"; done
+ for i in sefc sefs pfs pfc; do sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
+ rm -rf $TOME/{gapp,cauhinh} $TOME/gapp.zip $TOME/gboad.zip
  elif [[ "$(du -m $TOME/nikgapp.zip | awk '{print $1}')" -gt 20 ]]; then echo " * Thêm Gói NikGapp..."
  mkdir -p $TOME/gapp $TOME/tam
  7za x -tzip -y $TOME/nikgapp.zip -o$TOME/tam >/dev/null
@@ -322,14 +322,14 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
    t5=$(echo $t | awk -F___ '{print $6}')
    tm="$TOME/cauhinh/product/$t1/$t2/$t3/$t4/$t5"
     mkdir -p $tm 
-    sudo cp -rf $t/* $tm
+    cp -rf $t/* $tm
   fi
  done
- sudo cp -rf $TOME/cauhinh/product/* $phanvungtam/product
- for tt in $(find $TOME/cauhinh/product -type f); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for tt in $(find $TOME/cauhinh/product -type d); do sudo bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for i in pfs pfc; do sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
- sudo rm -rf $TOME/{tam,gapp,cauhinh} $TOME/nikgapp.zip
+ cp -rf $TOME/cauhinh/product/* $phanvungtam/product
+ for tt in $(find $TOME/cauhinh/product -type f); do bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for tt in $(find $TOME/cauhinh/product -type d); do bash -c "echo '${tt//$TOME\/cauhinh\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/cauhinh/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for i in pfs pfc; do sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
+ rm -rf $TOME/{tam,gapp,cauhinh} $TOME/nikgapp.zip
  fi
 fi
 if [[ "$APPM" == "1" ]]; then 
@@ -342,15 +342,15 @@ if [[ "$APPM" == "1" ]]; then
   mv -f $a $tm 2>/dev/null
   mv -f $tm/$ttm.apk $tm/$tmm.apk 2>/dev/null
  done
- for tt in $(find $TOME/tam/product/*app -type d); do sudo bash -c "echo '${tt//$TOME\/tam\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/tam/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for tt in $(find $TOME/tam/product/*app -type f); do sudo bash -c "echo '${tt//$TOME\/tam\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/tam/}"; sudo bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
- for i in pfs pfc; do sudo sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
+ for tt in $(find $TOME/tam/product/*app -type d); do bash -c "echo '${tt//$TOME\/tam\//} 0 0 0755' >> $TOME/pfs"; ttm="${tt//$TOME\/tam/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for tt in $(find $TOME/tam/product/*app -type f); do bash -c "echo '${tt//$TOME\/tam\//} 0 0 0644' >> $TOME/pfs"; ttm="${tt//$TOME\/tam/}"; bash -c "echo '${ttm//./\\.} u:object_r:system_file:s0' >> $TOME/pfc"; done
+ for i in pfs pfc; do sed -i -e 's/\r$//g; /^$/d' $TOME/$i; done
 
-  sudo cp -rf $TOME/tam/product/*app $phanvungtam/product 2>/dev/null
-  sudo cp -rf $TOME/tam/vendor/*app $phanvungtam/vendor 2>/dev/null
-  sudo cp -rf $TOME/tam/system_ext/*app $phanvungtam/system_ext 2>/dev/null
-  sudo cp -rf $TOME/tam/system/*app $phanvungtam/system/system 2>/dev/null
-  sudo rm -rf $TOME/tam $TOME/appm.zip
+  cp -rf $TOME/tam/product/*app $phanvungtam/product 2>/dev/null
+  cp -rf $TOME/tam/vendor/*app $phanvungtam/vendor 2>/dev/null
+  cp -rf $TOME/tam/system_ext/*app $phanvungtam/system_ext 2>/dev/null
+  cp -rf $TOME/tam/system/*app $phanvungtam/system/system 2>/dev/null
+  rm -rf $TOME/tam $TOME/appm.zip
  fi
 fi
 #

@@ -4,7 +4,7 @@ cd $TOME/Super
 # Chỉ dành cho hệ thống ext4 mới có thể mount
 if [[ -n "$(hexdump -n 4000 system.img | grep 'e1e2 e0f5')" ]]; then echo " - Tập tin hệ thống là erofs"
 else 
-for m in system.img vendor.img product.img system_ext.img; do sudo mkdir -p /mnt/diem/${m%/*}; [[ -s "$m" ]] && sudo mount -w -t auto $TOME/Super/$m /mnt/diem/${m%/*} 2>/dev/null; done 
+for m in system.img vendor.img product.img system_ext.img; do mkdir -p /mnt/diem/${m%/*}; [[ -s "$m" ]] && sudo mount -w -t auto $TOME/Super/$m /mnt/diem/${m%/*} 2>/dev/null; done 
 khoichay() {
 if [[ -n "$(echo "$URL" | grep 'CNXM')" ]]; then 
  Taive "https://sourceforge.net/projects/nikgapps/files/Releases/NikGapps-T/16-Jul-2023/NikGapps-basic-arm64-13-20230716-signed.zip" "$TOME/gapp.zip"
@@ -24,11 +24,11 @@ if [[ -n "$(echo "$URL" | grep 'CNXM')" ]]; then
    t4=$(echo $t | awk -F___ '{print $5}')
    t5=$(echo $t | awk -F___ '{print $6}')
    tm="/mnt/diem/product/$t1/$t2/$t3/$t4/$t5"
-   sudo mkdir -p $tm
-   sudo cp -af $t/* $tm
+   mkdir -p $tm
+   cp -af $t/* $tm
   fi
  done
- sudo rm -rf $TOME/tam $TOME/gapp $TOME/gapp.zip
+ rm -rf $TOME/tam $TOME/gapp $TOME/gapp.zip
  fi
  Taive "https://sourceforge.net/projects/toolkudotwrp/files/kudo/MiuiMod14.zip" "$TOME/appm.zip"
  if [[ -s "$TOME/appm.zip" ]]; then echo " * Thêm App Mod..."
@@ -37,17 +37,17 @@ if [[ -n "$(echo "$URL" | grep 'CNXM')" ]]; then
  [[ $? -ne 0 ]] && unzip -qo $TOME/appm.zip -d $TOME/tam
  for a in $TOME/tam/product/app/*; do 
  tm=${a//miui/MIUI}; ttm=${a##*/}; tmm=${ttm//miui/MIUI}; 
- sudo mv -f $a $tm 2>/dev/null
- sudo mv -f $tm/$ttm.apk $tm/$tmm.apk 2>/dev/null
+ mv -f $a $tm 2>/dev/null
+ mv -f $tm/$ttm.apk $tm/$tmm.apk 2>/dev/null
  done
  
- sudo cp -af $TOME/tam/product/*app /mnt/diem/product 2>/dev/null
- sudo cp -af $TOME/tam/vendor/*app /mnt/diem/vendor 2>/dev/null
- sudo cp -af $TOME/tam/system_ext/*app /mnt/diem/system_ext 2>/dev/null
- sudo cp -af $TOME/tam/system/*app /mnt/diem/system/system 2>/dev/null
- sudo rm -rf $TOME/tam $TOME/appm.zip
+ cp -af $TOME/tam/product/*app /mnt/diem/product 2>/dev/null
+ cp -af $TOME/tam/vendor/*app /mnt/diem/vendor 2>/dev/null
+ cp -af $TOME/tam/system_ext/*app /mnt/diem/system_ext 2>/dev/null
+ cp -af $TOME/tam/system/*app /mnt/diem/system/system 2>/dev/null
+ rm -rf $TOME/tam $TOME/appm.zip
  fi
- for i in system/system vendor product system_ext; do sudo cd /mnt/diem/$i && Phanquyen; done 
+ for i in system/system vendor product system_ext; do cd /mnt/diem/$i && Phanquyen; done 
 fi
 }
 #khoichay
