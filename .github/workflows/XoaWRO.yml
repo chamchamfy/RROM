@@ -2,7 +2,7 @@ name: Delete old workflow runs
 
 on:
   schedule:
-    - cron: "0 0 * * 0" # chạy mỗi Chủ Nhật lúc 00:00 UTC
+    - cron: "0 0 * * 0" 
   workflow_dispatch:
     inputs:
       days:
@@ -12,7 +12,7 @@ on:
       minimum_runs:
         description: 'Minimum runs to keep for each workflow'
         required: true
-        default: '6'
+        default: '2'
       delete_workflow_pattern:
         description: 'Name or filename of the workflow (if not set, all workflows are targeted)'
         required: false
@@ -57,7 +57,7 @@ jobs:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
           retain_days: ${{ github.event.inputs.days || 30 }}
-          keep_minimum_runs: ${{ github.event.inputs.minimum_runs || 6 }}
+          keep_minimum_runs: ${{ github.event.inputs.minimum_runs || 0 }}
           delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
           delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern || 'ALL' }}
           delete_run_by_conclusion_pattern: >-
