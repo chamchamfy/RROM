@@ -36,5 +36,5 @@ jobs:
         with:
          name: Xem Log
          path: log.txt
-         retention-days: 5
+         retention-days: 90
             
