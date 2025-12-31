@@ -1,23 +1,23 @@
-name: Delete old workflow runs
+name: Force delete old workflow runs
 
 on:
   schedule:
-    - cron: "0 0 * * 0" 
+    - cron: "0 0 * * 0" # chạy tự động mỗi Chủ Nhật lúc 00:00 UTC
   workflow_dispatch:
     inputs:
       days:
-        description: 'Days-worth of runs to keep for each workflow'
+        description: 'Số ngày giữ lại workflow runs'
         required: true
-        default: '30'
+        default: '14'
       minimum_runs:
-        description: 'Minimum runs to keep for each workflow'
+        description: 'Số lượng tối thiểu run giữ lại cho mỗi workflow'
         required: true
         default: '2'
       delete_workflow_pattern:
-        description: 'Name or filename of the workflow (if not set, all workflows are targeted)'
+        description: 'Tên hoặc file workflow (nếu không set thì xóa tất cả)'
         required: false
       delete_workflow_by_state_pattern:
-        description: 'Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
+        description: 'Lọc workflow theo trạng thái'
         required: true
         default: "ALL"
         type: choice
@@ -28,7 +28,7 @@ on:
           - disabled_inactivity
           - disabled_manually
       delete_run_by_conclusion_pattern:
-        description: 'Remove runs based on conclusion: action_required, cancelled, failure, skipped, success'
+        description: 'Xóa theo kết quả run'
         required: true
         default: "ALL"
         type: choice
@@ -41,7 +41,7 @@ on:
           - skipped
           - success
       dry_run:
-        description: 'Logs simulated changes, no deletions are performed'
+        description: 'Chạy thử, không xóa thật'
         required: false
 
 jobs:
@@ -56,7 +56,7 @@ jobs:
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          retain_days: ${{ github.event.inputs.days || 30 }}
+          retain_days: ${{ github.event.inputs.days || 14 }}
           keep_minimum_runs: ${{ github.event.inputs.minimum_runs || 2 }}
           delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
           delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern || 'ALL' }}
