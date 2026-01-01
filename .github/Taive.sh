@@ -55,7 +55,7 @@ GITENV AGPU $DGPU
 GITENV Loaihethong $DDPV
 
 # Gắn lên git env
-TEM=$(sed -E 's|.*/||; s/\.(zip|tar\.gz|tgz|gz)$//' <<< "$URL")
+TEM=$(sed -E 's|.*/||; s/\.(zip|tar\.gz|tgz|gz)$//' <<< "$URLKK")
 GITENV URL $URLKK
 GITENV NEMEROM "RROM_${DDPV}_${TEM}.zip"
 
