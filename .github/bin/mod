@@ -236,20 +236,6 @@ for i in vfs vfc; do [ -f "$TOME/$i" ] && sed -i -e 's/\r$//g; /^$/d' $TOME/$i; 
 rm -rf $TOME/tam $TOME/AdrenoGPUDriver.zip
 fi 
 #
-#tinhnang
-#
-thempersist() {
-if [[ "$tenmamay" == "vili" ]]; then 
- if [[ ! -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ]]; then 
-  if [[ -n "$(echo "$URL" | grep 'MIXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}gl.zip"; elif [[ -n "$(echo "$URL" | grep 'TWXM')" ]]; then linkps="https://github.com/chamchamfy/toolcc/raw/main/persist_${tenmamay}tw.zip"; fi
-  Taive "$linkps" "$TOME/persist.zip"
-  [[ -s "$TOME/persist.zip" ]] && 7za e -tzip -y $TOME/persist.zip *.img -o$TOME/.github/libpy/Flash2in1/images/ >/dev/null 2>&1 && rm -rf $TOME/persist.zip 2>/dev/null
- fi
-fi
-}
-#thempersist
-#[ -f "$TOME/.github/libpy/Flash2in1/images/persist.img" ] && echo " * Thêm persist..."
-#
 mkdir -p $TOME/twrp
 taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$tenmamay"; [ -n "$(curl -s "$LURL/" | grep 'net.sf.files' | grep 'skkk')" ] && TURL="$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | grep -oP 'twrp[^"]*skkk\.img' | head -n1)" || TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; Taive "$TURL" "$2$duoi"; } 
 txrec() { [ -f $TOME/twrp/recovery.zip ] && 7za x -tzip -y $TOME/twrp/recovery.zip *.img -o$TOME/twrp/recovery.img >/dev/null && rm -f $TOME/twrp/recovery.zip 2>/dev/null; }
