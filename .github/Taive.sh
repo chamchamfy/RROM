@@ -55,8 +55,9 @@ GITENV AGPU $DGPU
 GITENV Loaihethong $DDPV
 
 # Gắn lên git env
+TEM=$(sed -E 's|.*/||; s/\.(zip|tar\.gz|tgz|gz)$//' <<< "$URL")
 GITENV URL $URLKK
-GITENV NEMEROM "RROM_${DDPV}_${URL##*/}.zip"
+GITENV NEMEROM "RROM_${DDPV}_${TEM}.zip"
 
 # Thêm tên tác giả khi flash Rom
 GITENV Tacgia "chamchamfy"
