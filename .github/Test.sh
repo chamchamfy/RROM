@@ -14,7 +14,7 @@ uname -a
 echo
 
 sudo apt-get update >/dev/null
-sudo apt-get install wget curl zip unzip zstd pzstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign jq f2fs-tools p7zip >/dev/null
+sudo apt-get install wget curl zip unzip zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign jq f2fs-tools p7zip >/dev/null
 pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome zstandard >/dev/null
 
 echo "protobuf<=3.20.1" > requirements.txt
@@ -77,9 +77,10 @@ fi
 
 bin="$TOME/.github/bin"
 libpy="$TOME/.github/libpy"
-$bin/pydump --help
-$bin/paydump --help
-python3 $libpy/payload_dumper.py --help
-python3 $libpy/extract_payload.py --help
+echo 1
+$bin/pydump -h
+echo 2
+$bin/paydump -h
+
 
 echo "- Kết thúc" 
