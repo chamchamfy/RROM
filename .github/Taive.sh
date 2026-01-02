@@ -75,7 +75,7 @@ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.13 
 sudo update-alternatives --set python3 /usr/bin/python3.13
 #
 python3 -m pip install --upgrade pip
-pip3 install protobuf bsdiff4 six brotli crypto construct google docopt pycryptodome zstandard 
+pip3 install protobuf bsdiff4 six brotli crypto construct google docopt pycryptodome zstandard >/dev/null
 #echo "protobuf<=3.20.1" > requirements.txt
 #pip install -r requirements.txt >/dev/null
 ) & ( 
