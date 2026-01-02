@@ -69,15 +69,10 @@ GITENV SEVERUP "$(checktc Sourceforge)"
 if [ "$URL" ]; then
 (
 sudo apt-get update >/dev/null
-sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip xz-utils protobuf-compiler python3.13 python3.13-venv python3.13-dev python3-pip >/dev/null
-#
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.13 2 
-sudo update-alternatives --set python3 /usr/bin/python3.13
-#
-python3 -m pip install --upgrade pip
+sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip xz-utils >/dev/null
 pip3 install protobuf bsdiff4 six brotli crypto construct google docopt pycryptodome zstandard >/dev/null
-#echo "protobuf<=3.20.1" > requirements.txt
-#pip install -r requirements.txt >/dev/null
+echo "protobuf<=3.21.0" > requirements.txt
+pip install -r requirements.txt >/dev/null
 ) & ( 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
 aria2c --continue=true -x16 -s16 -d $TOME -o "rom.zip" "$URL"
