@@ -70,7 +70,7 @@ if [ "$URL" ]; then
 (
 sudo apt-get update >/dev/null
 sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip xz-utils >/dev/null
-pip3 install protobuf bsdiff4 six brotli crypto construct google docopt pycryptodome zstandard >/dev/null
+pip3 install protobuf bsdiff4 brotli six brotli crypto construct google docopt pycryptodome zstandard >/dev/null
 echo "protobuf<=3.25.5" > requirements.txt
 pip install -r requirements.txt >/dev/null
 ) & ( 
