@@ -72,7 +72,7 @@ sudo apt-get update >/dev/null
 sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip xz-utils >/dev/null
 #
 PYM=$(apt-cache search ^python3.[0-9]+$ | awk '{print $1}' | sort -V | tail -n1)
-sudo apt-get install -y $PYM ${PYM}-venv ${PYM}-dev python3-pip
+sudo apt-get install $PYM ${PYM}-venv ${PYM}-dev python3-pip
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/$PYM 2
 sudo update-alternatives --config python3
 #
