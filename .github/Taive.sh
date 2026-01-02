@@ -71,7 +71,15 @@ if [ "$URL" ]; then
 sudo apt-get update >/dev/null
 sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip xz-utils >/dev/null
 pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome zstandard >/dev/null
-#echo "protobuf<=3.20.1" > requirements.txt
+#echo "#protobuf<=3.20.1
+echo "protobuf>=5.27.3
+six>=1.16.0
+bsdiff4>=1.1.5
+brotli>=1.1.0
+zstandard>=0.23.0
+fsspec>=2023.0.0
+requests>=2.28.0
+aiohttp>=3.8.0" > requirements.txt
 pip3 install -r requirements.txt >/dev/null;
 ) & ( 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
