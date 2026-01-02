@@ -69,11 +69,15 @@ GITENV SEVERUP "$(checktc Sourceforge)"
 if [ "$URL" ]; then
 (
 sudo apt-get update >/dev/null
-sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip xz-utils python3.12 python3.12-venv python3-pip >/dev/null
-python3.12 -m venv venv
-source venv/bin/activate
+sudo apt-get install zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign f2fs-tools p7zip xz-utils >/dev/null
+#
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get update >/dev/null
+sudo apt-get install python3.12 python3.12-venv python3.12-dev
+#
 python3 -m pip install --upgrade pip
-pip3 install protobuf bsdiff4 six brotli crypto construct google docopt pycryptodome zstandard
+pip3 install protobuf bsdiff4 six brotli crypto construct google docopt pycryptodome zstandard 
 #echo "protobuf<=3.20.1" > requirements.txt
 #pip install -r requirements.txt >/dev/null
 ) & ( 
