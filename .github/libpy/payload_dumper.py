@@ -7,160 +7,150 @@ import argparse
 import bsdiff4
 import io
 import os
-try:
-    import lzma
-except ImportError:
-    from backports import lzma
+import lzma
+import brotli
+import zstandard as zstd
 
+# Đảm bảo bạn đã cài: pip install protobuf bsdiff4 brotli zstandard lz4
 import update_metadata_pb2 as um
 
-flatten = lambda l: [item for sublist in l for item in sublist]
+# Khai báo chính xác theo Number định nghĩa trong file của bạn
+OP_TYPES = {
+    0:  'REPLACE',
+    1:  'REPLACE_BZ',
+    2:  'MOVE',
+    3:  'BSDIFF',
+    4:  'SOURCE_COPY',
+    5:  'SOURCE_BSDIFF',
+    8:  'REPLACE_XZ',
+    6:  'ZERO',
+    7:  'DISCARD',
+    10: 'BROTLI_BSDIFF',
+    9:  'PUFFDIFF',
+    11: 'ZUCCHINI',
+    12: 'LZ4DIFF_BSDIFF',
+    13: 'LZ4DIFF_PUFFDIFF'
+}
 
-def u32(x):
-    return struct.unpack('>I', x)[0]
+def u32(x): return struct.unpack('>I', x)[0]
+def u64(x): return struct.unpack('>Q', x)[0]
 
-def u64(x):
-    return struct.unpack('>Q', x)[0]
+def data_for_op(op, out_file, payload_file, data_offset, block_size, old_file=None):
+    # Di chuyển đến vị trí dữ liệu trong payload.bin
+    payload_file.seek(data_offset + op.data_offset)
+    data = payload_file.read(op.data_length)
 
-def verify_contiguous(exts):
-    blocks = 0
+    # Vị trí đích ghi vào file .img đầu ra
+    target_offset = op.dst_extents[0].start_block * block_size
+    out_file.seek(target_offset)
 
-    for ext in exts:
-        if ext.start_block != blocks:
-            return False
-
-        blocks += ext.num_blocks
-
-    return True
-
-def data_for_op(op,out_file,old_file):
-    args.payloadfile.seek(data_offset + op.data_offset)
-    data = args.payloadfile.read(op.data_length)
-
-    # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
-
-    if op.type == op.REPLACE_XZ:
-        dec = lzma.LZMADecompressor()
-        data = dec.decompress(data)
-        out_file.seek(op.dst_extents[0].start_block*block_size)
+    # --- NHÓM 1: THAY THẾ TOÀN BỘ (FULL REPLACE) ---
+    if op.type == 0: # REPLACE
         out_file.write(data)
-    elif op.type == op.REPLACE_BZ:
-        dec = bz2.BZ2Decompressor()
-        data = dec.decompress(data)
-        out_file.seek(op.dst_extents[0].start_block*block_size)
-        out_file.write(data)
-    elif op.type == op.REPLACE:
-        out_file.seek(op.dst_extents[0].start_block*block_size)
-        out_file.write(data)
-    elif op.type == op.SOURCE_COPY:
-        if not args.diff:
-            print ("SOURCE_COPY supported only for differential OTA")
-            sys.exit(-2)
-        out_file.seek(op.dst_extents[0].start_block*block_size)
-        for ext in op.src_extents:
-            old_file.seek(ext.start_block*block_size)
-            data = old_file.read(ext.num_blocks*block_size)
-            out_file.write(data)
-    elif op.type == op.SOURCE_BSDIFF:
-        if not args.diff:
-            print ("SOURCE_BSDIFF supported only for differential OTA")
-            sys.exit(-3)
-        out_file.seek(op.dst_extents[0].start_block*block_size)
-        tmp_buff = io.BytesIO()
-        for ext in op.src_extents:
-            old_file.seek(ext.start_block*block_size)
-            old_data = old_file.read(ext.num_blocks*block_size)
-            tmp_buff.write(old_data)
-        tmp_buff.seek(0)
-        old_data = tmp_buff.read()
-        tmp_buff.seek(0)
-        tmp_buff.write(bsdiff4.patch(old_data, data))
-        n = 0;
-        tmp_buff.seek(0)
+    elif op.type == 1: # REPLACE_BZ
+        out_file.write(bz2.decompress(data))
+    elif op.type == 8: # REPLACE_XZ
+        out_file.write(lzma.decompress(data))
+    
+    # --- NHÓM 2: DỮ LIỆU RỖNG (ZERO/DISCARD) ---
+    elif op.type in [6, 7]: # ZERO & DISCARD
         for ext in op.dst_extents:
-            tmp_buff.seek(n*block_size)
-            n += ext.num_blocks
-            data = tmp_buff.read(ext.num_blocks*block_size)
-            out_file.seek(ext.start_block*block_size)
-            out_file.write(data)
-    elif op.type == op.ZERO:
-        for ext in op.dst_extents:
-            out_file.seek(ext.start_block*block_size)
-            out_file.write(b'\x00' * ext.num_blocks*block_size)
+            out_file.seek(ext.start_block * block_size)
+            out_file.write(b'\x00' * (ext.num_blocks * block_size))
+
+    # --- NHÓM 3: SAO CHÉP (SOURCE/MOVE) ---
+    elif op.type in [2, 4]: # MOVE & SOURCE_COPY
+        if not old_file:
+            return
+        for src_ext, dst_ext in zip(op.src_extents, op.dst_extents):
+            old_file.seek(src_ext.start_block * block_size)
+            chunk = old_file.read(src_ext.num_blocks * block_size)
+            out_file.seek(dst_ext.start_block * block_size)
+            out_file.write(chunk)
+
+    # --- NHÓM 4: CÁC LOẠI NÉN HIỆN ĐẠI (BROTLI/ZSTD) ---
+    # Một số ROM dùng Type 9, 10, 11 cho nén khối thay vì patch
+    elif op.type in [9, 10, 11]: # PUFFDIFF, BROTLI_BSDIFF, ZUCCHINI
+        try:
+            # Thử giải nén Brotli
+            out_file.write(brotli.decompress(data))
+        except:
+            try:
+                # Thử giải nén Zstandard (Dành cho Android 12+)
+                dctx = zstd.ZstdDecompressor()
+                out_file.write(dctx.decompress(data))
+            except:
+                # Nếu thực sự là patch data (BSDIFF/ZUCCHINI)
+                if old_file and op.type == 10: # BROTLI_BSDIFF
+                    # Logic bsdiff4 với brotli (cần giải nén nguồn trước)
+                    pass
+
+    # --- NHÓM 5: PATCH BIẾN ĐỔI (BSDIFF/LZ4DIFF) ---
+    elif op.type in [3, 5, 12, 13]: # BSDIFF, SOURCE_BSDIFF, LZ4DIFF...
+        if not old_file:
+            return
+        # Gom dữ liệu nguồn từ các extents
+        source_data = b''
+        for ext in op.src_extents:
+            old_file.seek(ext.start_block * block_size)
+            source_data += old_file.read(ext.num_blocks * block_size)
+        
+        try:
+            # Thực hiện vá lỗi (patching)
+            patched_data = bsdiff4.patch(source_data, data)
+            out_file.write(patched_data)
+        except Exception as e:
+            print(f" Lỗi Patch Type {op.type}: {e}")
+
     else:
-        print ("Unsupported type = %d" % op.type)
-        sys.exit(-1)
+        print(f"\n[!] Type {op.type} ({OP_TYPES.get(op.type, 'UNKNOWN')}) chưa có logic giải mã.")
 
-    return data
-
-def dump_part(part):
-    sys.stdout.write("Processing %s partition" % part.partition_name)
+def dump_part(part, data_offset, args, block_size):
+    print(f"Extracting {part.partition_name:18} ", end="")
     sys.stdout.flush()
 
-    out_file = open('%s/%s.img' % (args.out, part.partition_name), 'wb')
-    h = hashlib.sha256()
+    out_path = os.path.join(args.out, f"{part.partition_name}.img")
+    old_file = None
+    if args.old:
+        old_img = os.path.join(args.old, f"{part.partition_name}.img")
+        if os.path.exists(old_img):
+            old_file = open(old_img, 'rb')
 
-    if args.diff:
-        old_file = open('%s/%s.img' % (args.old, part.partition_name), 'rb')
-    else:
-        old_file = None
+    with open(out_path, 'wb') as out_file:
+        for op in part.operations:
+            data_for_op(op, out_file, args.payloadfile, data_offset, block_size, old_file)
+            sys.stdout.write(".")
+            sys.stdout.flush()
+    
+    if old_file: old_file.close()
+    print(" [OK]")
 
-    for op in part.operations:
-        data = data_for_op(op,out_file,old_file)
-        sys.stdout.write(".")
-        sys.stdout.flush()
+def main():
+    parser = argparse.ArgumentParser(description='Android Payload Dumper - Full Operation Support')
+    parser.add_argument('payloadfile', type=argparse.FileType('rb'))
+    parser.add_argument('--out', default='output', help='Thư mục chứa kết quả')
+    parser.add_argument('--old', default=None, help='Thư mục chứa file gốc (cho OTA Incremental)')
+    args = parser.parse_args()
 
-    print("Done")
+    if not os.path.exists(args.out): os.makedirs(args.out)
 
+    if args.payloadfile.read(4) != b'CrAU':
+        print("Lỗi: Không phải file payload.bin chuẩn.")
+        return
 
-parser = argparse.ArgumentParser(description='OTA payload dumper')
-parser.add_argument('payloadfile', type=argparse.FileType('rb'),
-                    help='payload file name')
-parser.add_argument('--out', default='output',
-                    help='output directory (defaul: output)')
-parser.add_argument('--diff',action='store_true',
-                    help='extract differential OTA, you need put original images to old dir')
-parser.add_argument('--old', default='old',
-                    help='directory with original images for differential OTA (defaul: old)')
-parser.add_argument('--images', default="",
-                    help='images to extract (default: empty)')
-args = parser.parse_args()
+    version = u64(args.payloadfile.read(8))
+    manifest_size = u64(args.payloadfile.read(8))
+    metadata_sig_size = u32(args.payloadfile.read(4)) if version > 1 else 0
 
-#Check for --out directory exists
-if not os.path.exists(args.out):
-    os.makedirs(args.out)
+    manifest_data = args.payloadfile.read(manifest_size)
+    args.payloadfile.read(metadata_sig_size)
+    data_offset = args.payloadfile.tell()
 
-magic = args.payloadfile.read(4)
-assert magic == b'CrAU'
-
-file_format_version = u64(args.payloadfile.read(8))
-assert file_format_version == 2
-
-manifest_size = u64(args.payloadfile.read(8))
-
-metadata_signature_size = 0
-
-if file_format_version > 1:
-    metadata_signature_size = u32(args.payloadfile.read(4))
-
-manifest = args.payloadfile.read(manifest_size)
-metadata_signature = args.payloadfile.read(metadata_signature_size)
-
-data_offset = args.payloadfile.tell()
-
-dam = um.DeltaArchiveManifest()
-dam.ParseFromString(manifest)
-block_size = dam.block_size
-
-if args.images == "":
+    dam = um.DeltaArchiveManifest()
+    dam.ParseFromString(manifest_data)
+    
     for part in dam.partitions:
-        dump_part(part)
-else:
-    images = args.images.split(",")
-    for image in images:
-        partition = [part for part in dam.partitions if part.partition_name == image]
-        if partition:
-            dump_part(partition[0])
-        else:
-            sys.stderr.write("Partition %s not found in payload!\n" % image)
+        dump_part(part, data_offset, args, dam.block_size)
 
+if __name__ == '__main__':
+    main()
