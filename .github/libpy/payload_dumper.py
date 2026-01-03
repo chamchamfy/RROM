@@ -51,10 +51,52 @@ def write_extents(out_file, extents, data, block_size):
         pos += ext.num_blocks * block_size
 
 def decompress_zstd(data):
-    return zstd.ZstdDecompressor().decompress(data)
+    try:
+        return zstd.ZstdDecompressor().decompress(data)
+    except Exception:
+        return None
+
+def decompress_brotli(data):
+    try:
+        return brotli.decompress(data)
+    except Exception:
+        return None
+
+def decompress_lz4(data):
+    try:
+        return lz4.block.decompress(data)
+    except Exception:
+        return None
+
+def decompress_xz(data):
+    try:
+        return lzma.decompress(data)
+    except Exception:
+        return None
+
+def decompress_bz2(data):
+    try:
+        return bz2.decompress(data)
+    except Exception:
+        return None
 
 def apply_bsdiff(old_data, patch):
     return bsdiff4.patch(old_data, patch)
+
+def try_decompress(data):
+    # Thử tất cả phương pháp giải nén
+    decompressors = [
+        ("zstd", decompress_zstd),
+        ("brotli", decompress_brotli),
+        ("lz4", decompress_lz4),
+        ("xz", decompress_xz),
+        ("bz2", decompress_bz2),
+    ]
+    for name, func in decompressors:
+        result = func(data)
+        if result is not None:
+            return result
+    return data  # Trả về dữ liệu gốc nếu tất cả phương pháp thất bại
 
 def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, partition_name):
     payload_file.seek(data_offset + op.data_offset)
@@ -68,54 +110,19 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
     try:
         if op.type == um.InstallOperation.REPLACE:
             write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type == um.InstallOperation.REPLACE_BZ:
-            data = bz2.decompress(data)
-            write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type == um.InstallOperation.REPLACE_XZ:
-            data = lzma.decompress(data)
-            write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type == um.InstallOperation.REPLACE_ZSTD:
-            try:
-                data = decompress_zstd(data)
-            except Exception:
-                try:
-                    data = brotli.decompress(data)
-                except Exception:
-                    data = lz4.block.decompress(data)
+        elif op.type in [um.InstallOperation.REPLACE_ZSTD, um.InstallOperation.REPLACE_BZ, um.InstallOperation.REPLACE_XZ]:
+            data = try_decompress(data)
             write_extents(out_file, op.dst_extents, data, block_size)
         elif op.type == um.InstallOperation.SOURCE_COPY:
             if not old_file:
                 raise ValueError(f"SOURCE_COPY yêu cầu file cũ cho {partition_name}")
             old_data = read_extents(old_file, op.src_extents, block_size)
             write_extents(out_file, op.dst_extents, old_data, block_size)
-        elif op.type == um.InstallOperation.SOURCE_BSDIFF:
+        elif op.type in [um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF, um.InstallOperation.ZSTD_BSDIFF, um.InstallOperation.LZ4DIFF_BSDIFF]:
             if not old_file:
-                raise ValueError(f"SOURCE_BSDIFF yêu cầu file cũ cho {partition_name}")
+                raise ValueError(f"{op.type} yêu cầu file cũ cho {partition_name}")
             old_data = read_extents(old_file, op.src_extents, block_size)
-            patched = apply_bsdiff(old_data, data)
-            write_extents(out_file, op.dst_extents, patched, block_size)
-        elif op.type == um.InstallOperation.BROTLI_BSDIFF:
-            if not old_file:
-                raise ValueError(f"BROTLI_BSDIFF yêu cầu file cũ cho {partition_name}")
-            old_data = read_extents(old_file, op.src_extents, block_size)
-            data = brotli.decompress(data)
-            patched = apply_bsdiff(old_data, data)
-            write_extents(out_file, op.dst_extents, patched, block_size)
-        elif op.type == um.InstallOperation.ZSTD_BSDIFF:
-            if not old_file:
-                raise ValueError(f"ZSTD_BSDIFF yêu cầu file cũ cho {partition_name}")
-            try:
-                data = decompress_zstd(data)
-            except Exception:
-                data = brotli.decompress(data)
-            old_data = read_extents(old_file, op.src_extents, block_size)
-            patched = apply_bsdiff(old_data, data)
-            write_extents(out_file, op.dst_extents, patched, block_size)
-        elif op.type == um.InstallOperation.LZ4DIFF_BSDIFF:
-            if not old_file:
-                raise ValueError(f"LZ4DIFF_BSDIFF yêu cầu file cũ cho {partition_name}")
-            old_data = read_extents(old_file, op.src_extents, block_size)
-            data = lz4.block.decompress(data)
+            data = try_decompress(data)
             patched = apply_bsdiff(old_data, data)
             write_extents(out_file, op.dst_extents, patched, block_size)
         elif op.type == um.InstallOperation.MOVE:
@@ -131,6 +138,13 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
             pass
         else:
             print(f"[!] Cảnh báo: Loại operation không được hỗ trợ: {partition_name} ({op.type})")
+            data = try_decompress(data)
+            if old_file and op.src_extents:
+                old_data = read_extents(old_file, op.src_extents, block_size)
+                patched = apply_bsdiff(old_data, data)
+                write_extents(out_file, op.dst_extents, patched, block_size)
+            else:
+                write_extents(out_file, op.dst_extents, data, block_size)
     except Exception as e:
         print(f"[!] Lỗi khi xử lý {partition_name} ({op.type}): {str(e)}")
         raise
@@ -151,6 +165,7 @@ def dump_partition(part, payload_file, out_dir, old_dir, data_offset, block_size
     try:
         for op in part.operations:
             data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, partition_name)
+        print(f"[+] Hoàn tất: {partition_name}")
     except Exception as e:
         print(f"[!] Lỗi khi trích xuất {partition_name}: {str(e)}")
         out_file.close()
