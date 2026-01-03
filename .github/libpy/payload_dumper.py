@@ -112,7 +112,7 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
     if op.data_sha256_hash:
         current_hash = hashlib.sha256(data).digest()
         if current_hash != op.data_sha256_hash:
-            print(f"[!] Cảnh báo: Hash không khớp cho {partition_name} ({op.type})")
+            print(f"[!] CẢNH BÁO: Hash không khớp cho {partition_name} ({op.type}), nhưng vẫn tiếp tục giải nén!")
 
     try:
         if op.type == um.InstallOperation.REPLACE:
@@ -154,7 +154,7 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
         elif op.type == um.InstallOperation.DISCARD:
             pass
         else:
-            print(f"[!] Cảnh báo: Loại operation không được hỗ trợ: {partition_name} ({op.type})")
+            print(f"[!] CẢNH BÁO: Loại operation không được hỗ trợ: {partition_name} ({op.type}), nhưng vẫn tiếp tục!")
             data = try_decompress(data)
             if old_file and op.src_extents:
                 old_data = read_extents(old_file, op.src_extents, block_size)
@@ -163,7 +163,7 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
             else:
                 write_extents(out_file, op.dst_extents, data, block_size)
     except Exception as e:
-        print(f"[!] Lỗi khi xử lý {partition_name} ({op.type}): {str(e)}")
+        print(f"[!] LỖI khi xử lý {partition_name} ({op.type}): {str(e)}")
         raise
 
 def dump_partition(part, payload_file, out_dir, old_dir, data_offset, block_size, is_diff):
@@ -172,7 +172,7 @@ def dump_partition(part, payload_file, out_dir, old_dir, data_offset, block_size
     if is_diff:
         old_path = os.path.join(old_dir, f"{partition_name}.img")
         if not os.path.exists(old_path):
-            print(f"[!] Lỗi: Không tìm thấy file cũ: {old_path}")
+            print(f"[!] LỖI: Không tìm thấy file cũ: {old_path}")
             return None
         old_file = open(old_path, 'rb')
 
@@ -182,9 +182,9 @@ def dump_partition(part, payload_file, out_dir, old_dir, data_offset, block_size
     try:
         for op in part.operations:
             data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, partition_name)
-        print(f"[+] Hoàn tất: {partition_name}")
+        print(f"[+] HOÀN TẤT: {partition_name}")
     except Exception as e:
-        print(f"[!] Lỗi khi trích xuất {partition_name}: {str(e)}")
+        print(f"[!] LỖI khi trích xuất {partition_name}: {str(e)}")
         out_file.close()
         if old_file:
             old_file.close()
@@ -230,12 +230,12 @@ def main():
     # Đọc header payload
     magic = args.payload.read(4)
     if magic != b'CrAU':
-        print("Lỗi: File payload không hợp lệ (sai magic)")
+        print("LỖI: File payload không hợp lệ (sai magic)")
         sys.exit(1)
 
     file_format_version = u64(args.payload.read(8))
     if file_format_version != 2:
-        print("Lỗi: Phiên bản file không được hỗ trợ")
+        print("LỖI: Phiên bản file không được hỗ trợ")
         sys.exit(1)
 
     manifest_size = u64(args.payload.read(8))
@@ -256,12 +256,12 @@ def main():
         images = args.images.split(",")
         partitions = [p for p in dam.partitions if p.partition_name in images]
         if not partitions:
-            print("Lỗi: Không tìm thấy partition nào trong danh sách!")
+            print("LỖI: Không tìm thấy partition nào trong danh sách!")
             sys.exit(1)
     else:
         partitions = dam.partitions
 
-    print(f"[*] Bắt đầu trích xuất {len(partitions)} partition(s) với {args.threads} luồng...")
+    print(f"[*] BẮT ĐẦU TRÍCH XUẤT {len(partitions)} partition(s) với {args.threads} luồng...")
 
     # Trích xuất đa luồng (nếu threads > 1)
     if args.threads > 1:
@@ -286,7 +286,7 @@ def main():
             if result:
                 success += 1
 
-    print(f"[+] Hoàn tất! Trích xuất thành công {success}/{len(partitions)} partition(s).")
+    print(f"[+] HOÀN TẤT! Trích xuất thành công {success}/{len(partitions)} partition(s).")
 
 if __name__ == "__main__":
     main()
