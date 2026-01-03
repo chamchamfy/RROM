@@ -52,51 +52,58 @@ def write_extents(out_file, extents, data, block_size):
 
 def decompress_zstd(data):
     try:
-        return zstd.ZstdDecompressor().decompress(data)
-    except Exception:
+        dctx = zstd.ZstdDecompressor()
+        return dctx.decompress(data)
+    except Exception as e:
+        print(f"[!] Lỗi giải nén ZSTD: {str(e)}")
         return None
 
 def decompress_brotli(data):
     try:
         return brotli.decompress(data)
-    except Exception:
+    except Exception as e:
+        print(f"[!] Lỗi giải nén Brotli: {str(e)}")
         return None
 
 def decompress_lz4(data):
     try:
         return lz4.block.decompress(data)
-    except Exception:
+    except Exception as e:
+        print(f"[!] Lỗi giải nén LZ4: {str(e)}")
         return None
 
 def decompress_xz(data):
     try:
         return lzma.decompress(data)
-    except Exception:
+    except Exception as e:
+        print(f"[!] Lỗi giải nén XZ: {str(e)}")
         return None
 
 def decompress_bz2(data):
     try:
         return bz2.decompress(data)
-    except Exception:
+    except Exception as e:
+        print(f"[!] Lỗi giải nén BZ2: {str(e)}")
         return None
 
-def apply_bsdiff(old_data, patch):
-    return bsdiff4.patch(old_data, patch)
-
 def try_decompress(data):
-    # Thử tất cả phương pháp giải nén
     decompressors = [
-        ("zstd", decompress_zstd),
-        ("brotli", decompress_brotli),
-        ("lz4", decompress_lz4),
-        ("xz", decompress_xz),
-        ("bz2", decompress_bz2),
+        ("ZSTD", decompress_zstd),
+        ("Brotli", decompress_brotli),
+        ("LZ4", decompress_lz4),
+        ("XZ", decompress_xz),
+        ("BZ2", decompress_bz2),
     ]
     for name, func in decompressors:
         result = func(data)
         if result is not None:
+            print(f"[+] Giải nén thành công bằng {name}")
             return result
-    return data  # Trả về dữ liệu gốc nếu tất cả phương pháp thất bại
+    print("[!] Không thể giải nén, sử dụng dữ liệu gốc")
+    return data
+
+def apply_bsdiff(old_data, patch):
+    return bsdiff4.patch(old_data, patch)
 
 def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, partition_name):
     payload_file.seek(data_offset + op.data_offset)
@@ -110,7 +117,7 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
     try:
         if op.type == um.InstallOperation.REPLACE:
             write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type in [um.InstallOperation.REPLACE_ZSTD, um.InstallOperation.REPLACE_BZ, um.InstallOperation.REPLACE_XZ]:
+        elif op.type == um.InstallOperation.REPLACE_ZSTD:
             data = try_decompress(data)
             write_extents(out_file, op.dst_extents, data, block_size)
         elif op.type == um.InstallOperation.SOURCE_COPY:
