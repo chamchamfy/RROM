@@ -50,10 +50,23 @@ def write_extents(out_file, extents, data, block_size):
         out_file.write(data[pos:pos + ext.num_blocks * block_size])
         pos += ext.num_blocks * block_size
 
+def decompress_xz(data):
+    try:
+        return lzma.decompress(data)
+    except Exception as e:
+        print(f"[!] Lỗi giải nén XZ: {str(e)}")
+        return None
+
+def decompress_bz2(data):
+    try:
+        return bz2.decompress(data)
+    except Exception as e:
+        print(f"[!] Lỗi giải nén BZ2: {str(e)}")
+        return None
+
 def decompress_zstd(data):
     try:
-        dctx = zstd.ZstdDecompressor()
-        return dctx.decompress(data)
+        return zstd.ZstdDecompressor().decompress(data)
     except Exception as e:
         print(f"[!] Lỗi giải nén ZSTD: {str(e)}")
         return None
@@ -72,27 +85,14 @@ def decompress_lz4(data):
         print(f"[!] Lỗi giải nén LZ4: {str(e)}")
         return None
 
-def decompress_xz(data):
-    try:
-        return lzma.decompress(data)
-    except Exception as e:
-        print(f"[!] Lỗi giải nén XZ: {str(e)}")
-        return None
-
-def decompress_bz2(data):
-    try:
-        return bz2.decompress(data)
-    except Exception as e:
-        print(f"[!] Lỗi giải nén BZ2: {str(e)}")
-        return None
-
 def try_decompress(data):
+    # Ưu tiên XZ và BZ2 trước
     decompressors = [
+        ("XZ", decompress_xz),
+        ("BZ2", decompress_bz2),
         ("ZSTD", decompress_zstd),
         ("Brotli", decompress_brotli),
         ("LZ4", decompress_lz4),
-        ("XZ", decompress_xz),
-        ("BZ2", decompress_bz2),
     ]
     for name, func in decompressors:
         result = func(data)
@@ -119,6 +119,16 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
             write_extents(out_file, op.dst_extents, data, block_size)
         elif op.type == um.InstallOperation.REPLACE_ZSTD:
             data = try_decompress(data)
+            write_extents(out_file, op.dst_extents, data, block_size)
+        elif op.type == um.InstallOperation.REPLACE_BZ:
+            data = decompress_bz2(data)
+            if data is None:
+                data = try_decompress(data)
+            write_extents(out_file, op.dst_extents, data, block_size)
+        elif op.type == um.InstallOperation.REPLACE_XZ:
+            data = decompress_xz(data)
+            if data is None:
+                data = try_decompress(data)
             write_extents(out_file, op.dst_extents, data, block_size)
         elif op.type == um.InstallOperation.SOURCE_COPY:
             if not old_file:
