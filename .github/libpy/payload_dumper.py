@@ -33,15 +33,14 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                     f_pay.seek(data_offset + op.data_offset)
                 data = f_pay.read(op.data_length) if op.data_length else b''
 
-                # --- Xử lý các định dạng nén (Bao gồm LZ4) ---
+                # --- Giải nén các định dạng ---
                 if op.type == 0: # REPLACE
                     out_data = data
                 elif op.type == 1: # REPLACE_BZ
                     out_data = bz2.decompress(data)
                 elif op.type == 8: # REPLACE_XZ
                     out_data = lzma.decompress(data)
-                elif op.type == 5: # REPLACE_LZ4 (Thêm hỗ trợ LZ4)
-                    # LZ4 block thường yêu cầu kích thước đích để giải nén chính xác
+                elif op.type == 5: # REPLACE_LZ4
                     out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length)
                 elif op.type == 6: # REPLACE_ZSTD
                     out_data = dctx.decompress(data, max_output_size=op.dst_length)
@@ -62,15 +61,19 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                 sha256.update(out_data)
 
         # Kiểm tra Hash sau khi giải nén
+        hash_status = ""
         if part.new_partition_info.hash:
             if sha256.digest() != part.new_partition_info.hash:
-                print(f"[!] CẢNH BÁO: {name}.img không khớp Hash SHA256")
+                hash_status = " | [!] SAI HASH"
         
-        print(f"[THÀNH CÔNG] {name}.img")
+        # Thông báo thành công kèm trạng thái Hash nếu có
+        print(f"[OK] {name}.img{hash_status}")
         counter.value += 1
         return True
+
     except Exception as e:
-        print(f"[LỖI] {name}.img | Chi tiết: {e}")
+        # Thông báo lỗi cụ thể cho file
+        print(f"[ERROR] {name}.img | Chi tiết: {e}")
         return False
 
 class PayloadDumper:
@@ -104,7 +107,7 @@ class PayloadDumper:
             json_string = MessageToJson(self.manifest)
             with open(meta_file, "w", encoding="utf-8") as f:
                 f.write(json_string)
-            print(f"[*] Đã xuất Metadata: {meta_file}")
+            print(f"[*] Đã xuất Metadata JSON: {meta_file}")
         except Exception as e:
             print(f"[!] Lỗi trích xuất Metadata: {e}")
 
@@ -118,7 +121,8 @@ class PayloadDumper:
         work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
         total = len(work_list)
         
-        print(f"[*] Đang xử lý {total} phân vùng với {self.args.threads} luồng.")
+        print(f"[*] Đang xử lý {total} phân vùng với {self.args.threads} luồng...")
+        print("-" * 50)
         
         manager = Manager()
         success_counter = manager.Value('i', 0)
@@ -135,10 +139,11 @@ class PayloadDumper:
         with Pool(processes=self.args.threads) as pool:
             pool.starmap(process_partition, tasks)
 
-        print(f"\nĐã trích xuất thành công: {success_counter.value}/{total} phân vùng.")
+        print("-" * 50)
+        print(f"Hoàn tất! Đã trích xuất thành công: {success_counter.value}/{total} phân vùng.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Android Payload Dumper Pro (LZ4 Support)")
+    parser = argparse.ArgumentParser(description="Android Payload Dumper Pro")
     parser.add_argument("payload", help="Đường dẫn file payload.bin")
     parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra")
     parser.add_argument("-t", "--threads", type=int, default=2, help="Số luồng đa nhân")
