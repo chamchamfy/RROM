@@ -31,7 +31,7 @@ class PayloadDumper:
         try:
             with open(self.payload_path, 'rb') as f:
                 magic = f.read(4)
-                if magic != b'CrOS':
+                if magic != b'CrAU':
                     raise ValueError("Không phải file payload.bin hợp lệ!")
 
                 file_format_version = struct.unpack('>Q', f.read(8))[0]
