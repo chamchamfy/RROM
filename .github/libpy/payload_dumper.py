@@ -19,6 +19,10 @@ try:
     import lz4.block
 except ImportError:
     print("Lỗi: Vui lòng cài đặt thư viện lz4: pip install lz4")
+try:
+    import zstandard as zstd
+except ImportError:
+    print("Lỗi: Vui lòng cài đặt thư viện zstandard: pip install zstandard")
     sys.exit(1)
 
 import update_metadata_pb2 as um
@@ -52,6 +56,10 @@ def apply_puffdiff(old_data, patch):
 def apply_zucchini(old_data, patch):
     raise NotImplementedError("Zucchini chưa được hỗ trợ")
 
+def decompress_zstd(data):
+    dctx = zstd.ZstdDecompressor()
+    return dctx.decompress(data)
+
 def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size):
     payload_file.seek(data_offset + op.data_offset)
     data = payload_file.read(op.data_length)
@@ -66,6 +74,9 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size):
         write_extents(out_file, op.dst_extents, data, block_size)
     elif op.type == op.REPLACE_XZ:
         data = lzma.decompress(data)
+        write_extents(out_file, op.dst_extents, data, block_size)
+    elif op.type == op.REPLACE_ZSTD:  # Thêm hỗ trợ Zstandard
+        data = decompress_zstd(data)
         write_extents(out_file, op.dst_extents, data, block_size)
     elif op.type == op.SOURCE_COPY:
         if not old_file:
@@ -83,6 +94,13 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size):
             raise ValueError("BROTLI_BSDIFF chỉ hỗ trợ cho OTA differential")
         old_data = read_extents(old_file, op.src_extents, block_size)
         data = brotli.decompress(data)
+        patched = apply_bsdiff(old_data, data)
+        write_extents(out_file, op.dst_extents, patched, block_size)
+    elif op.type == op.ZSTD_BSDIFF:  # Thêm hỗ trợ ZSTD_BSDIFF
+        if not old_file:
+            raise ValueError("ZSTD_BSDIFF chỉ hỗ trợ cho OTA differential")
+        old_data = read_extents(old_file, op.src_extents, block_size)
+        data = decompress_zstd(data)
         patched = apply_bsdiff(old_data, data)
         write_extents(out_file, op.dst_extents, patched, block_size)
     elif op.type == op.PUFFDIFF:
