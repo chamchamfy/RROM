@@ -1,292 +1,137 @@
 #!/usr/bin/env python3
 import os
-import sys
-import struct
-import hashlib
-import bz2
 import argparse
-import bsdiff4
-import io
-import json
+import struct
+import bz2
 import lzma
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import json
+import lz4.block
+import zstandard as zstd
+import bsdiff4
+import update_metadata_pb2
+from multiprocessing import Pool
+from google.protobuf.json_format import MessageToJson
 
-# Cài đặt thư viện cần thiết
-try:
-    import brotli
-except ImportError:
-    print("Lỗi: Vui lòng cài đặt brotli: pip install brotli")
-    sys.exit(1)
-try:
-    import lz4.block
-except ImportError:
-    print("Lỗi: Vui lòng cài đặt lz4: pip install lz4")
-    sys.exit(1)
-try:
-    import zstandard as zstd
-except ImportError:
-    print("Lỗi: Vui lòng cài đặt zstandard: pip install zstandard")
-    sys.exit(1)
+class PayloadDumper:
+    def __init__(self, payload_path, out_dir, thread_count, select_images, dump_meta, diff_mode, old_dir):
+        self.payload_path = payload_path
+        self.out_dir = out_dir
+        self.thread_count = thread_count
+        self.select_images = select_images
+        self.dump_meta = dump_meta
+        self.diff_mode = diff_mode
+        self.old_dir = old_dir
+        self.data_offset = 0
+        self.manifest = None
 
-import update_metadata_pb2 as um
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
 
-def u32(data):
-    return struct.unpack('>I', data)[0]
+    def _parse_manifest(self):
+        try:
+            with open(self.payload_path, 'rb') as f:
+                magic = f.read(4)
+                if magic != b'CrOS':
+                    raise ValueError("Không phải file payload.bin hợp lệ!")
 
-def u64(data):
-    return struct.unpack('>Q', data)[0]
+                file_format_version = struct.unpack('>Q', f.read(8))[0]
+                manifest_size = struct.unpack('>Q', f.read(8))[0]
+                metadata_sig_size = 0
+                if file_format_version > 1:
+                    metadata_sig_size = struct.unpack('>I', f.read(4))[0]
 
-def read_extents(file, extents, block_size):
-    data = b''
-    for ext in extents:
-        file.seek(ext.start_block * block_size)
-        data += file.read(ext.num_blocks * block_size)
-    return data
+                manifest_data = f.read(manifest_size)
+                self.manifest = update_metadata_pb2.DeltaArchiveManifest()
+                self.manifest.ParseFromString(manifest_data)
+                self.data_offset = f.tell() + metadata_sig_size
 
-def write_extents(out_file, extents, data, block_size):
-    pos = 0
-    for ext in extents:
-        out_file.seek(ext.start_block * block_size)
-        out_file.write(data[pos:pos + ext.num_blocks * block_size])
-        pos += ext.num_blocks * block_size
+            if self.dump_meta:
+                json_data = MessageToJson(self.manifest)
+                with open(os.path.join(self.out_dir, "metadata.json"), "w", encoding="utf-8") as jf:
+                    jf.write(json_data)
+                print(f"[+] Metadata đã xuất: {self.out_dir}/metadata.json")
+        except Exception as e:
+            print(f"[!] Lỗi Payload: {e}")
+            exit(1)
 
-def decompress_xz(data):
-    try:
-        return lzma.decompress(data)
-    except Exception as e:
-        print(f"[!] Lỗi giải nén XZ: {str(e)}")
-        return None
+    def _get_data_from_extents(self, f, extents, block_size):
+        data = b''
+        for extent in extents:
+            f.seek(extent.start_block * block_size)
+            data += f.read(extent.num_blocks * block_size)
+        return data
 
-def decompress_bz2(data):
-    try:
-        return bz2.decompress(data)
-    except Exception as e:
-        print(f"[!] Lỗi giải nén BZ2: {str(e)}")
-        return None
+    def _extract_partition(self, partition):
+        name = partition.partition_name
+        if self.select_images and name not in self.select_images:
+            return
 
-def decompress_zstd(data):
-    try:
-        return zstd.ZstdDecompressor().decompress(data)
-    except Exception as e:
-        print(f"[!] Lỗi giải nén ZSTD: {str(e)}")
-        return None
+        output_path = os.path.join(self.out_dir, f"{name}.img")
+        old_img_path = os.path.join(self.old_dir, f"{name}.img")
+        dctx = zstd.ZstdDecompressor()
+        block_size = self.manifest.block_size or 4096
 
-def decompress_brotli(data):
-    try:
-        return brotli.decompress(data)
-    except Exception as e:
-        print(f"[!] Lỗi giải nén Brotli: {str(e)}")
-        return None
+        try:
+            with open(self.payload_path, 'rb') as f_pay, open(output_path, 'wb') as f_out:
+                for op in partition.operations:
+                    f_pay.seek(self.data_offset + op.data_offset)
+                    data = f_pay.read(op.data_length)
 
-def decompress_lz4(data):
-    try:
-        return lz4.block.decompress(data)
-    except Exception as e:
-        print(f"[!] Lỗi giải nén LZ4: {str(e)}")
-        return None
+                    # --- NHÓM 1: CÁC THAO TÁC REPLACE (FULL) ---
+                    if op.type == update_metadata_pb2.InstallOperation.REPLACE:
+                        f_out.write(data)
+                    elif op.type == update_metadata_pb2.InstallOperation.REPLACE_BZ:
+                        f_out.write(bz2.decompress(data))
+                    elif op.type == update_metadata_pb2.InstallOperation.REPLACE_XZ:
+                        f_out.write(lzma.decompress(data))
+                    elif op.type == 5: # REPLACE_LZ4
+                        f_out.write(lz4.block.decompress(data, uncompressed_size=op.dst_length))
+                    elif op.type == 6: # REPLACE_ZSTD
+                        f_out.write(dctx.decompress(data, max_output_size=op.dst_length))
 
-def try_decompress(data):
-    # Ưu tiên XZ và BZ2 trước
-    decompressors = [
-        ("XZ", decompress_xz),
-        ("BZ2", decompress_bz2),
-        ("ZSTD", decompress_zstd),
-        ("Brotli", decompress_brotli),
-        ("LZ4", decompress_lz4),
-    ]
-    for name, func in decompressors:
-        result = func(data)
-        if result is not None:
-            print(f"[+] Giải nén thành công bằng {name}")
-            return result
-    print("[!] Không thể giải nén, sử dụng dữ liệu gốc")
-    return data
+                    # --- NHÓM 2: CÁC THAO TÁC DIFFERENTIAL (DELTA) ---
+                    elif op.type in [update_metadata_pb2.InstallOperation.SOURCE_BSDIFF, 
+                                   update_metadata_pb2.InstallOperation.BROTLI_BSDIFF]:
+                        if not self.diff_mode:
+                            raise Exception("Phát hiện gói Delta. Vui lòng thêm flag --diff và --old")
+                        
+                        with open(old_img_path, 'rb') as f_old:
+                            old_data = self._get_data_from_extents(f_old, op.src_extents, block_size)
+                            f_out.write(bsdiff4.patch(old_data, data))
+                            
+                    elif op.type == update_metadata_pb2.InstallOperation.SOURCE_COPY:
+                        if not self.diff_mode:
+                            raise Exception("Phát hiện gói Delta. Vui lòng thêm flag --diff và --old")
+                        with open(old_img_path, 'rb') as f_old:
+                            f_out.write(self._get_data_from_extents(f_old, op.src_extents, block_size))
 
-def apply_bsdiff(old_data, patch):
-    return bsdiff4.patch(old_data, patch)
+            print(f"[OK] {name}.img")
+        except Exception as e:
+            print(f"[ERROR] {name}.img | Lỗi: {e}")
 
-def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, partition_name):
-    payload_file.seek(data_offset + op.data_offset)
-    data = payload_file.read(op.data_length)
+    def run(self):
+        self._parse_manifest()
+        work_list = [p for p in self.manifest.partitions if not self.select_images or p.partition_name in self.select_images]
+        
+        print(f"[*] Đang xử lý {len(work_list)} phân vùng với {self.thread_count} luồng.")
+        if self.diff_mode:
+            print(f"[*] Chế độ Differential: BẬT (Thư mục cũ: {self.old_dir})")
 
-    if op.data_sha256_hash:
-        current_hash = hashlib.sha256(data).digest()
-        if current_hash != op.data_sha256_hash:
-            print(f"[!] CẢNH BÁO: Hash không khớp cho {partition_name} ({op.type}), nhưng vẫn tiếp tục giải nén!")
-
-    try:
-        if op.type == um.InstallOperation.REPLACE:
-            write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type == um.InstallOperation.REPLACE_ZSTD:
-            data = try_decompress(data)
-            write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type == um.InstallOperation.REPLACE_BZ:
-            data = decompress_bz2(data)
-            if data is None:
-                data = try_decompress(data)
-            write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type == um.InstallOperation.REPLACE_XZ:
-            data = decompress_xz(data)
-            if data is None:
-                data = try_decompress(data)
-            write_extents(out_file, op.dst_extents, data, block_size)
-        elif op.type == um.InstallOperation.SOURCE_COPY:
-            if not old_file:
-                raise ValueError(f"SOURCE_COPY yêu cầu file cũ cho {partition_name}")
-            old_data = read_extents(old_file, op.src_extents, block_size)
-            write_extents(out_file, op.dst_extents, old_data, block_size)
-        elif op.type in [um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF, um.InstallOperation.ZSTD_BSDIFF, um.InstallOperation.LZ4DIFF_BSDIFF]:
-            if not old_file:
-                raise ValueError(f"{op.type} yêu cầu file cũ cho {partition_name}")
-            old_data = read_extents(old_file, op.src_extents, block_size)
-            data = try_decompress(data)
-            patched = apply_bsdiff(old_data, data)
-            write_extents(out_file, op.dst_extents, patched, block_size)
-        elif op.type == um.InstallOperation.MOVE:
-            if not old_file:
-                raise ValueError(f"MOVE yêu cầu file cũ cho {partition_name}")
-            old_data = read_extents(old_file, op.src_extents, block_size)
-            write_extents(out_file, op.dst_extents, old_data, block_size)
-        elif op.type == um.InstallOperation.ZERO:
-            for ext in op.dst_extents:
-                out_file.seek(ext.start_block * block_size)
-                out_file.write(b'\x00' * ext.num_blocks * block_size)
-        elif op.type == um.InstallOperation.DISCARD:
-            pass
-        else:
-            print(f"[!] CẢNH BÁO: Loại operation không được hỗ trợ: {partition_name} ({op.type}), nhưng vẫn tiếp tục!")
-            data = try_decompress(data)
-            if old_file and op.src_extents:
-                old_data = read_extents(old_file, op.src_extents, block_size)
-                patched = apply_bsdiff(old_data, data)
-                write_extents(out_file, op.dst_extents, patched, block_size)
-            else:
-                write_extents(out_file, op.dst_extents, data, block_size)
-    except Exception as e:
-        print(f"[!] LỖI khi xử lý {partition_name} ({op.type}): {str(e)}")
-        raise
-
-def dump_partition(part, payload_file, out_dir, old_dir, data_offset, block_size, is_diff):
-    partition_name = part.partition_name
-    old_file = None
-    if is_diff:
-        old_path = os.path.join(old_dir, f"{partition_name}.img")
-        if not os.path.exists(old_path):
-            print(f"[!] LỖI: Không tìm thấy file cũ: {old_path}")
-            return None
-        old_file = open(old_path, 'rb')
-
-    out_path = os.path.join(out_dir, f"{partition_name}.img")
-    out_file = open(out_path, 'wb')
-
-    try:
-        for op in part.operations:
-            data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, partition_name)
-        print(f"[+] HOÀN TẤT: {partition_name}")
-    except Exception as e:
-        print(f"[!] LỖI khi trích xuất {partition_name}: {str(e)}")
-        out_file.close()
-        if old_file:
-            old_file.close()
-        os.remove(out_path)
-        return None
-
-    out_file.close()
-    if old_file:
-        old_file.close()
-    return partition_name
-
-def dump_metadata(dam, out_dir):
-    metadata = {
-        "block_size": dam.block_size,
-        "partitions": [
-            {
-                "name": part.partition_name,
-                "operations": len(part.operations),
-                "size": part.new_partition_info.size if part.new_partition_info else 0,
-                "hash": part.new_partition_info.hash.hex() if part.new_partition_info and part.new_partition_info.hash else None,
-            }
-            for part in dam.partitions
-        ],
-    }
-    metadata_path = os.path.join(out_dir, "metadata.json")
-    with open(metadata_path, 'w', encoding='utf-8') as f:
-        json.dump(metadata, f, indent=2, ensure_ascii=False)
-    print(f"[+] Đã lưu metadata: {metadata_path}")
-
-def main():
-    parser = argparse.ArgumentParser(description="Công cụ trích xuất payload.bin (OTA)")
-    parser.add_argument("payload", type=argparse.FileType('rb'), help="File payload.bin")
-    parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra (mặc định: output)")
-    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng xử lý (mặc định: 1)")
-    parser.add_argument("-m", "--metadata", action="store_true", help="Xuất metadata ra JSON")
-    parser.add_argument("--diff", action="store_true", help="Trích xuất OTA differential (cần thư mục old)")
-    parser.add_argument("--old", default="old", help="Thư mục chứa file cũ (mặc định: old)")
-    parser.add_argument("-i", "--images", default="", help="Danh sách partition (ví dụ: system,boot,vendor)")
-    args = parser.parse_args()
-
-    os.makedirs(args.out, exist_ok=True)
-
-    # Đọc header payload
-    magic = args.payload.read(4)
-    if magic != b'CrAU':
-        print("LỖI: File payload không hợp lệ (sai magic)")
-        sys.exit(1)
-
-    file_format_version = u64(args.payload.read(8))
-    if file_format_version != 2:
-        print("LỖI: Phiên bản file không được hỗ trợ")
-        sys.exit(1)
-
-    manifest_size = u64(args.payload.read(8))
-    metadata_signature_size = u32(args.payload.read(4)) if file_format_version > 1 else 0
-    manifest = args.payload.read(manifest_size)
-    args.payload.read(metadata_signature_size)
-
-    data_offset = args.payload.tell()
-    dam = um.DeltaArchiveManifest()
-    dam.ParseFromString(manifest)
-    block_size = dam.block_size
-
-    if args.metadata:
-        dump_metadata(dam, args.out)
-
-    # Lọc partition nếu có danh sách
-    if args.images:
-        images = args.images.split(",")
-        partitions = [p for p in dam.partitions if p.partition_name in images]
-        if not partitions:
-            print("LỖI: Không tìm thấy partition nào trong danh sách!")
-            sys.exit(1)
-    else:
-        partitions = dam.partitions
-
-    print(f"[*] BẮT ĐẦU TRÍCH XUẤT {len(partitions)} partition(s) với {args.threads} luồng...")
-
-    # Trích xuất đa luồng (nếu threads > 1)
-    if args.threads > 1:
-        with ThreadPoolExecutor(max_workers=args.threads) as executor:
-            futures = []
-            for part in partitions:
-                future = executor.submit(
-                    dump_partition,
-                    part, args.payload, args.out, args.old, data_offset, block_size, args.diff
-                )
-                futures.append(future)
-
-            success = 0
-            for future in as_completed(futures):
-                if future.result():
-                    success += 1
-    else:
-        # Chạy tuần tự nếu threads = 1
-        success = 0
-        for part in partitions:
-            result = dump_partition(part, args.payload, args.out, args.old, data_offset, block_size, args.diff)
-            if result:
-                success += 1
-
-    print(f"[+] HOÀN TẤT! Trích xuất thành công {success}/{len(partitions)} partition(s).")
+        with Pool(processes=self.thread_count) as pool:
+            pool.map(self._extract_partition, work_list)
+        print("\n[--- HOÀN TẤT ---]")
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Android Payload Dumper Pro (Full & Delta Support)")
+    parser.add_argument("payload", help="Đường dẫn đến file payload.bin")
+    parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra (Mặc định: output)")
+    parser.add_argument("-t", "--threads", type=int, default=1, help="Số lượng luồng (Mặc định: 1)")
+    parser.add_argument("-i", "--images", nargs='+', help="Chỉ trích xuất các phân vùng cụ thể")
+    parser.add_argument("-m", "--metadata", action="store_true", help="Xuất metadata.json")
+    parser.add_argument("--diff", action="store_true", help="Trích xuất OTA differential (cần thư mục old)")
+    parser.add_argument("--old", default="old", help="Thư mục chứa file cũ (mặc định: old)")
+
+    args = parser.parse_args()
+
+    dumper = PayloadDumper(args.payload, args.out, args.threads, args.images, args.metadata, args.diff, args.old)
+    dumper.run()
