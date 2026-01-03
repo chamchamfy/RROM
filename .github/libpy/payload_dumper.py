@@ -63,8 +63,7 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
     if op.data_sha256_hash:
         current_hash = hashlib.sha256(data).digest()
         if current_hash != op.data_sha256_hash:
-            print(f"[!] Cảnh báo: Hash không khớp cho {partition_name} ({op.type}). Bỏ qua kiểm tra hash...")
-            # raise AssertionError(f"Lỗi hash cho {partition_name} ({op.type})")
+            print(f"[!] Cảnh báo: Hash không khớp cho {partition_name} ({op.type})")
 
     try:
         if op.type == um.InstallOperation.REPLACE:
@@ -76,7 +75,13 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
             data = lzma.decompress(data)
             write_extents(out_file, op.dst_extents, data, block_size)
         elif op.type == um.InstallOperation.REPLACE_ZSTD:
-            data = decompress_zstd(data)
+            try:
+                data = decompress_zstd(data)
+            except Exception:
+                try:
+                    data = brotli.decompress(data)
+                except Exception:
+                    data = lz4.block.decompress(data)
             write_extents(out_file, op.dst_extents, data, block_size)
         elif op.type == um.InstallOperation.SOURCE_COPY:
             if not old_file:
@@ -99,8 +104,11 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
         elif op.type == um.InstallOperation.ZSTD_BSDIFF:
             if not old_file:
                 raise ValueError(f"ZSTD_BSDIFF yêu cầu file cũ cho {partition_name}")
+            try:
+                data = decompress_zstd(data)
+            except Exception:
+                data = brotli.decompress(data)
             old_data = read_extents(old_file, op.src_extents, block_size)
-            data = decompress_zstd(data)
             patched = apply_bsdiff(old_data, data)
             write_extents(out_file, op.dst_extents, patched, block_size)
         elif op.type == um.InstallOperation.LZ4DIFF_BSDIFF:
@@ -122,15 +130,13 @@ def data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, p
         elif op.type == um.InstallOperation.DISCARD:
             pass
         else:
-            print(f"[!] Cảnh báo: Loại operation không được hỗ trợ: {op.type} ({partition_name})")
+            print(f"[!] Cảnh báo: Loại operation không được hỗ trợ: {partition_name} ({op.type})")
     except Exception as e:
         print(f"[!] Lỗi khi xử lý {partition_name} ({op.type}): {str(e)}")
         raise
 
 def dump_partition(part, payload_file, out_dir, old_dir, data_offset, block_size, is_diff):
     partition_name = part.partition_name
-    print(f"[*] Đang trích xuất: {partition_name}")
-
     old_file = None
     if is_diff:
         old_path = os.path.join(old_dir, f"{partition_name}.img")
@@ -145,7 +151,6 @@ def dump_partition(part, payload_file, out_dir, old_dir, data_offset, block_size
     try:
         for op in part.operations:
             data_for_op(op, payload_file, out_file, old_file, data_offset, block_size, partition_name)
-        print(f"[+] Hoàn tất: {partition_name}")
     except Exception as e:
         print(f"[!] Lỗi khi trích xuất {partition_name}: {str(e)}")
         out_file.close()
@@ -181,7 +186,7 @@ def main():
     parser = argparse.ArgumentParser(description="Công cụ trích xuất payload.bin (OTA)")
     parser.add_argument("payload", type=argparse.FileType('rb'), help="File payload.bin")
     parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra (mặc định: output)")
-    parser.add_argument("-t", "--threads", type=int, default=4, help="Số luồng xử lý (mặc định: 4)")
+    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng xử lý (mặc định: 1)")
     parser.add_argument("-m", "--metadata", action="store_true", help="Xuất metadata ra JSON")
     parser.add_argument("--diff", action="store_true", help="Trích xuất OTA differential (cần thư mục old)")
     parser.add_argument("--old", default="old", help="Thư mục chứa file cũ (mặc định: old)")
@@ -226,19 +231,27 @@ def main():
 
     print(f"[*] Bắt đầu trích xuất {len(partitions)} partition(s) với {args.threads} luồng...")
 
-    # Trích xuất đa luồng
-    with ThreadPoolExecutor(max_workers=args.threads) as executor:
-        futures = []
-        for part in partitions:
-            future = executor.submit(
-                dump_partition,
-                part, args.payload, args.out, args.old, data_offset, block_size, args.diff
-            )
-            futures.append(future)
+    # Trích xuất đa luồng (nếu threads > 1)
+    if args.threads > 1:
+        with ThreadPoolExecutor(max_workers=args.threads) as executor:
+            futures = []
+            for part in partitions:
+                future = executor.submit(
+                    dump_partition,
+                    part, args.payload, args.out, args.old, data_offset, block_size, args.diff
+                )
+                futures.append(future)
 
+            success = 0
+            for future in as_completed(futures):
+                if future.result():
+                    success += 1
+    else:
+        # Chạy tuần tự nếu threads = 1
         success = 0
-        for future in as_completed(futures):
-            if future.result():
+        for part in partitions:
+            result = dump_partition(part, args.payload, args.out, args.old, data_offset, block_size, args.diff)
+            if result:
                 success += 1
 
     print(f"[+] Hoàn tất! Trích xuất thành công {success}/{len(partitions)} partition(s).")
