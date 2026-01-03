@@ -75,7 +75,7 @@ echo "protobuf<=3.25.5" > requirements.txt
 pip install -r requirements.txt >/dev/null
 ) & ( 
 Chatbot "- Bắt đầu tải ROM: $URL ...";
-aria2c --continue=true -x8 -s8 -d $TOME -o "rom.zip" "$URL"
+aria2c -c -x8 -s8 --retry-wait=5 --connect-timeout=60 --timeout=600 -d $TOME -o "rom.zip" "$URL"
 [ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taiver "$URL" "$TOME/rom.zip"
 [ "$(du -m $TOME/rom.zip | awk '{print $1}')" -lt 1024 ] && Taive "$URL" "$TOME/rom.zip"
 mv -f "$TOME/rom.zip" "$TOME/$NEMEROM"
