@@ -13,6 +13,36 @@ import update_metadata_pb2
 from multiprocessing import Pool, Manager
 from google.protobuf.json_format import MessageToJson
 
+def decompress_multi_bz2(data):
+    """Giải nén đa luồng BZ2 bằng cách lặp cho đến khi hết dữ liệu."""
+    results = []
+    while data:
+        dec = bz2.BZ2Decompressor()
+        try:
+            res = dec.decompress(data)
+            results.append(res)
+            data = dec.unused_data
+        except EOFError:
+            break
+        except Exception:
+            break
+    return b''.join(results)
+
+def decompress_multi_xz(data):
+    """Giải nén đa luồng XZ/LZMA."""
+    results = []
+    while data:
+        dec = lzma.LZMADecompressor(format=lzma.FORMAT_AUTO)
+        try:
+            res = dec.decompress(data)
+            results.append(res)
+            data = dec.unused_data
+        except EOFError:
+            break
+        except Exception:
+            break
+    return b''.join(results)
+
 def process_partition(part_raw, args_dict, data_offset, block_size, counter):
     import update_metadata_pb2 as um
     part = um.PartitionUpdate()
@@ -32,16 +62,12 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                 if op.type == um.InstallOperation.REPLACE:
                     out_data = data
                 elif op.type == um.InstallOperation.REPLACE_BZ:
-                    # Sử dụng decompressor object để tránh lỗi end-of-stream
-                    dec = bz2.BZ2Decompressor()
-                    out_data = dec.decompress(data)
+                    out_data = decompress_multi_bz2(data)
                 elif op.type == um.InstallOperation.REPLACE_XZ:
-                    # XZ trong payload đôi khi chứa nhiều stream, dùng FORMAT_AUTO
-                    out_data = lzma.decompress(data, format=lzma.FORMAT_AUTO)
+                    out_data = decompress_multi_xz(data)
                 elif op.type == 5: # REPLACE_LZ4
                     out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length)
                 elif op.type == 6: # ZERO
-                    # Một số phân vùng xbl dùng ZERO để lấp đầy block
                     out_data = b'\x00' * (op.dst_length if op.dst_length else (op.dst_extents[0].num_blocks * block_size))
                 elif op.type in [um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF] and args_dict['diff']:
                     if os.path.exists(old_img_path):
@@ -74,7 +100,8 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
         return True
 
     except Exception as e:
-        sys.stdout.write(f"[Error]: {name}.img | Lỗi: {e}\n")
+        # Thay thế định dạng thông báo lỗi theo yêu cầu của bạn
+        sys.stdout.write(f"[ERROR]: {name}.img | {e}\n")
         sys.stdout.flush()
         return False
 
@@ -84,14 +111,14 @@ class PayloadDumper:
         try:
             self.payload_file = open(args.payload, 'rb')
         except FileNotFoundError:
-            print(f"[Error]: Không tìm thấy file {args.payload}")
+            print(f"[!] Lỗi: Không tìm thấy file {args.payload}")
             sys.exit(1)
         self._parse_header()
 
     def _parse_header(self):
         magic = self.payload_file.read(4)
         if magic != b'CrAU':
-            print("[Error]: Định dạng file không hợp lệ.")
+            print("[!] Lỗi: Định dạng file không hợp lệ.")
             sys.exit(1)
         version = struct.unpack('>Q', self.payload_file.read(8))[0]
         manifest_size = struct.unpack('>Q', self.payload_file.read(8))[0]
@@ -139,3 +166,4 @@ if __name__ == "__main__":
     parser.add_argument("--old", default="old")
     args = parser.parse_args()
     PayloadDumper(args).run()
+                                                  
