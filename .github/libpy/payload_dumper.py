@@ -69,8 +69,7 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                     elif op.type == um.InstallOperation.ZERO:
                         out_data = b'\x00' * sum(e.num_blocks for e in op.dst_extents) * block_size
                     elif op.type in [um.InstallOperation.SOURCE_COPY, um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF]:
-                        if not os.path.exists(old_img_path):
-                            raise FileNotFoundError()
+                        if not os.path.exists(old_img_path): raise FileNotFoundError()
                         with open(old_img_path, 'rb') as f_old:
                             src_data = b''
                             for ext in op.src_extents:
@@ -90,7 +89,6 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                         f_out.write(out_data[data_ptr : data_ptr + length])
                         data_ptr += length
 
-        # Xác minh Hash sau khi ghi xong
         sha256 = hashlib.sha256()
         with open(out_path, 'rb') as f_verify:
             while chunk := f_verify.read(1024*1024):
@@ -106,11 +104,9 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
         return True
     except FileNotFoundError:
         sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: Thiếu file gốc (Delta Update)\n")
-        sys.stdout.flush()
         return False
     except Exception as e:
         sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: {str(e)}\n")
-        sys.stdout.flush()
         return False
 
 class PayloadDumper:
@@ -125,7 +121,7 @@ class PayloadDumper:
     def _parse_header(self):
         magic = self.payload_file.read(4)
         if magic != b'CrAU':
-            print("[ERROR]: Định dạng file không hợp lệ."); sys.exit(1)
+            print("[ERROR]: payload.bin không hợp lệ."); sys.exit(1)
         self.version = struct.unpack('>Q', self.payload_file.read(8))[0]
         self.manifest_size = struct.unpack('>Q', self.payload_file.read(8))[0]
         self.sig_size = struct.unpack('>I', self.payload_file.read(4))[0] if self.version > 1 else 0
@@ -135,50 +131,48 @@ class PayloadDumper:
         self.manifest = update_metadata_pb2.DeltaArchiveManifest()
         self.manifest.ParseFromString(self.manifest_data)
 
-    def list_partitions(self):
-        print(f"{'Phân vùng':<25} | {'Kích thước (Bytes)':<15}")
-        for part in self.manifest.partitions:
-            size = part.new_partition_info.size
-            print(f"{part.partition_name:<25} | {size:<15}")
-        print(f"\nTổng cộng: {len(self.manifest.partitions)} phân vùng.")
-
     def run(self):
         if not os.path.exists(self.args.out): os.makedirs(self.args.out)
-
+        
         if self.args.metadata:
             meta_path = os.path.join(self.args.out, "metadata.json")
             with open(meta_path, "w", encoding="utf-8") as f:
                 f.write(MessageToJson(self.manifest, indent=2))
-            print(f"[*] Đã xuất Metadata JSON: {meta_path}")
+            print(f"[*] Đã xuất Metadata: {meta_path}")
             return
 
         if self.args.list:
-            self.list_partitions()
+            print(f"{'Phân vùng':<25} | {'Kích thước (Bytes)':<15}")
+            for part in self.manifest.partitions:
+                print(f"{part.partition_name:<25} | {part.new_partition_info.size:<15}")
             return
 
         work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
-        total = len(work_list)
-        print(f"[*] Đang trích xuất {total} phân vùng với số {self.args.threads} luồng")
+        print(f"[*] Đang xử lý {len(work_list)} phân vùng với {self.args.threads} luồng")
         
         manager = Manager()
         counter = manager.Value('i', 0)
-        args_dict = {'payload_path': self.args.payload, 'out': self.args.out, 'old': self.args.old, 'diff': self.args.diff}
+        args_dict = {'payload_path': self.args.payload, 'out': self.args.out, 'old': self.args.old}
         tasks = [(p.SerializeToString(), args_dict, self.data_offset, self.manifest.block_size, counter) for p in work_list]
 
         with Pool(processes=self.args.threads) as pool:
             pool.starmap(process_partition, tasks)
-        print(f"[*] Hoàn tất {counter.value}/{total} phân vùng")
+        print(f"[*] Hoàn tất {counter.value}/{len(work_list)} phân vùng.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Công cụ trích xuất payload.bin Android")
     parser.add_argument("payload", help="Đường dẫn đến file payload.bin")
-    parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra")
-    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng (mặc định: 1)")
-    parser.add_argument("-i", "--images", nargs='+', help="Trích xuất phân vùng cụ thể")
-    parser.add_argument("-l", "--list", action="store_true", help="Liệt kê phân vùng")
+    parser.add_argument("-o", "--out", default="output", help="Thư mục lưu kết quả (Mặc định: output)")
+    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng xử lý đồng thời (Mặc định: 1)")
+    parser.add_argument("-i", "--images", nargs='+', help="Chỉ trích xuất các phân vùng cụ thể (ví dụ: boot system)")
+    parser.add_argument("-l", "--list", action="store_true", help="Liệt kê danh sách phân vùng và kích thước")
     parser.add_argument("-m", "--metadata", action="store_true", help="Chỉ xuất metadata.json")
-    parser.add_argument("--diff", action="store_true")
-    parser.add_argument("--old", default="old")
+    parser.add_argument("--old", default="old", help="Thư mục chứa file gốc cho bản cập nhật Delta (Mặc định: old)")
+    
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+        
     args = parser.parse_args()
     PayloadDumper(args).run()
-        
+    
