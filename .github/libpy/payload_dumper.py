@@ -10,28 +10,47 @@ import lz4.block
 import zstandard as zstd
 import brotli
 import bsdiff4
-import update_metadata_pb2
+import update_metadata_pb2 as um
 from multiprocessing import Pool, Manager
 from google.protobuf.json_format import MessageToJson
 
-# Hàm flatten giúp xử lý danh sách extents nếu cần tính toán tổng block
 flatten = lambda l: [item for sublist in l for item in sublist]
 
+def decompress_multi_xz(data):
+    results = []
+    while data:
+        dec = lzma.LZMADecompressor(format=lzma.FORMAT_AUTO)
+        try:
+            res = dec.decompress(data)
+            results.append(res)
+            data = dec.unused_data
+        except Exception: break
+    return b''.join(results)
+
+def decompress_multi_bz2(data):
+    results = []
+    while data:
+        dec = bz2.BZ2Decompressor()
+        try:
+            res = dec.decompress(data)
+            results.append(res)
+            data = dec.unused_data
+        except Exception: break
+    return b''.join(results)
+
 def process_partition(part_raw, args_dict, data_offset, block_size, counter):
-    import update_metadata_pb2 as um
-    part = um.PartitionUpdate()
-    part.ParseFromString(part_raw)
-    name = part.partition_name
-    
-    out_path = os.path.join(args_dict['out'], f"{name}.img")
-    old_img_path = os.path.join(args_dict['old'], f"{name}.img")
-    
     try:
-        # Tạo file trắng với kích thước chuẩn xác
+        part = um.PartitionUpdate()
+        part.ParseFromString(part_raw)
+        name = part.partition_name
+        
+        out_path = os.path.join(args_dict['out'], f"{name}.img")
+        old_img_path = os.path.join(args_dict['old'], f"{name}.img")
+        
+        # Tạo file với kích thước chuẩn xác
         with open(out_path, 'wb') as f_out:
             f_out.truncate(part.new_partition_info.size)
         
-        # Mở file r+b để ghi vào các vị trí block chính xác
         with open(out_path, 'r+b') as f_out:
             with open(args_dict['payload_path'], 'rb') as f_pay:
                 for op in part.operations:
@@ -39,13 +58,12 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                     data = f_pay.read(op.data_length)
                     out_data = b''
                     
-                    # Các kiểu trích xuất trực tiếp (Full)
                     if op.type == um.InstallOperation.REPLACE:
                         out_data = data
                     elif op.type == um.InstallOperation.REPLACE_BZ:
                         out_data = bz2.decompress(data)
                     elif op.type == um.InstallOperation.REPLACE_XZ:
-                        out_data = lzma.decompress(data)
+                        out_data = decompress_multi_xz(data)
                     elif op.type == 5: # REPLACE_LZ4
                         out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length)
                     elif op.type == 7: # REPLACE_ZSTD
@@ -59,10 +77,9 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                             f_out.write(b'\x00' * (ext.num_blocks * block_size))
                         continue
                     
-                    # Xử lý Delta OTA (Cần tùy chọn --diff và file trong thư mục old/)
                     elif op.type in [um.InstallOperation.SOURCE_COPY, um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF]:
                         if not os.path.exists(old_img_path):
-                            raise FileNotFoundError(f"Thiếu file gốc trong thư mục '{args_dict['old']}'")
+                            raise FileNotFoundError(f"Thiếu file gốc trong '{args_dict['old']}'")
                         
                         with open(old_img_path, 'rb') as f_old:
                             src_data = b''
@@ -76,10 +93,8 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                                 out_data = bsdiff4.patch(src_data, data)
                             elif op.type == um.InstallOperation.BROTLI_BSDIFF:
                                 out_data = bsdiff4.patch(src_data, brotli.decompress(data))
-                    else:
-                        continue
-
-                    # Ghi dữ liệu vào ĐÚNG các extents (Khắc phục lỗi HASH)
+                    
+                    # Ghi dữ liệu vào ĐÚNG các extents
                     data_ptr = 0
                     for ext in op.dst_extents:
                         f_out.seek(ext.start_block * block_size)
@@ -101,11 +116,14 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
         sys.stdout.flush()
         counter.value += 1
         return True
-    except FileNotFoundError as e:
-        sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: {str(e)}\n")
-        return False
+
     except Exception as e:
-        sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: {str(e)}\n")
+        # Ép buộc in lỗi ra màn hình kể cả trong đa luồng
+        partition_name = "Unknown"
+        try: partition_name = um.PartitionUpdate.FromString(part_raw).partition_name
+        except: pass
+        sys.stdout.write(f"[ERROR]: {partition_name} | Lỗi: {str(e)}\n")
+        sys.stdout.flush()
         return False
 
 class PayloadDumper:
@@ -127,13 +145,12 @@ class PayloadDumper:
         self.manifest_data = self.payload_file.read(self.manifest_size)
         self.payload_file.read(self.sig_size)
         self.data_offset = self.payload_file.tell()
-        self.manifest = update_metadata_pb2.DeltaArchiveManifest()
+        self.manifest = um.DeltaArchiveManifest()
         self.manifest.ParseFromString(self.manifest_data)
 
     def run(self):
         if not os.path.exists(self.args.out): os.makedirs(self.args.out)
         
-        # Tùy chọn xuất Metadata
         if self.args.metadata:
             meta_path = os.path.join(self.args.out, "metadata.json")
             with open(meta_path, "w", encoding="utf-8") as f:
@@ -154,11 +171,18 @@ class PayloadDumper:
         manager = Manager()
         sync_counter = manager.Value('i', 0)
         
-        args_dict = {'payload_path': self.args.payload, 'out': self.args.out, 'old': self.args.old, 'diff': self.args.diff}
+        args_dict = {
+            'payload_path': self.args.payload, 
+            'out': self.args.out, 
+            'old': self.args.old, 
+            'diff': self.args.diff
+        }
+        
         tasks = [(p.SerializeToString(), args_dict, self.data_offset, self.manifest.block_size, sync_counter) for p in work_list]
 
         with Pool(processes=self.args.threads) as pool:
             pool.starmap(process_partition, tasks)
+            
         print(f"[*] Hoàn tất {sync_counter.value}/{len(work_list)} phân vùng.")
 
 if __name__ == "__main__":
@@ -178,4 +202,4 @@ if __name__ == "__main__":
         
     args = parser.parse_args()
     PayloadDumper(args).run()
-                        
+    
