@@ -28,25 +28,22 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
     try:
         with open(args_dict['payload_path'], 'rb') as f_pay, open(out_path, 'wb') as f_out:
             for op in part.operations:
-                # Quan trọng: Di chuyển con trỏ đến đúng vị trí data_offset của TỪNG operation
+                # Di chuyển đến vị trí dữ liệu của từng Operation
                 f_pay.seek(data_offset + op.data_offset)
+                # Đọc chính xác độ dài dữ liệu nén được chỉ định trong manifest
                 data = f_pay.read(op.data_length)
 
-                # --- Giải nén các định dạng dựa trên Enum chuẩn ---
-                # 0: REPLACE, 1: REPLACE_BZ, 8: REPLACE_XZ, 5: REPLACE_LZ4 (tùy ROM), 6: ZERO
-                
                 if op.type == um.InstallOperation.REPLACE:
                     out_data = data
                 elif op.type == um.InstallOperation.REPLACE_BZ:
                     out_data = bz2.decompress(data)
                 elif op.type == um.InstallOperation.REPLACE_XZ:
+                    # Dùng lzma.decompress cho XZ
                     out_data = lzma.decompress(data)
-                elif op.type == 5: # Thường là REPLACE_LZ4 trong một số bản build
+                elif op.type == 5: # REPLACE_LZ4
                     out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length)
-                elif op.type == 6: # ZERO: Ghi đè bằng dữ liệu trống
+                elif op.type == 6: # ZERO
                     out_data = b'\x00' * (op.dst_extents[0].num_blocks * block_size)
-                elif op.type == 7: # DISCARD (Bỏ qua)
-                    continue
                 elif op.type in [um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF] and args_dict['diff']:
                     if os.path.exists(old_img_path):
                         with open(old_img_path, 'rb') as f_old:
@@ -54,7 +51,7 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                             for ext in op.src_extents:
                                 f_old.seek(ext.start_block * block_size)
                                 src_io += f_old.read(ext.num_blocks * block_size)
-                            # Giải nén data nếu là BROTLI_BSDIFF trước khi patch
+                            
                             patch_data = data
                             if op.type == um.InstallOperation.BROTLI_BSDIFF:
                                 import brotli
@@ -63,13 +60,12 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                     else:
                         raise FileNotFoundError(f"Thiếu file gốc: {old_img_path}")
                 else:
-                    # Các loại khác mặc định là REPLACE hoặc bỏ qua nếu không hỗ trợ
                     out_data = data
 
                 f_out.write(out_data)
                 sha256.update(out_data)
 
-        # Kiểm tra Hash sau khi ghi xong
+        # Kiểm tra Hash sau khi hoàn tất
         hash_status = ""
         if part.new_partition_info.hash:
             if sha256.digest() != part.new_partition_info.hash:
@@ -81,7 +77,7 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
         return True
 
     except Exception as e:
-        sys.stdout.write(f"[ERROR] {name}.img | Lỗi: {e}\n")
+        sys.stdout.write(f"Error:  {name}.img | Lỗi: {e}\n")
         sys.stdout.flush()
         return False
 
@@ -98,7 +94,7 @@ class PayloadDumper:
     def _parse_header(self):
         magic = self.payload_file.read(4)
         if magic != b'CrAU':
-            print("[!] Lỗi: Định dạng file không hợp lệ.")
+            print("[!] Lỗi: Magic bytes không khớp.")
             sys.exit(1)
         version = struct.unpack('>Q', self.payload_file.read(8))[0]
         manifest_size = struct.unpack('>Q', self.payload_file.read(8))[0]
@@ -130,7 +126,9 @@ class PayloadDumper:
         if self.args.images or not self.args.metadata:
             work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
             total = len(work_list)
-            print(f"[*] Đang xử lý {total} phân vùng với {self.args.threads} luồng.")
+            
+            # Khôi phục thông báo lúc đầu
+            print(f"[*] Trích xuất {total} phân vùng với {self.args.threads} luồng xử lý.")
             
             manager = Manager()
             success_counter = manager.Value('i', 0)
@@ -154,10 +152,10 @@ if __name__ == "__main__":
     parser.add_argument("payload", help="Đường dẫn payload.bin")
     parser.add_argument("-o", "--out", default="output", help="Thư mục xuất")
     parser.add_argument("-t", "--threads", type=int, default=2, help="Số luồng")
-    parser.add_argument("-i", "--images", nargs='+', help="Phân vùng cần lấy")
+    parser.add_argument("-i", "--images", nargs='+', help="Phân vùng chỉ định")
     parser.add_argument("-m", "--metadata", action="store_true", help="Xuất Metadata")
     parser.add_argument("--diff", action="store_true", help="Chế độ Delta")
-    parser.add_argument("--old", default="old", help="Thư mục file gốc")
+    parser.add_argument("--old", default="old", help="Thư mục ảnh cũ")
 
     args = parser.parse_args()
     PayloadDumper(args).run()
