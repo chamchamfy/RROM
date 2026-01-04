@@ -12,6 +12,7 @@ import brotli
 import bsdiff4
 import update_metadata_pb2
 from multiprocessing import Pool, Manager
+from google.protobuf.json_format import MessageToJson
 
 def decompress_multi_bz2(data):
     results = []
@@ -89,6 +90,7 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                         f_out.write(out_data[data_ptr : data_ptr + length])
                         data_ptr += length
 
+        # Xác minh Hash sau khi ghi xong
         sha256 = hashlib.sha256()
         with open(out_path, 'rb') as f_verify:
             while chunk := f_verify.read(1024*1024):
@@ -96,14 +98,14 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
 
         hash_status = ""
         if part.new_partition_info.hash and sha256.digest() != part.new_partition_info.hash:
-            hash_status = " | [!] Sai HASH (file có thể bị lỗi)"
+            hash_status = " | Sai HASH có thể lỗi file"
         
         sys.stdout.write(f"[OK] {name}.img{hash_status}\n")
         sys.stdout.flush()
         counter.value += 1
         return True
     except FileNotFoundError:
-        sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: Thiếu file gốc (Yêu cầu cho bản cập nhật Delta)\n")
+        sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: Thiếu file gốc (Delta Update)\n")
         sys.stdout.flush()
         return False
     except Exception as e:
@@ -141,11 +143,19 @@ class PayloadDumper:
         print(f"\nTổng cộng: {len(self.manifest.partitions)} phân vùng.")
 
     def run(self):
+        if not os.path.exists(self.args.out): os.makedirs(self.args.out)
+
+        if self.args.metadata:
+            meta_path = os.path.join(self.args.out, "metadata.json")
+            with open(meta_path, "w", encoding="utf-8") as f:
+                f.write(MessageToJson(self.manifest, indent=2))
+            print(f"[*] Đã xuất Metadata JSON: {meta_path}")
+            return
+
         if self.args.list:
             self.list_partitions()
             return
 
-        if not os.path.exists(self.args.out): os.makedirs(self.args.out)
         work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
         total = len(work_list)
         print(f"[*] Đang trích xuất {total} phân vùng với số {self.args.threads} luồng")
@@ -162,12 +172,13 @@ class PayloadDumper:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("payload", help="Đường dẫn đến file payload.bin")
-    parser.add_argument("-o", "--out", default="output", help="Thư mục lưu file trích xuất")
-    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng xử lý (mặc định: 1)")
-    parser.add_argument("-i", "--images", nargs='+', help="Chỉ trích xuất phân vùng cụ thể")
-    parser.add_argument("-l", "--list", action="store_true", help="Liệt kê danh sách phân vùng")
+    parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra")
+    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng (mặc định: 1)")
+    parser.add_argument("-i", "--images", nargs='+', help="Trích xuất phân vùng cụ thể")
+    parser.add_argument("-l", "--list", action="store_true", help="Liệt kê phân vùng")
+    parser.add_argument("-m", "--metadata", action="store_true", help="Chỉ xuất metadata.json")
     parser.add_argument("--diff", action="store_true")
     parser.add_argument("--old", default="old")
     args = parser.parse_args()
     PayloadDumper(args).run()
-    
+        
