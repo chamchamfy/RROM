@@ -22,19 +22,24 @@ def decompress_multi_bz2(data):
             res = dec.decompress(data)
             results.append(res)
             data = dec.unused_data
-        except: break
+        except Exception:
+            break
     return b''.join(results)
 
 def decompress_multi_xz(data):
-    results = []
-    while data:
-        dec = lzma.LZMADecompressor(format=lzma.FORMAT_AUTO)
-        try:
-            res = dec.decompress(data)
-            results.append(res)
-            data = dec.unused_data
-        except: break
-    return b''.join(results)
+    try:
+        return lzma.decompress(data)
+    except lzma.LZMAError:
+        results = []
+        while data:
+            dec = lzma.LZMADecompressor(format=lzma.FORMAT_AUTO)
+            try:
+                res = dec.decompress(data)
+                results.append(res)
+                data = dec.unused_data
+            except Exception:
+                break
+        return b''.join(results)
 
 def process_partition(part_raw, args_dict, data_offset, block_size, counter):
     import update_metadata_pb2 as um
@@ -69,7 +74,8 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                     elif op.type == um.InstallOperation.ZERO:
                         out_data = b'\x00' * sum(e.num_blocks for e in op.dst_extents) * block_size
                     elif op.type in [um.InstallOperation.SOURCE_COPY, um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF]:
-                        if not os.path.exists(old_img_path): raise FileNotFoundError()
+                        if not os.path.exists(old_img_path):
+                            raise FileNotFoundError(f"Thiếu file gốc trong thư mục '{args_dict['old']}'")
                         with open(old_img_path, 'rb') as f_old:
                             src_data = b''
                             for ext in op.src_extents:
@@ -94,16 +100,16 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
             while chunk := f_verify.read(1024*1024):
                 sha256.update(chunk)
 
-        hash_status = ""
+        status = ""
         if part.new_partition_info.hash and sha256.digest() != part.new_partition_info.hash:
-            hash_status = " | Sai HASH có thể lỗi file"
+            status = " | Sai HASH có thể lỗi file"
         
-        sys.stdout.write(f"[OK] {name}.img{hash_status}\n")
+        sys.stdout.write(f"[OK] {name}.img{status}\n")
         sys.stdout.flush()
         counter.value += 1
         return True
-    except FileNotFoundError:
-        sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: Thiếu file gốc (Delta Update)\n")
+    except FileNotFoundError as e:
+        sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: {str(e)}\n")
         return False
     except Exception as e:
         sys.stdout.write(f"[ERROR]: {name}.img | Lỗi: {str(e)}\n")
@@ -145,6 +151,7 @@ class PayloadDumper:
             print(f"{'Phân vùng':<25} | {'Kích thước (Bytes)':<15}")
             for part in self.manifest.partitions:
                 print(f"{part.partition_name:<25} | {part.new_partition_info.size:<15}")
+            print(f"\nTổng cộng: {len(self.manifest.partitions)} phân vùng.")
             return
 
         work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
@@ -160,14 +167,15 @@ class PayloadDumper:
         print(f"[*] Hoàn tất {counter.value}/{len(work_list)} phân vùng.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Công cụ trích xuất payload.bin Android")
-    parser.add_argument("payload", help="Đường dẫn đến file payload.bin")
-    parser.add_argument("-o", "--out", default="output", help="Thư mục lưu kết quả (Mặc định: output)")
-    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng xử lý đồng thời (Mặc định: 1)")
-    parser.add_argument("-i", "--images", nargs='+', help="Chỉ trích xuất các phân vùng cụ thể (ví dụ: boot system)")
-    parser.add_argument("-l", "--list", action="store_true", help="Liệt kê danh sách phân vùng và kích thước")
+    parser = argparse.ArgumentParser(description="Payload Dumper CC")
+    parser.add_argument("payload", help="Đường dẫn file payload.bin")
+    parser.add_argument("-o", "--out", default="output", help="Thư mục xuất file")
+    parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng")
+    parser.add_argument("-i", "--images", nargs='+', help="Phân vùng cụ thể")
+    parser.add_argument("-l", "--list", action="store_true", help="Liệt kê phân vùng")
     parser.add_argument("-m", "--metadata", action="store_true", help="Chỉ xuất metadata.json")
-    parser.add_argument("--old", default="old", help="Thư mục chứa file gốc cho bản cập nhật Delta (Mặc định: old)")
+    parser.add_argument("--diff", action="store_true", help="Chế độ Delta OTA")
+    parser.add_argument("--old", default="old", help="Thư mục chứa file ảnh cũ")
     
     if len(sys.argv) == 1:
         parser.print_help()
@@ -175,4 +183,4 @@ if __name__ == "__main__":
         
     args = parser.parse_args()
     PayloadDumper(args).run()
-    
+                        
