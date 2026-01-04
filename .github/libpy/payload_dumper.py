@@ -60,20 +60,21 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                 f_out.write(out_data)
                 sha256.update(out_data)
 
-        # Kiểm tra Hash sau khi giải nén
+        # Kiểm tra Hash
         hash_status = ""
         if part.new_partition_info.hash:
             if sha256.digest() != part.new_partition_info.hash:
                 hash_status = " | [!] SAI HASH"
         
-        # Thông báo thành công kèm trạng thái Hash nếu có
-        print(f"[OK] {name}.img{hash_status}")
+        # In kết quả sau khi hoàn tất phân vùng
+        sys.stdout.write(f"[OK] {name}.img{hash_status}\n")
+        sys.stdout.flush()
         counter.value += 1
         return True
 
     except Exception as e:
-        # Thông báo lỗi cụ thể cho file
-        print(f"[ERROR] {name}.img | Chi tiết: {e}")
+        sys.stdout.write(f"[ERROR] {name}.img | Lỗi: {e}\n")
+        sys.stdout.flush()
         return False
 
 class PayloadDumper:
@@ -89,7 +90,7 @@ class PayloadDumper:
     def _parse_header(self):
         magic = self.payload_file.read(4)
         if magic != b'CrAU':
-            print("[!] Lỗi: Định dạng payload.bin không hợp lệ.")
+            print("[!] Lỗi: Định dạng file payload.bin không hợp lệ.")
             sys.exit(1)
         version = struct.unpack('>Q', self.payload_file.read(8))[0]
         manifest_size = struct.unpack('>Q', self.payload_file.read(8))[0]
@@ -104,12 +105,12 @@ class PayloadDumper:
     def dump_metadata(self):
         meta_file = os.path.join(self.args.out, "metadata.json")
         try:
-            json_string = MessageToJson(self.manifest)
+            json_string = MessageToJson(self.manifest, indent=2)
             with open(meta_file, "w", encoding="utf-8") as f:
                 f.write(json_string)
             print(f"[*] Đã xuất Metadata JSON: {meta_file}")
         except Exception as e:
-            print(f"[!] Lỗi trích xuất Metadata: {e}")
+            print(f"[!] Lỗi Metadata: {e}")
 
     def run(self):
         if not os.path.exists(self.args.out):
@@ -118,40 +119,42 @@ class PayloadDumper:
         if self.args.metadata:
             self.dump_metadata()
 
-        work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
-        total = len(work_list)
-        
-        print(f"[*] Đang xử lý {total} phân vùng với {self.args.threads} luồng...")
-        print("-" * 50)
-        
-        manager = Manager()
-        success_counter = manager.Value('i', 0)
-        
-        args_dict = {
-            'payload_path': self.args.payload,
-            'out': self.args.out,
-            'diff': self.args.diff,
-            'old': self.args.old
-        }
+        # Chỉ trích xuất phân vùng nếu:
+        # 1. Có danh sách ảnh cụ thể (-i)
+        # 2. Hoặc KHÔNG dùng tham số -m (chạy mặc định)
+        if self.args.images or not self.args.metadata:
+            work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
+            total = len(work_list)
+            
+            print(f"[*] Đang xử lý {total} phân vùng với {self.args.threads} luồng.")
+            
+            manager = Manager()
+            success_counter = manager.Value('i', 0)
+            
+            args_dict = {
+                'payload_path': self.args.payload,
+                'out': self.args.out,
+                'diff': self.args.diff,
+                'old': self.args.old
+            }
 
-        tasks = [(p.SerializeToString(), args_dict, self.data_offset, self.manifest.block_size, success_counter) for p in work_list]
+            tasks = [(p.SerializeToString(), args_dict, self.data_offset, self.manifest.block_size, success_counter) for p in work_list]
 
-        with Pool(processes=self.args.threads) as pool:
-            pool.starmap(process_partition, tasks)
+            with Pool(processes=self.args.threads) as pool:
+                pool.starmap(process_partition, tasks)
 
-        print("-" * 50)
-        print(f"Hoàn tất! Đã trích xuất thành công: {success_counter.value}/{total} phân vùng.")
+            print(f"\nĐã trích xuất thành công: {success_counter.value}/{total} phân vùng.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Android Payload Dumper Pro")
-    parser.add_argument("payload", help="Đường dẫn file payload.bin")
+    parser.add_argument("payload", help="Đường dẫn đến file payload.bin")
     parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra")
-    parser.add_argument("-t", "--threads", type=int, default=2, help="Số luồng đa nhân")
-    parser.add_argument("-i", "--images", nargs='+', help="Các phân vùng cụ thể")
-    parser.add_argument("-m", "--metadata", action="store_true", help="Xuất Metadata JSON")
-    parser.add_argument("--diff", action="store_true", help="Chế độ Differential")
-    parser.add_argument("--old", default="old", help="Thư mục chứa ảnh gốc")
+    parser.add_argument("-t", "--threads", type=int, default=2, help="Số lượng luồng")
+    parser.add_argument("-i", "--images", nargs='+', help="Danh sách phân vùng cần trích xuất")
+    parser.add_argument("-m", "--metadata", action="store_true", help="Chỉ xuất file metadata.json")
+    parser.add_argument("--diff", action="store_true", help="Chế độ Delta (Differential)")
+    parser.add_argument("--old", default="old", help="Thư mục chứa file gốc cho chế độ Delta")
 
     args = parser.parse_args()
     PayloadDumper(args).run()
-        
+    
