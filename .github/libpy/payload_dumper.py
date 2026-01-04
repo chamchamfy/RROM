@@ -5,7 +5,6 @@ import struct
 import bz2
 import lzma
 import sys
-import json
 import hashlib
 import lz4.block
 import zstandard as zstd
@@ -29,44 +28,53 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
     try:
         with open(args_dict['payload_path'], 'rb') as f_pay, open(out_path, 'wb') as f_out:
             for op in part.operations:
-                if op.data_offset is not None:
-                    f_pay.seek(data_offset + op.data_offset)
-                data = f_pay.read(op.data_length) if op.data_length else b''
+                # Quan trọng: Di chuyển con trỏ đến đúng vị trí data_offset của TỪNG operation
+                f_pay.seek(data_offset + op.data_offset)
+                data = f_pay.read(op.data_length)
 
-                # --- Giải nén các định dạng ---
-                if op.type == 0: # REPLACE
+                # --- Giải nén các định dạng dựa trên Enum chuẩn ---
+                # 0: REPLACE, 1: REPLACE_BZ, 8: REPLACE_XZ, 5: REPLACE_LZ4 (tùy ROM), 6: ZERO
+                
+                if op.type == um.InstallOperation.REPLACE:
                     out_data = data
-                elif op.type == 1: # REPLACE_BZ
+                elif op.type == um.InstallOperation.REPLACE_BZ:
                     out_data = bz2.decompress(data)
-                elif op.type == 8: # REPLACE_XZ
+                elif op.type == um.InstallOperation.REPLACE_XZ:
                     out_data = lzma.decompress(data)
-                elif op.type == 5: # REPLACE_LZ4
+                elif op.type == 5: # Thường là REPLACE_LZ4 trong một số bản build
                     out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length)
-                elif op.type == 6: # REPLACE_ZSTD
-                    out_data = dctx.decompress(data, max_output_size=op.dst_length)
-                elif op.type in [3, 5] and args_dict['diff']: # BSDIFF / SOURCE_BSDIFF
+                elif op.type == 6: # ZERO: Ghi đè bằng dữ liệu trống
+                    out_data = b'\x00' * (op.dst_extents[0].num_blocks * block_size)
+                elif op.type == 7: # DISCARD (Bỏ qua)
+                    continue
+                elif op.type in [um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF] and args_dict['diff']:
                     if os.path.exists(old_img_path):
                         with open(old_img_path, 'rb') as f_old:
                             src_io = b''
                             for ext in op.src_extents:
                                 f_old.seek(ext.start_block * block_size)
                                 src_io += f_old.read(ext.num_blocks * block_size)
-                            out_data = bsdiff4.patch(src_io, data)
+                            # Giải nén data nếu là BROTLI_BSDIFF trước khi patch
+                            patch_data = data
+                            if op.type == um.InstallOperation.BROTLI_BSDIFF:
+                                import brotli
+                                patch_data = brotli.decompress(data)
+                            out_data = bsdiff4.patch(src_io, patch_data)
                     else:
                         raise FileNotFoundError(f"Thiếu file gốc: {old_img_path}")
                 else:
+                    # Các loại khác mặc định là REPLACE hoặc bỏ qua nếu không hỗ trợ
                     out_data = data
 
                 f_out.write(out_data)
                 sha256.update(out_data)
 
-        # Kiểm tra Hash
+        # Kiểm tra Hash sau khi ghi xong
         hash_status = ""
         if part.new_partition_info.hash:
             if sha256.digest() != part.new_partition_info.hash:
                 hash_status = " | [!] SAI HASH"
         
-        # In kết quả sau khi hoàn tất phân vùng
         sys.stdout.write(f"[OK] {name}.img{hash_status}\n")
         sys.stdout.flush()
         counter.value += 1
@@ -90,7 +98,7 @@ class PayloadDumper:
     def _parse_header(self):
         magic = self.payload_file.read(4)
         if magic != b'CrAU':
-            print("[!] Lỗi: Định dạng file payload.bin không hợp lệ.")
+            print("[!] Lỗi: Định dạng file không hợp lệ.")
             sys.exit(1)
         version = struct.unpack('>Q', self.payload_file.read(8))[0]
         manifest_size = struct.unpack('>Q', self.payload_file.read(8))[0]
@@ -119,13 +127,9 @@ class PayloadDumper:
         if self.args.metadata:
             self.dump_metadata()
 
-        # Chỉ trích xuất phân vùng nếu:
-        # 1. Có danh sách ảnh cụ thể (-i)
-        # 2. Hoặc KHÔNG dùng tham số -m (chạy mặc định)
         if self.args.images or not self.args.metadata:
             work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
             total = len(work_list)
-            
             print(f"[*] Đang xử lý {total} phân vùng với {self.args.threads} luồng.")
             
             manager = Manager()
@@ -147,13 +151,13 @@ class PayloadDumper:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Android Payload Dumper Pro")
-    parser.add_argument("payload", help="Đường dẫn đến file payload.bin")
-    parser.add_argument("-o", "--out", default="output", help="Thư mục đầu ra")
-    parser.add_argument("-t", "--threads", type=int, default=2, help="Số lượng luồng")
-    parser.add_argument("-i", "--images", nargs='+', help="Danh sách phân vùng cần trích xuất")
-    parser.add_argument("-m", "--metadata", action="store_true", help="Chỉ xuất file metadata.json")
-    parser.add_argument("--diff", action="store_true", help="Chế độ Delta (Differential)")
-    parser.add_argument("--old", default="old", help="Thư mục chứa file gốc cho chế độ Delta")
+    parser.add_argument("payload", help="Đường dẫn payload.bin")
+    parser.add_argument("-o", "--out", default="output", help="Thư mục xuất")
+    parser.add_argument("-t", "--threads", type=int, default=2, help="Số luồng")
+    parser.add_argument("-i", "--images", nargs='+', help="Phân vùng cần lấy")
+    parser.add_argument("-m", "--metadata", action="store_true", help="Xuất Metadata")
+    parser.add_argument("--diff", action="store_true", help="Chế độ Delta")
+    parser.add_argument("--old", default="old", help="Thư mục file gốc")
 
     args = parser.parse_args()
     PayloadDumper(args).run()
