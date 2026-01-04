@@ -22,24 +22,20 @@ def decompress_multi_bz2(data):
             res = dec.decompress(data)
             results.append(res)
             data = dec.unused_data
-        except Exception:
-            break
+        except Exception: break
     return b''.join(results)
 
 def decompress_multi_xz(data):
-    try:
-        return lzma.decompress(data)
-    except lzma.LZMAError:
-        results = []
-        while data:
-            dec = lzma.LZMADecompressor(format=lzma.FORMAT_AUTO)
-            try:
-                res = dec.decompress(data)
-                results.append(res)
-                data = dec.unused_data
-            except Exception:
-                break
-        return b''.join(results)
+    # Xử lý đặc biệt cho các phân vùng lớn hay bị lỗi Hash
+    results = []
+    while data:
+        dec = lzma.LZMADecompressor(format=lzma.FORMAT_AUTO)
+        try:
+            res = dec.decompress(data)
+            results.append(res)
+            data = dec.unused_data
+        except Exception: break
+    return b''.join(results)
 
 def process_partition(part_raw, args_dict, data_offset, block_size, counter):
     import update_metadata_pb2 as um
@@ -51,7 +47,10 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
     old_img_path = os.path.join(args_dict['old'], f"{name}.img")
     
     try:
-        with open(out_path, 'wb+') as f_out:
+        # Mở file mới và thiết lập kích thước chuẩn xác ngay từ đầu
+        with open(out_path, 'wb') as f_out:
+            f_out.truncate(part.new_partition_info.size)
+            
             with open(args_dict['payload_path'], 'rb') as f_pay:
                 for op in part.operations:
                     f_pay.seek(data_offset + op.data_offset)
@@ -68,11 +67,11 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                         out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length)
                     elif op.type == 7: # REPLACE_ZSTD
                         dctx = zstd.ZstdDecompressor()
-                        out_data = dctx.decompress(data, max_output_size=op.dst_length if op.dst_length else 0)
+                        out_data = dctx.decompress(data, max_output_size=op.dst_length)
                     elif op.type == 8: # REPLACE_BROTLI
                         out_data = brotli.decompress(data)
                     elif op.type == um.InstallOperation.ZERO:
-                        out_data = b'\x00' * sum(e.num_blocks for e in op.dst_extents) * block_size
+                        out_data = b'\x00' * (sum(e.num_blocks for e in op.dst_extents) * block_size)
                     elif op.type in [um.InstallOperation.SOURCE_COPY, um.InstallOperation.SOURCE_BSDIFF, um.InstallOperation.BROTLI_BSDIFF]:
                         if not os.path.exists(old_img_path):
                             raise FileNotFoundError(f"Thiếu file gốc trong thư mục '{args_dict['old']}'")
@@ -88,6 +87,7 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                             elif op.type == um.InstallOperation.BROTLI_BSDIFF:
                                 out_data = bsdiff4.patch(src_data, brotli.decompress(data))
 
+                    # Ghi chính xác dữ liệu vào các phân đoạn (extents)
                     data_ptr = 0
                     for extent in op.dst_extents:
                         f_out.seek(extent.start_block * block_size)
@@ -95,6 +95,7 @@ def process_partition(part_raw, args_dict, data_offset, block_size, counter):
                         f_out.write(out_data[data_ptr : data_ptr + length])
                         data_ptr += length
 
+        # Tính Hash để kiểm tra tính toàn vẹn
         sha256 = hashlib.sha256()
         with open(out_path, 'rb') as f_verify:
             while chunk := f_verify.read(1024*1024):
@@ -155,7 +156,7 @@ class PayloadDumper:
             return
 
         work_list = [p for p in self.manifest.partitions if not self.args.images or p.partition_name in self.args.images]
-        print(f"[*] Đang xử lý {len(work_list)} phân vùng với {self.args.threads} luồng")
+        print(f"[*] Đang trích xuất {len(work_list)} phân vùng với {self.args.threads} luồng xử lý")
         
         manager = Manager()
         counter = manager.Value('i', 0)
@@ -167,7 +168,7 @@ class PayloadDumper:
         print(f"[*] Hoàn tất {counter.value}/{len(work_list)} phân vùng.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Payload Dumper CC")
+    parser = argparse.ArgumentParser(description="Payload Dumper CC Pro")
     parser.add_argument("payload", help="Đường dẫn file payload.bin")
     parser.add_argument("-o", "--out", default="output", help="Thư mục xuất file")
     parser.add_argument("-t", "--threads", type=int, default=1, help="Số luồng")
@@ -183,4 +184,4 @@ if __name__ == "__main__":
         
     args = parser.parse_args()
     PayloadDumper(args).run()
-                        
+    
