@@ -15,12 +15,14 @@ import update_metadata_pb2 as um
 from multiprocessing import Pool, Manager
 
 def decompress_xz(data):
-    results, dec = [], lzma.LZMADecompressor(lzma.FORMAT_AUTO)
+    results = []
     while data:
         try:
+            dec = lzma.LZMADecompressor(lzma.FORMAT_AUTO)
             results.append(dec.decompress(data))
             data = dec.unused_data
-        except: break
+        except lzma.LZMAError:
+            break
     return b''.join(results)
 
 def process_partition(part_raw, args, data_offset, block_size, counter):
@@ -28,6 +30,7 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
     p.ParseFromString(part_raw)
     name = p.partition_name
     out_path = os.path.join(args['out'], f"{name}.img")
+    
     ops_type = um.InstallOperation
     op_map = {v: k for k, v in ops_type.Type.items()}
     
@@ -35,6 +38,7 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
         print(f"[*] Đang trích xuất: {name}...", flush=True)
 
     try:
+        # Khởi tạo file với kích thước chính xác tuyệt đối
         with open(out_path, 'wb') as f:
             f.truncate(p.new_partition_info.size)
 
@@ -43,12 +47,15 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
                 op_name = op_map.get(op.type, "UNKNOWN")
                 
                 if args.get('debug'):
-                    print(f"  > [{i}] {op_name:<15} | Offset: {op.data_offset:<10} | Size: {op.data_length:<10} bytes", flush=True)
+                    # In chỉ số i để đối chiếu trực tiếp với metadata của phân vùng đó
+                    print(f"  > [{i}] {op_name:<15} | Offset: {op.data_offset:<12} | Size: {op.data_length:<10} bytes", flush=True)
 
+                # Tìm vị trí dữ liệu trong payload.bin
                 f_pay.seek(data_offset + op.data_offset)
                 data = f_pay.read(op.data_length)
                 out_data = b''
 
+                # Logic giải nén dữ liệu
                 if op_name in ['ZERO', 'DISCARD']:
                     for ex in op.dst_extents:
                         f_out.seek(ex.start_block * block_size)
@@ -72,30 +79,41 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
                         raise Exception(f"Cần --diff cho {op_name}")
                     old_path = os.path.join(args['old'], f"{name}.img")
                     if not os.path.exists(old_path):
-                        raise Exception(f"Không tìm thấy file gốc: {old_path}")
+                        raise Exception(f"Thiếu file gốc: {old_path}")
                     with open(old_path, 'rb') as f_old:
                         src = b''.join((f_old.seek(e.start_block * block_size) or f_old.read(e.num_blocks * block_size)) for e in op.src_extents)
-                    out_data = bsdiff4.patch(src, data if op_name != 'BROTLI_BSDIFF' else brotli.decompress(data))
+                    
+                    if op_name == 'SOURCE_COPY':
+                        out_data = src
+                    else:
+                        patch_data = data if op_name != 'BROTLI_BSDIFF' else brotli.decompress(data)
+                        out_data = bsdiff4.patch(src, patch_data)
                 else:
                     out_data = data
 
+                # Ghi dữ liệu ra file đầu ra theo đúng extents
                 ptr = 0
                 for ex in op.dst_extents:
                     f_out.seek(ex.start_block * block_size)
                     sz = ex.num_blocks * block_size
+                    # Cắt đúng đoạn dữ liệu tương ứng với từng extent
                     f_out.write(out_data[ptr : ptr + sz])
                     ptr += sz
 
+        # Kiểm tra HASH
         with open(out_path, 'rb') as f:
             actual_h = hashlib.sha256(f.read()).hexdigest()
         expect_h = p.new_partition_info.hash.hex()
-        status = f" | Lỗi: Sai HASH (tính toán: {actual_h}, đúng: {expect_h})" if expect_h and actual_h != expect_h else ""
         
+        status = ""
+        if expect_h and actual_h != expect_h:
+            status = f" | Lỗi: Sai HASH (tính toán: {actual_h}, đúng: {expect_h})"
+            
         if not args.get('debug') or status:
             print(f"[OK] {name}.img{status}", flush=True)
         counter.value += 1
     except Exception as e:
-        print(f"[ERROR] {name} Lỗi: {e}", flush=True)
+        print(f"[ERROR] {name} Lỗi tại Op {i} ({op_name}): {e}", flush=True)
 
 class PayloadDumper:
     def __init__(self, args):
@@ -106,7 +124,7 @@ class PayloadDumper:
         try:
             with open(args.payload, 'rb') as f:
                 if f.read(4) != b'CrAU': 
-                    sys.exit("Lỗi: payload.bin không hợp lệ")
+                    sys.exit("Lỗi: payload.bin không hợp lệ (Magic 'CrAU' không khớp)")
                 self.ver, self.m_size = struct.unpack('>QQ', f.read(16))
                 self.sig_size = struct.unpack('>I', f.read(4))[0] if self.ver > 1 else 0
                 self.m_data = f.read(self.m_size)
