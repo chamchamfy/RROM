@@ -38,7 +38,7 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
         print(f"[*] Đang trích xuất: {name}...", flush=True)
 
     try:
-        # Khởi tạo file với kích thước chính xác tuyệt đối
+        # Khởi tạo file với kích thước chính xác tuyệt đối từ metadata
         with open(out_path, 'wb') as f:
             f.truncate(p.new_partition_info.size)
 
@@ -47,15 +47,14 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
                 op_name = op_map.get(op.type, "UNKNOWN")
                 
                 if args.get('debug'):
-                    # In chỉ số i để đối chiếu trực tiếp với metadata của phân vùng đó
                     print(f"  > [{i}] {op_name:<15} | Offset: {op.data_offset:<12} | Size: {op.data_length:<10} bytes", flush=True)
 
-                # Tìm vị trí dữ liệu trong payload.bin
+                # Tìm vị trí dữ liệu trong payload.bin (Sử dụng seek tuyệt đối)
                 f_pay.seek(data_offset + op.data_offset)
                 data = f_pay.read(op.data_length)
                 out_data = b''
 
-                # Logic giải nén dữ liệu
+                # Logic giải nén dữ liệu - Giữ đầy đủ các định dạng
                 if op_name in ['ZERO', 'DISCARD']:
                     for ex in op.dst_extents:
                         f_out.seek(ex.start_block * block_size)
@@ -68,9 +67,10 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
                 elif op_name == 'REPLACE_XZ':
                     out_data = decompress_xz(data)
                 elif op_name == 'REPLACE_LZ4':
-                    out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length)
+                    # Fix: Thêm dst_length để tránh lỗi buffer LZ4 trên các ROM mới
+                    out_data = lz4.block.decompress(data, uncompressed_size=op.dst_length if op.dst_length else None)
                 elif op_name == 'REPLACE_ZSTD':
-                    out_data = zstd.ZstdDecompressor().decompress(data, max_output_size=op.dst_length)
+                    out_data = zstd.ZstdDecompressor().decompress(data, max_output_size=op.dst_length if op.dst_length else 0)
                 elif op_name == 'REPLACE_BROTLI':
                     out_data = brotli.decompress(data)
                 elif op_name in ['SOURCE_COPY', 'SOURCE_BSDIFF', 'BROTLI_BSDIFF', 'BSDIFF', 
@@ -81,7 +81,10 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
                     if not os.path.exists(old_path):
                         raise Exception(f"Thiếu file gốc: {old_path}")
                     with open(old_path, 'rb') as f_old:
-                        src = b''.join((f_old.seek(e.start_block * block_size) or f_old.read(e.num_blocks * block_size)) for e in op.src_extents)
+                        src = b''
+                        for e in op.src_extents:
+                            f_old.seek(e.start_block * block_size)
+                            src += f_old.read(e.num_blocks * block_size)
                     
                     if op_name == 'SOURCE_COPY':
                         out_data = src
@@ -91,12 +94,11 @@ def process_partition(part_raw, args, data_offset, block_size, counter):
                 else:
                     out_data = data
 
-                # Ghi dữ liệu ra file đầu ra theo đúng extents
+                # Ghi dữ liệu ra file đầu ra theo đúng extents (Fix lỗi ghi đè/lệch ptr)
                 ptr = 0
                 for ex in op.dst_extents:
                     f_out.seek(ex.start_block * block_size)
                     sz = ex.num_blocks * block_size
-                    # Cắt đúng đoạn dữ liệu tương ứng với từng extent
                     f_out.write(out_data[ptr : ptr + sz])
                     ptr += sz
 
@@ -124,10 +126,11 @@ class PayloadDumper:
         try:
             with open(args.payload, 'rb') as f:
                 if f.read(4) != b'CrAU': 
-                    sys.exit("Lỗi: payload.bin không hợp lệ (Magic 'CrAU' không khớp)")
+                    sys.exit("Lỗi: payload.bin không hợp lệ")
                 self.ver, self.m_size = struct.unpack('>QQ', f.read(16))
                 self.sig_size = struct.unpack('>I', f.read(4))[0] if self.ver > 1 else 0
                 self.m_data = f.read(self.m_size)
+                # Tính toán offset dữ liệu sau Header và Signature
                 self.data_offset = f.tell() + self.sig_size
             self.manifest = um.DeltaArchiveManifest()
             self.manifest.ParseFromString(self.m_data)
@@ -168,12 +171,13 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--threads", type=int, default=1, help="Số lượng luồng xử lý đồng thời (mặc định: 1)")
     parser.add_argument("-i", "--images", nargs='+', help="Chỉ trích xuất các phân vùng cụ thể (ví dụ: boot system)")
     parser.add_argument("-l", "--list", action="store_true", help="Liệt kê danh sách các phân vùng")
-    parser.add_argument("-m", "--metadata", action="store_true", help="Xuất thông tin cấu trúc phân vùng ra file metadata.json")
+    parser.add_argument("-m", "--metadata", action="store_true", help="Xuất thông tin phân vùng ra file metadata.json")
     parser.add_argument("-d", "--debug", action="store_true", default=True, help="Bật chế độ Debug")
-    parser.add_argument("--diff", action="store_true", help="Sử dụng (--diff) chế độ Delta OTA (yêu cầu phân vùng gốc)")
-    parser.add_argument("--old", default="old", help="Thư mục chứa các file .img gốc cho chế độ Delta khi sử dụng --diff (mặc định: old)")
+    parser.add_argument("--diff", action="store_true", help="Sử dụng (--diff) khi trích xuất Delta OTA cần thư mục gốc")
+    parser.add_argument("--old", default="old", help="Thư mục chứa các file .img gốc (khi trích xuất Delta OTA sử dụng cùng --diff) (mặc định: old)")
     
     args = parser.parse_args()
     setattr(args, 'payload_path', args.payload)
     if len(sys.argv) == 1: parser.print_help()
     else: PayloadDumper(args).run()
+    
