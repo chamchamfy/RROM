@@ -3,7 +3,7 @@ TOME="$GITHUB_WORKSPACE"
 phanvungtam=$TOME/Unpack
 #API=$(grep -oP 'ro.build.version.sdk=\K\d+' $phanvungtam/system/system/build.prop)
 #VERS=$(grep -oP 'ro.build.version.release=\K\d+' $phanvungtam/system/system/build.prop)
-#tenmamay=$(grep -sh -oP 'ro.product.(odm|vendor).device=\K\S+' $phanvungtam/{odm/etc,vendor}/build.prop | head -n1)
+#Mamay=$(grep -sh -oP 'ro.product.(odm|vendor).device=\K\S+' $phanvungtam/{odm/etc,vendor}/build.prop | head -n1)
 # Thư mục chứa apk,jar đã mod: $TOME/Mod
 # Tìm tập tin apk,jar chép vào $TOME/Mod: [ Timfile *.apk/*.jar ]
 # Giải nén dex trong apk/jar từ thư mục $TOME/Mod: [ Unpackfile ] 
