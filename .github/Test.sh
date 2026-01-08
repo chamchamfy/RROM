@@ -13,9 +13,9 @@ echo "▼ Tên máy chủ"
 uname -a
 echo
 
-sudo apt-get update >/dev/null
-sudo apt-get install wget curl zip unzip zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign jq f2fs-tools p7zip >/dev/null
-pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome zstandard >/dev/null
+sudo apt-get update > /dev/null
+sudo apt-get install wget curl zstd binutils e2fsprogs erofs-utils simg2img img2simg zipalign > /dev/null
+pip3 install protobuf bsdiff4 six crypto construct google docopt pycryptodome > /dev/null
 
 echo "protobuf<=3.20.1" > requirements.txt
 pip3 install -r requirements.txt > /dev/null
@@ -71,16 +71,7 @@ if [ "$(file $TOME/rom.zip | grep 'Zip archive')" -o "$(file $TOME/rom.zip | gre
 fi 
 }
 
-#Taidulieu
-#ls $TOME/Unzip
+Taidulieu
+ls $TOME/Unzip
 #. $TOME/Option.md
-
-bin="$TOME/.github/bin"
-libpy="$TOME/.github/libpy"
-echo 1
-$bin/pydump -h
-echo 2
-$bin/paydump -h
-
-
 echo "- Kết thúc" 

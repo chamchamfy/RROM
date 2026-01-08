@@ -5,7 +5,6 @@
   - Thêm Tiếng Việt
   - Tối ưu hệ thống
   - Bật các tính năng nâng cao
-  - Bật giả mạo khóa bootloader
   - Xóa ứng dụng thừa...
 + Buy me coffee:
   - Viettel Money: 
