@@ -71,7 +71,13 @@ if [ "$(file $TOME/rom.zip | grep 'Zip archive')" -o "$(file $TOME/rom.zip | gre
 fi 
 }
 
-Taidulieu
-ls $TOME/Unzip
+#Taidulieu
+#ls $TOME/Unzip
 #. $TOME/Option.md
+bin="$TOME/.github/bin"
+libpy="$TOME/.github/libpy"
+echo 1
+$bin/paydump -h
+echo 2
+$bin/paydump --help
 echo "- Kết thúc" 
