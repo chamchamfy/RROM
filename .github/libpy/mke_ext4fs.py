@@ -233,7 +233,7 @@ def main(argv):
 
   # run mke2fs
   with tempfile.NamedTemporaryFile() as conf_file:
-    conf_data = pkgutil.get_data('mkuserimg_mke2fs', 'mke2fs.conf')
+    conf_data = pkgutil.get_data('mke_ext4fs', 'mke2fs.conf')
     conf_file.write(conf_data)
     conf_file.flush()
     mke2fs_env = {"MKE2FS_CONFIG" : conf_file.name}
