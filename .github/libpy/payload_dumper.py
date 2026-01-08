@@ -172,7 +172,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--images", nargs='+', help="Chỉ trích xuất các phân vùng cụ thể (ví dụ: boot system)")
     parser.add_argument("-l", "--list", action="store_true", help="Liệt kê danh sách các phân vùng")
     parser.add_argument("-m", "--metadata", action="store_true", help="Xuất thông tin phân vùng ra file metadata.json")
-    parser.add_argument("-d", "--debug", action="store_true", default=True, help="Bật chế độ Debug")
+    parser.add_argument("-d", "--debug", action="store_true", default=False, help="Bật chế độ Debug")
     parser.add_argument("--diff", action="store_true", help="Sử dụng (--diff) khi trích xuất Delta OTA cần thư mục gốc")
     parser.add_argument("--old", default="old", help="Thư mục chứa các file .img gốc (khi trích xuất Delta OTA sử dụng cùng --diff) (mặc định: old)")
     
