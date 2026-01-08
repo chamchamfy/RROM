@@ -41,18 +41,18 @@ if [[ -n "$(echo "$URL" | grep 'CNXM')" ]]; then
  mv -f $tm/$ttm.apk $tm/$tmm.apk 2>/dev/null
  done
  
- cp -af $TOME/tam/product/*app /mnt/diem/product 2>/dev/null
- cp -af $TOME/tam/vendor/*app /mnt/diem/vendor 2>/dev/null
- cp -af $TOME/tam/system_ext/*app /mnt/diem/system_ext 2>/dev/null
- cp -af $TOME/tam/system/*app /mnt/diem/system/system 2>/dev/null
+sudo cp -af $TOME/tam/product/*app /mnt/diem/product 2>/dev/null
+sudo cp -af $TOME/tam/vendor/*app /mnt/diem/vendor 2>/dev/null
+sudo cp -af $TOME/tam/system_ext/*app /mnt/diem/system_ext 2>/dev/null
+sudo cp -af $TOME/tam/system/*app /mnt/diem/system/system 2>/dev/null
  rm -rf $TOME/tam $TOME/appm.zip
  fi
  for i in system/system vendor product system_ext; do cd /mnt/diem/$i && Phanquyen; done 
 fi
 }
 #khoichay
-umount /mnt/diem/product 2>/dev/null
-umount /mnt/diem/system 2>/dev/null
-umount /mnt/diem/system_ext 2>/dev/null
-umount /mnt/diem/vendor 2>/dev/null
+sudo umount /mnt/diem/product 2>/dev/null
+sudo umount /mnt/diem/system 2>/dev/null
+sudo umount /mnt/diem/system_ext 2>/dev/null
+sudo umount /mnt/diem/vendor 2>/dev/null
 fi
