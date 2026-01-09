@@ -148,7 +148,8 @@ Caidat
 #
 themcauhinh() { 
 # Thêm file_contexts
-systemfc="/system/lib64/libGLESv1\.so u:object_r:system_lib_file:s0
+systemfc="/lost\+found        u:object_r:rootfs:s0
+/system/lib64/libGLESv1\.so u:object_r:system_lib_file:s0
 /system/lib64/libGLESv2\.so u:object_r:system_lib_file:s0
 /system/lib/libGLESv1\.so u:object_r:system_lib_file:s0
 /system/lib/libGLESv2\.so u:object_r:system_lib_file:s0"
