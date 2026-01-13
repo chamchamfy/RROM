@@ -1,19 +1,15 @@
-name: Xóa runs cũ
+name: Cleanup workflow runs
 
 on:
-  workflow_dispatch:   # chạy thủ công từ tab Actions
+  workflow_dispatch:   # chạy thủ công
     inputs:
       days:
-        description: "Xóa các runs cũ hơn bao nhiêu ngày"
+        description: "Số ngày giữ lại (ví dụ 30)"
         required: true
         default: "14"
-      status:
-        description: "Trạng thái cần xóa (failure, cancelled, all)"
-        required: true
-        default: "failure"
 
-  schedule:            # chạy tự động theo lịch
-    - cron: '0 0 * * 0'   # chạy mỗi tuần vào Chủ Nhật 00:00 UTC
+  schedule:            # chạy tự động
+    - cron: '0 0 * * 0'   # mỗi tuần vào Chủ Nhật 00:00 UTC
 
 jobs:
   cleanup:
@@ -24,20 +20,17 @@ jobs:
           sudo apt-get install -y gh jq
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Delete runs
+      - name: Delete old runs
         run: |
-          # Nếu chạy thủ công thì lấy input, nếu chạy tự động thì dùng mặc định
+          # Nếu chạy thủ công thì lấy input, nếu chạy tự động thì mặc định 14 ngày
           DAYS=${{ github.event.inputs.days || 14 }}
-          STATUS=${{ github.event.inputs.status || 'failure' }}
 
-          if [ "$STATUS" = "all" ]; then
-            FILTER='.workflow_runs[] | select(.status=="completed")'
-          else
-            FILTER=".workflow_runs[] | select(.status==\"completed\") | select(.conclusion==\"$STATUS\")"
-          fi
-
+          # Lấy tất cả runs đã completed, không phân biệt trạng thái
           gh api repos/${{ github.repository }}/actions/runs \
-            --jq "$FILTER | select((now - (.created_at | fromdateiso8601)) > ($DAYS*24*3600)) | .id" > runs.txt
+            --jq ".workflow_runs[] 
+                  | select(.status==\"completed\") 
+                  | select((now - (.created_at | fromdateiso8601)) > ($DAYS*24*3600)) 
+                  | .id" > runs.txt
 
           while read run_id; do
             echo "Deleting run $run_id"
