@@ -1,4 +1,4 @@
-name: Xóa workflow runs
+name: Xóa runs cũ
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ on:
     - cron: '0 0 * * 0'  # Mỗi tuần Chủ Nhật 00:00 UTC
 
 permissions:
-  actions: write        # Cần để xóa workflow runs
+  actions: write
   contents: read
 
 jobs:
@@ -33,43 +33,29 @@ jobs:
           sudo apt-get install -y gh jq
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Delete old runs with pagination
+      - name: Delete old runs with pagination + parallel
         env:
           REPO: ${{ github.repository }}
           DAYS: ${{ github.event.inputs.days || 14 }}
           INCLUDE_INCOMPLETE: ${{ github.event.inputs.include_incomplete || 'false' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
-          echo "Repo: $REPO"
-          echo "Days threshold: $DAYS"
-          echo "Include incomplete: $INCLUDE_INCOMPLETE"
-          echo "Dry run: $DRY_RUN"
-
-          # Tính ngưỡng thời gian (epoch seconds)
           THRESHOLD_SECONDS=$(( DAYS * 24 * 3600 ))
-
           PAGE=1
           DELETED=0
           LISTED=0
 
           while true; do
-            # Lấy 100 runs mỗi trang để giảm số lần gọi
             RESP=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$PAGE")
             COUNT=$(echo "$RESP" | jq '.workflow_runs | length')
+            [ "$COUNT" -eq 0 ] && break
 
-            if [ "$COUNT" -eq 0 ]; then
-              echo "No more runs on page $PAGE. Stop."
-              break
-            fi
-
-            # Chọn theo trạng thái
             if [ "$INCLUDE_INCOMPLETE" = "true" ]; then
-              STATUS_FILTER='true'  # lấy tất cả status
+              STATUS_FILTER='true'
             else
               STATUS_FILTER='.status=="completed"'
             fi
 
-            # Lọc theo thời gian
             echo "$RESP" | jq -r \
               --argjson threshold "$THRESHOLD_SECONDS" \
               ".workflow_runs[]
@@ -80,24 +66,18 @@ jobs:
             LIST_PAGE=$(wc -l < runs.txt)
             LISTED=$(( LISTED + LIST_PAGE ))
 
-            if [ "$LIST_PAGE" -eq 0 ]; then
-              echo "Page $PAGE: No runs older than $DAYS days (with current filters)."
-            else
+            if [ "$LIST_PAGE" -gt 0 ]; then
               echo "Page $PAGE: Found $LIST_PAGE runs to process."
-              while read -r run_id; do
-                [ -z "$run_id" ] && continue
-                if [ "$DRY_RUN" = "true" ]; then
-                  echo "[DRY] Would delete run $run_id"
-                else
-                  echo "Deleting run $run_id"
-                  gh api "repos/$REPO/actions/runs/$run_id" -X DELETE
-                  DELETED=$(( DELETED + 1 ))
-                fi
-              done < runs.txt
+              if [ "$DRY_RUN" = "true" ]; then
+                cat runs.txt | xargs -n1 echo "[DRY] Would delete run"
+              else
+                cat runs.txt | xargs -n1 -P10 -I {} gh api "repos/$REPO/actions/runs/{}" -X DELETE
+                DELETED=$(( DELETED + LIST_PAGE ))
+              fi
             fi
 
             PAGE=$(( PAGE + 1 ))
           done
 
-          echo "Listed runs: $LISTED"
-          echo "Deleted runs: $DELETED"
+          echo "Danh sách runs: $LISTED"
+          echo "Xóa runs: $DELETED"
