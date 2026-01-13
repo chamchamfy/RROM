@@ -1,15 +1,15 @@
-name: Cleanup workflow runs
+name: Xóa workflow runs
 
 on:
-  workflow_dispatch:   # chạy thủ công
+  workflow_dispatch:   # Cho phép chạy thủ công từ tab Actions
     inputs:
       days:
         description: "Số ngày giữ lại (ví dụ 30)"
         required: true
         default: "14"
 
-  schedule:            # chạy tự động
-    - cron: '0 0 * * 0'   # mỗi tuần vào Chủ Nhật 00:00 UTC
+  schedule:            # Chạy tự động theo lịch
+    - cron: '0 0 * * 0'   # Mỗi tuần vào Chủ Nhật 00:00 UTC
 
 jobs:
   cleanup:
@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Setup GitHub CLI
         run: |
+          sudo apt-get update
           sudo apt-get install -y gh jq
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
@@ -25,7 +26,7 @@ jobs:
           # Nếu chạy thủ công thì lấy input, nếu chạy tự động thì mặc định 14 ngày
           DAYS=${{ github.event.inputs.days || 14 }}
 
-          # Lấy tất cả runs đã completed, không phân biệt trạng thái
+          # Lấy tất cả runs đã completed, không phân biệt trạng thái (success, failure, cancelled, timed_out…)
           gh api repos/${{ github.repository }}/actions/runs \
             --jq ".workflow_runs[] 
                   | select(.status==\"completed\") 
@@ -33,6 +34,8 @@ jobs:
                   | .id" > runs.txt
 
           while read run_id; do
-            echo "Deleting run $run_id"
-            gh api repos/${{ github.repository }}/actions/runs/$run_id -X DELETE
+            if [ -n "$run_id" ]; then
+              echo "Deleting run $run_id"
+              gh api repos/${{ github.repository }}/actions/runs/$run_id -X DELETE
+            fi
           done < runs.txt
