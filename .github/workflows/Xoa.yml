@@ -1,8 +1,19 @@
-name: Xóa run cũ
+name: Xóa runs cũ
 
 on:
-  schedule:
-    - cron: '0 0 * * *' 
+  workflow_dispatch:   # chạy thủ công từ tab Actions
+    inputs:
+      days:
+        description: "Xóa các runs cũ hơn bao nhiêu ngày"
+        required: true
+        default: "14"
+      status:
+        description: "Trạng thái cần xóa (failure, cancelled, all)"
+        required: true
+        default: "failure"
+
+  schedule:            # chạy tự động theo lịch
+    - cron: '0 0 * * 0'   # chạy mỗi tuần vào Chủ Nhật 00:00 UTC
 
 jobs:
   cleanup:
@@ -13,14 +24,20 @@ jobs:
           sudo apt-get install -y gh jq
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Delete runs older than 14 days
+      - name: Delete runs
         run: |
+          # Nếu chạy thủ công thì lấy input, nếu chạy tự động thì dùng mặc định
+          DAYS=${{ github.event.inputs.days || 14 }}
+          STATUS=${{ github.event.inputs.status || 'failure' }}
+
+          if [ "$STATUS" = "all" ]; then
+            FILTER='.workflow_runs[] | select(.status=="completed")'
+          else
+            FILTER=".workflow_runs[] | select(.status==\"completed\") | select(.conclusion==\"$STATUS\")"
+          fi
+
           gh api repos/${{ github.repository }}/actions/runs \
-            --jq '.workflow_runs[] 
-                  | select(.status=="completed") 
-                  | select(.conclusion=="failure" or .conclusion=="cancelled") 
-                  | select((now - (.created_at | fromdateiso8601)) > (14*24*3600)) 
-                  | .id' > runs.txt
+            --jq "$FILTER | select((now - (.created_at | fromdateiso8601)) > ($DAYS*24*3600)) | .id" > runs.txt
 
           while read run_id; do
             echo "Deleting run $run_id"
