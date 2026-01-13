@@ -1,15 +1,27 @@
 name: Xóa workflow runs
 
 on:
-  workflow_dispatch:   # Cho phép chạy thủ công từ tab Actions
+  workflow_dispatch:
     inputs:
       days:
         description: "Số ngày giữ lại (ví dụ 30)"
         required: true
         default: "14"
+      include_incomplete:
+        description: "Xóa cả runs chưa completed (queued/in_progress)? (true/false)"
+        required: true
+        default: "false"
+      dry_run:
+        description: "Chạy thử, chỉ liệt kê mà không xóa (true/false)"
+        required: true
+        default: "false"
 
-  schedule:            # Chạy tự động theo lịch
-    - cron: '0 0 * * 0'   # Mỗi tuần vào Chủ Nhật 00:00 UTC
+  schedule:
+    - cron: '0 0 * * 0'  # Mỗi tuần Chủ Nhật 00:00 UTC
+
+permissions:
+  actions: write        # Cần để xóa workflow runs
+  contents: read
 
 jobs:
   cleanup:
@@ -21,21 +33,71 @@ jobs:
           sudo apt-get install -y gh jq
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Delete old runs
+      - name: Delete old runs with pagination
+        env:
+          REPO: ${{ github.repository }}
+          DAYS: ${{ github.event.inputs.days || 14 }}
+          INCLUDE_INCOMPLETE: ${{ github.event.inputs.include_incomplete || 'false' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
-          # Nếu chạy thủ công thì lấy input, nếu chạy tự động thì mặc định 14 ngày
-          DAYS=${{ github.event.inputs.days || 14 }}
+          echo "Repo: $REPO"
+          echo "Days threshold: $DAYS"
+          echo "Include incomplete: $INCLUDE_INCOMPLETE"
+          echo "Dry run: $DRY_RUN"
 
-          # Lấy tất cả runs đã completed, không phân biệt trạng thái (success, failure, cancelled, timed_out…)
-          gh api repos/${{ github.repository }}/actions/runs \
-            --jq ".workflow_runs[] 
-                  | select(.status==\"completed\") 
-                  | select((now - (.created_at | fromdateiso8601)) > ($DAYS*24*3600)) 
-                  | .id" > runs.txt
+          # Tính ngưỡng thời gian (epoch seconds)
+          THRESHOLD_SECONDS=$(( DAYS * 24 * 3600 ))
 
-          while read run_id; do
-            if [ -n "$run_id" ]; then
-              echo "Deleting run $run_id"
-              gh api repos/${{ github.repository }}/actions/runs/$run_id -X DELETE
+          PAGE=1
+          DELETED=0
+          LISTED=0
+
+          while true; do
+            # Lấy 100 runs mỗi trang để giảm số lần gọi
+            RESP=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$PAGE")
+            COUNT=$(echo "$RESP" | jq '.workflow_runs | length')
+
+            if [ "$COUNT" -eq 0 ]; then
+              echo "No more runs on page $PAGE. Stop."
+              break
             fi
-          done < runs.txt
+
+            # Chọn theo trạng thái
+            if [ "$INCLUDE_INCOMPLETE" = "true" ]; then
+              STATUS_FILTER='true'  # lấy tất cả status
+            else
+              STATUS_FILTER='.status=="completed"'
+            fi
+
+            # Lọc theo thời gian
+            echo "$RESP" | jq -r \
+              --argjson threshold "$THRESHOLD_SECONDS" \
+              ".workflow_runs[]
+               | select($STATUS_FILTER)
+               | select((now - (.created_at | fromdateiso8601)) > \$threshold)
+               | .id" > runs.txt
+
+            LIST_PAGE=$(wc -l < runs.txt)
+            LISTED=$(( LISTED + LIST_PAGE ))
+
+            if [ "$LIST_PAGE" -eq 0 ]; then
+              echo "Page $PAGE: No runs older than $DAYS days (with current filters)."
+            else
+              echo "Page $PAGE: Found $LIST_PAGE runs to process."
+              while read -r run_id; do
+                [ -z "$run_id" ] && continue
+                if [ "$DRY_RUN" = "true" ]; then
+                  echo "[DRY] Would delete run $run_id"
+                else
+                  echo "Deleting run $run_id"
+                  gh api "repos/$REPO/actions/runs/$run_id" -X DELETE
+                  DELETED=$(( DELETED + 1 ))
+                fi
+              done < runs.txt
+            fi
+
+            PAGE=$(( PAGE + 1 ))
+          done
+
+          echo "Listed runs: $LISTED"
+          echo "Deleted runs: $DELETED"
