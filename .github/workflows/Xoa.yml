@@ -1,4 +1,4 @@
-name: Cleanup old workflow runs
+name: Xóa run cũ
 
 on:
   schedule:
