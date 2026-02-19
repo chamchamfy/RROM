@@ -74,8 +74,7 @@ fi
 #Taidulieu
 #ls $TOME/Unzip
 #. $TOME/Option.md
-bin="$TOME/.github/bin"
-libpy="$TOME/.github/libpy"
+bin=$TOME/.github/bin
 echo 1
 $bin/paydump -h
 echo 2
