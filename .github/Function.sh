@@ -5,9 +5,9 @@ export User="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up}
 
 Xem() { curl -sLGN -H "$User" --connect-timeout 20 "$1"; }
-Taive() { curl -sLk -H "$User" --connect-timeout 20 "$1" -o "$2"; }
+Taive() { curl -sL -H "$User" --connect-timeout 20 "$1" -o "$2"; }
 TAI() { aria2c -c -x8 -s8 -d "$2" -o "$3" "$1"; }
-Taiver() { curl -Sk "$1" -o "$2"; }
+Taiver() { curl -sLk "$1" -o "$2"; }
 Taivewget() { wget "$1" -O "$2"; }
 Taivewgetr() { wget --no-check-certificate "$1" -O "$2"; }
 
