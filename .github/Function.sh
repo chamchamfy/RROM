@@ -1,13 +1,12 @@
 # Function
 export TOME="$GITHUB_WORKSPACE"
-export User="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
+export User="User-Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
 
 mkdir -p $TOME/{tmp,Unpack,Repack,Unzip,Payload,Super,Apk,Mod/tmp,VH,Up}
 
-#Taive () { curl -s -L "$1" -o "$2"; }
-Xem() { curl -s -L -G -N -H "$User" --connect-timeout 20 "$1"; }
-Taive() { curl -s -L -k -H "$User" --connect-timeout 20 "$1" -o "$2"; }
-Taiver() { curl -S -k "$1" -o "$2"; }
+Xem() { curl -sLGN -H "$User" --connect-timeout 20 "$1"; }
+Taive() { curl -sLk -H "$User" --connect-timeout 20 "$1" -o "$2"; }
+Taiver() { curl -Sk "$1" -o "$2"; }
 Taivewget() { wget "$1" -O "$2"; }
 Taivewgetr() { wget --no-check-certificate "$1" -O "$2"; }
 
