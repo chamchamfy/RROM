@@ -1,6 +1,7 @@
 #!/bin/bash
 TOME="$GITHUB_WORKSPACE"
 phanvungtam=$TOME/Unpack
+TAI() { aria2c -c -x8 -s8 -d "$2" -o "$3" "$1"; }
 #API=$(grep -oP 'ro.build.version.sdk=\K\d+' $phanvungtam/system/system/build.prop)
 #VERS=$(grep -oP 'ro.build.version.release=\K\d+' $phanvungtam/system/system/build.prop)
 #Mamay=$(grep -sh -oP 'ro.product.(odm|vendor).device=\K\S+' $phanvungtam/{odm/etc,vendor}/build.prop | head -n1)
@@ -238,28 +239,28 @@ rm -rf $TOME/tam $TOME/AdrenoGPUDriver.zip
 fi 
 #
 mkdir -p $TOME/twrp
-taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$Mamay"; [ -n "$(curl -s "$LURL/" | grep 'net.sf.files' | grep 'skkk')" ] && TURL="$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | grep -oP 'twrp[^"]*skkk\.img' | head -n1)" || TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; Taive "$TURL" "$2$duoi"; } 
+taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$Mamay"; [ -n "$(curl -s "$LURL/" | grep 'net.sf.files' | grep 'skkk')" ] && TURL="$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | grep -oP 'twrp[^"]*skkk\.img' | head -n1)" || TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; TAI "$2" "$3$duoi" "$TURL"; } 
 txrec() { [ -f $TOME/twrp/recovery.zip ] && 7za x -tzip -y $TOME/twrp/recovery.zip *.img -o$TOME/twrp/recovery.img >/dev/null && rm -f $TOME/twrp/recovery.zip 2>/dev/null; }
 txtwrp() { [ -f $TOME/twrp/twrp.zip ] && 7za x -tzip -y $TOME/twrp/twrp.zip *.img -o$TOME/twrp/twrp.img >/dev/null && rm -f $TOME/twrp/twrp.zip 2>/dev/null; }
 if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then 
  if [[ "$MREC" == "OFOX" ]]; then 
-  taivetwrp "OrangeFox-" "$TOME/twrp/recovery" 
+  taivetwrp "OrangeFox-" "$TOME/twrp" "recovery"
   txrec
  elif [[ "$MREC" == "TWRP" ]]; then 
-  taivetwrp "twrp" "$TOME/twrp/recovery" || taivetwrp "boot" "$TOME/twrp/recovery"
+  taivetwrp "twrp" "$TOME/twrp" "recovery" || taivetwrp "boot" "$TOME/twrp" "recovery"
   txrec
  elif [[ "$MREC" == "PBRB" ]]; then 
-  taivetwrp "PBRP-" "$TOME/twrp/recovery"
+  taivetwrp "PBRP-" "$TOME/twrp" "recovery"
   txrec
  fi
 else 
  if [[ "$MREC" == "OFOX" ]]; then 
-  taivetwrp "OrangeFox-" "$TOME/twrp/twrp" 
+  taivetwrp "OrangeFox-" "$TOME/twrp" "twrp" 
   txtwrp
  elif [[ "$MREC" == "TWRP" ]]; then 
-  taivetwrp "twrp" "$TOME/twrp/twrp" || taivetwrp "boot" "$TOME/twrp/twrp"
+  taivetwrp "twrp" "$TOME/twrp" "twrp" || taivetwrp "boot" "$TOME/twrp" "twrp"
  elif [[ "$MREC" == "PBRP" ]]; then 
-  taivetwrp "PBRP-" "$TOME/twrp/twrp"
+  taivetwrp "PBRP-" "$TOME/twrp" "twrp"
   txtwrp
  fi
 fi
