@@ -246,7 +246,7 @@ if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then
   taivetwrp "OrangeFox-" "$TOME/twrp/recovery" 
   txrec
  elif [[ "$MREC" == "TWRP" ]]; then 
-  taivetwrp "twrp-" "$TOME/twrp/recovery" || taivetwrp "boot" "$TOME/twrp/recovery"
+  taivetwrp "twrp" "$TOME/twrp/recovery" || taivetwrp "boot" "$TOME/twrp/recovery"
   txrec
  elif [[ "$MREC" == "PBRB" ]]; then 
   taivetwrp "PBRP-" "$TOME/twrp/recovery"
@@ -257,7 +257,7 @@ else
   taivetwrp "OrangeFox-" "$TOME/twrp/twrp" 
   txtwrp
  elif [[ "$MREC" == "TWRP" ]]; then 
-  taivetwrp "twrp-" "$TOME/twrp/twrp" || taivetwrp "boot" "$TOME/twrp/twrp"
+  taivetwrp "twrp" "$TOME/twrp/twrp" || taivetwrp "boot" "$TOME/twrp/twrp"
  elif [[ "$MREC" == "PBRP" ]]; then 
   taivetwrp "PBRP-" "$TOME/twrp/twrp"
   txtwrp
