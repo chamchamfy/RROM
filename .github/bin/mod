@@ -2,6 +2,8 @@
 TOME="$GITHUB_WORKSPACE"
 phanvungtam=$TOME/Unpack
 TAI() { aria2c -c -x8 -s8 -d "$2" -o "$3" "$1"; }
+Taive() { curl -sL --connect-timeout 20 "$1" -o "$2"; }
+Tai() { wget -q "$1" -O "$2"; }
 #API=$(grep -oP 'ro.build.version.sdk=\K\d+' $phanvungtam/system/system/build.prop)
 #VERS=$(grep -oP 'ro.build.version.release=\K\d+' $phanvungtam/system/system/build.prop)
 #Mamay=$(grep -sh -oP 'ro.product.(odm|vendor).device=\K\S+' $phanvungtam/{odm/etc,vendor}/build.prop | head -n1)
@@ -188,7 +190,7 @@ ngonngu() {
 if [[ "$TTV" == "1" ]]; then 
 mkdir -p $TOME/VH
 Taive "https://github.com/chamchamfy/toolcc/raw/main/overlay.zip" "$TOME/VH.zip"
-[ ! -f "$TOME/VH.zip" ] && Taivewget "https://github.com/chamchamfy/toolcc/raw/main/overlay.zip" "$TOME/VH.zip"
+[ ! -f "$TOME/VH.zip" ] && Tai "https://github.com/chamchamfy/toolcc/raw/main/overlay.zip" "$TOME/VH.zip"
 if [[ -s "$TOME/VH.zip" ]]; then echo " * Thêm ngôn ngữ..."
 7za x -tzip -y "$TOME/VH.zip" -o$TOME/VH >/dev/null
 [[ -e "$phanvungtam/product/overlay" ]] && TMVH=$phanvungtam/product/overlay || TMVH=$phanvungtam/vendor/overlay
@@ -212,7 +214,7 @@ fi
 #
 if [[ "$AP" == "1" ]]; then 
 mkdir -p $TOME/tam/cauhinh/system_ext/apex
-Taive "https://sourceforge.net/projects/rrom/files/apex.tar.zst" "$TOME/tam/apex.tar.zst"
+Tai "https://sourceforge.net/projects/rrom/files/apex.tar.zst" "$TOME/tam/apex.tar.zst"
  if [ "$(sha1sum "$TOME/tam/apex.tar.zst" | awk '{OFMT="%.0f"; print $1}')" = "e6eecdd5476857ad124a20cbc0b44b19aac3c996" ]; then echo " * Thêm APEX..."
  zstd -d $TOME/tam/apex.tar.zst -o $TOME/tam/apex.tar >/dev/null
  7z e -y $TOME/tam/apex.tar -o$TOME/tam/cauhinh/system_ext/apex >/dev/null
@@ -239,12 +241,12 @@ rm -rf $TOME/tam $TOME/AdrenoGPUDriver.zip
 fi 
 #
 mkdir -p $TOME/twrp
-taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$Mamay"; [ -n "$(curl -s "$LURL/" | grep 'net.sf.files' | grep 'skkk')" ] && TURL="$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | grep -oP 'twrp[^"]*skkk\.img' | head -n1)" || TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; wget -q "$TURL" -O "$2$duoi"; } 
+taivetwrp() { LURL="https://sourceforge.net/projects/recovery-for-xiaomi-devices/files/$Mamay"; [ -n "$(curl -s "$LURL/" | grep 'net.sf.files' | grep 'skkk')" ] && TURL="$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | grep -oP 'twrp[^"]*skkk\.img' | head -n1)" || TURL="$LURL/"$1"$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F$1 '{print $4}' | awk -F/ '{print $1}')"; duoi=".${TURL##*.}"; Tai "$TURL" "$2$duoi"; } 
 txrec() { [ -f $TOME/twrp/recovery.zip ] && 7za x -tzip -y $TOME/twrp/recovery.zip *.img -o$TOME/twrp/recovery.img >/dev/null && rm -f $TOME/twrp/recovery.zip 2>/dev/null; }
 txtwrp() { [ -f $TOME/twrp/twrp.zip ] && 7za x -tzip -y $TOME/twrp/twrp.zip *.img -o$TOME/twrp/twrp.img >/dev/null && rm -f $TOME/twrp/twrp.zip 2>/dev/null; }
 if [[ -n "$(grep 'recovery' $phanvungtam/vendor/etc/fstab.*)" ]]; then 
  if [[ "$MREC" == "OFOX" ]]; then 
-  taivetwrp "OrangeFox-" "$TOME/twrp/recovery"
+  taivetwrp "OrangeFox-" "$TOME/twrp/recovery" 
   txrec
  elif [[ "$MREC" == "TWRP" ]]; then 
   taivetwrp "twrp" "$TOME/twrp/recovery" || taivetwrp "boot" "$TOME/twrp/recovery"
@@ -269,9 +271,9 @@ du -m $TOME/twrp/*.img 2>/dev/null
 #
 if [[ "$GAPP" == "1" ]]; then 
 if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "$VERS" == "14" ]; then PB=U; elif [ "$VERS" == "15" ]; then PB=V; elif [ "$VERS" == "16" ]; then PB=W; elif [ "$VERS" == "17" ]; then PB=X; elif [ "$VERS" == "18" ]; then PB=Y; elif [ "$VERS" == "19" ]; then PB=Z; fi
- tainikgapp() { LURL="https://sourceforge.net/projects/nikgapps/files/Releases/Android-${PB}"; Taive "$(curl -s "$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $2}')/" | grep 'net.sf.files' | awk -F'"' '{print $286}')" "$TOME/$1"; } 
- taigapp() { LURL="https://sourceforge.net/projects/litegapps/files/litegapps/arm64/$2/$1"; Taive "$(curl -s "$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $2}')/" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
- taigboad() { LURL="https://sourceforge.net/projects/litegapps/files/addon/arm64/$2/$1/GoogleKeyboard"; Taive "$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
+ tainikgapp() { LURL="https://sourceforge.net/projects/nikgapps/files/Releases/Android-${PB}"; Tai "$(curl -s "$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $2}')/" | grep 'net.sf.files' | awk -F'"' '{print $286}')" "$TOME/$1"; } 
+ taigapp() { LURL="https://sourceforge.net/projects/litegapps/files/litegapps/arm64/$2/$1"; Tai "$(curl -s "$LURL/$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $2}')/" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
+ taigboad() { LURL="https://sourceforge.net/projects/litegapps/files/addon/arm64/$2/$1/GoogleKeyboard"; Tai "$(curl -s "$LURL/" | grep 'net.sf.files' | awk -F'"' '{print $14}')" "$TOME/$3"; } 
  taigapp "core" "$API" "gapp.zip" || tainikgapp "nikgapp.zip"
  taigboad "gapps" "$API" "gboad.zip"
  
@@ -321,7 +323,7 @@ if [ "$VERS" == "12" ]; then PB=S; elif [ "$VERS" == "13" ]; then PB=T; elif [ "
  fi
 fi
 if [[ "$APPM" == "1" ]]; then 
- Taive "https://sourceforge.net/projects/kudopatch/files/twrp/MiuiMod14.zip" "$TOME/appm.zip"
+ Tai "https://sourceforge.net/projects/kudopatch/files/twrp/MiuiMod14.zip" "$TOME/appm.zip"
  if [[ "$(du -m $TOME/appm.zip | awk '{print $1}')" -gt 100 ]]; then echo " * Thêm App Mod..."
  mkdir -p $TOME/tam
  7za x -tzip -y $TOME/appm.zip -o$TOME/tam >/dev/null
