@@ -104,6 +104,13 @@ echo " => Sử dụng theo cú pháp sau: suasmali2 <Tùy chỉnh>
 
 	  -Chèn sau dòng biến [x1 vx2, x3]:
 	   chensaudongbien 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm đầu' 'Nội dung tìm đầu' 'Số dòng cần tìm cuối' 'Nội dung tìm cuối' 'Nội dung biến đầu' 'Nội dung biến cuối' 
+
+	  -Xoá dòng:
+	   xoadong 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm' 'Nội dung tìm'
+
+	  -Xoá đoạn trên/dưới: 
+	   xoadoantren 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm' 'Nội dung tìm'
+	   xoadoanduoi 'Tên smali' 'Phương thức tìm' 'Số dòng cần tìm' 'Nội dung tìm'
 	"
 }
 #
