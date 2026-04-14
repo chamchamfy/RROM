@@ -7,25 +7,28 @@ not_support() {
 }
 
 if [ "$(uname)" == "Linux" ]; then
-    systemType=linux
+    Loai=linux
 elif [ "$(uname)" == "Darwin" ]; then
-    systemType=darwin
+    Loai=darwin
     [[ -z $(command -v zstd) ]] && brew install zstd
 else
     not_support
 fi
 
-fastboot="bin/$systemType/all/fastboot"
+fastboot="bin/$Loai/all/fastboot"
 thietbi=kb
-[ -f "bin/$systemType/all/zstd" ] && zst="bin/$systemType/all/zstd" || zst=zstd
+[ -f "bin/$Loai/all/zstd" ] && zst="bin/$Loai/all/zstd" || zst=zstd
 device=$($fastboot getvar product 2>&1 | grep -F "product:" | tr -s " " | cut -d " " -f 2)
 [ -z "$device" ] && device="unknown"
 [ "$device" != "$thietbi" ] && echo "Dành cho thiết bị (Compatible devices): $thietbi" && echo "Thiết bị của bạn (Your device): $device" && exit 1
 
 if [ -f "images/super.img.zst" ]; then
     echo 'Đang chuẩn bị... (Preparing...)'
-    echo '- Bắt đầu chuyển đổi super. Có thể mất nhiều thời gian, tùy thuộc vào cấu hình máy tính của bạn. (- Start converting super partition. It may take a long time, depending on your computer configuration.)'
-    read -p "Lưu ý: Hãy đảm bảo rằng dung lượng còn lại của phân vùng hiện tại của bạn lớn hơn 10GB, nếu không quá trình chuyển đổi super sẽ không thành công. Bấm phím bất kỳ để tiếp tục... (Note: Please ensure that the free size of the current partition is greater than 10GB, otherwise the super conversion will fail. Press any key to continue...)" readtemp
+    echo '- Bắt đầu chuyển đổi super. Có thể mất nhiều thời gian, tùy thuộc vào cấu hình máy tính của bạn.
+ (- Converting super partition. This may take some time depending on your PC hardware.)'
+    echo '- Lưu ý: Ổ đĩa cần trống tối thiểu 10GB, nếu không quá trình chuyển đổi super sẽ lỗi. Bấm phím bất kỳ để tiếp tục...
+ (- Note: At least 10GB of free disk space is required, otherwise the conversion will fail. Press any key to continue...)'
+    read -p "Bấm phím bất kỳ để tiếp tục... (Press any key to continue...)" readtemp
     $zst --rm -d images/super.img.zst -o images/super.img
     if [ $? -ne 0 ]; then
         read -p "Chuyển đổi bị lỗi, nhấn phím bất kì để thoát... (Conversion process error, press any key to exit...)" readtemp
@@ -45,7 +48,7 @@ q1() {
 }
 
 q2() {
-    read -p "2. Bạn muốn cài đặt boot_magisk.img (ROOT) nếu có?  (2. Do you want to flash boot_magisk.img (ROOT))?(Y/N) " choice2
+    read -p "2. Bạn muốn cài đặt ROOT (boot_magisk.img) nếu có?  (2. Do you want to flash ROOT (boot_magisk.img)? (Y/N) " choice2
     if [ "$choice2" == 'Y' ] || [ "$choice2" == 'y' ] || [ "$choice2" == 'N' ] || [ "$choice2" == 'n' ]; then
         main
     else
@@ -132,33 +135,28 @@ main() {
     if [ -f "images/logo.img" ]; then
         $fastboot flash logo images/logo.img
     fi
- 
     if [ "$choice2" == 'Y' ] || [ "$choice2" == 'y' ]; then
         $fastboot flash boot images/boot_magisk.img
     elif [ "$choice2" == 'N' ] || [ "$choice2" == 'n' ]; then
         $fastboot flash boot images/boot.img
     fi
-
-    if [ -f "images/super.img" ]; then
-        echo 'Bắt đầu flash super. Tệp này lớn và có thể mất nhiều thời gian tùy thuộc vào cấu hình máy tính của bạn. (Start flashing super. This file is large and may take a long time depending on your computer configuration.)'
-        $fastboot flash super images/super.img
-    fi
-    
     if [ -f "images/recovery.img" ]; then 
         $fastboot flash recovery images/recovery.img
     fi
-
     if [ -f "images/cust.img" ]; then 
         $fastboot flash cust images/cust.img
     fi
-    
-    if [ -f "images/persist.img" ]; then 
-        $fastboot flash persistbak images/persist.img
-        $fastboot flash persist images/persist.img
-    fi
-    
+#    if [ -f "images/persist.img" ]; then 
+#        $fastboot flash persistbak images/persist.img
+#        $fastboot flash persist images/persist.img
+#    fi
     if [ -f "images/splash.img" ]; then 
         $fastboot flash splash images/splash.img
+    fi
+
+    if [ -f "images/super.img" ]; then
+        echo 'Bắt đầu flash super. Tệp này lớn và có thể mất nhiều thời gian, vui lòng chờ. (Flashing the super partition... This file is very large, please wait!)'
+        $fastboot flash super images/super.img
     fi
 
     if [ "$choice1" == 'Y' ] || [ "$choice1" == 'y' ]; then

@@ -1,28 +1,53 @@
 @echo off
-mode con cols=140 lines=50
+mode con cols=120 lines=50
+chcp 65001 >nul
+cd /d "%~dp0"
+setlocal enabledelayedexpansion
 set fastboot=bin\windows\all\fastboot.exe
 if %PROCESSOR_ARCHITECTURE%==x86 (set cpuArch=x86) else set cpuArch=amd64
 
-echo. ==== FLASH ROM BY @chamchamfy ====
-echo. %DATE%
-echo. %TIME%
+echo. ================= CONG CU FLASH ROM BY @chamchamfy ================
+echo. 	Hom nay ngay: %DATE%
+echo. 	Bay gio la: %TIME%
+echo. 	Qua trinh Flash Rom se mat nhieu thoi gian
+echo. 	Vui long cho cho den khi ket thuc!
+echo. ===================================================================
 echo.
-echo.
-if not exist %fastboot% echo %fastboot% not found. & pause & exit /B 1
+
+if not exist %fastboot% echo. Khong tim thay: %fastboot% (Not found: %fastboot%). & pause & exit /B 1
 echo. * Dang ket noi thiet bi...
 echo. * Waiting for device...
+echo.
 set device=unknown
-set thietbi=kb
-for /f "tokens=2" %%D in ('%fastboot% getvar product 2^>^&1 ^| findstr /l /b /c:"product:"') do set device=%%D
-if "%device%" neq "%thietbi%" echo. - Danh cho thiet bi (Compatible devices): %thietbi% & echo. - Thiet bi cua ban (Your device): %device% & pause & exit /B 1
-
-echo. * Thiet bi cua ban (Your device): %device%
+for /l %%i in (1,1,120) do (
+    set /a tg=%%i*5
+::    echo. "Thu ket noi lan %%i... (Da cho !tg! giay)"
+    for /f "tokens=1" %%t in ('%fastboot% devices 2^>^&1 ^| findstr /v "List"') do (
+        if "%%t" neq "" (
+            for /f "usebackq tokens=2 delims=: " %%D in (`%fastboot% getvar product 2^>^&1 ^| findstr /b "product:"`) do set "device=%%D"
+        )
+    )
+    if "!device!" neq "unknown" goto chay
+    timeout /t 5 /nobreak >nul
+)
+echo. [ERROR]: Timeout: 10 mins
+echo. [LOI]: Qua thoi gian cho 10 phut, khong tim thay thiet bi! 
+echo. Nhan phim bat ki de thoat (Press any key to exit)...
+pause >nul 2>nul
+exit
+:chay
+set "hwc=" & for /f "tokens=3" %%A in ('%fastboot% oem hwid 2^>^&1 ^| findstr "\<HwCountry:"') do set hwc=%%A
+set "b=boot" & %fastboot% getvar partition-size:init_boot 2>&1 | findstr /i "init_boot" >nul && set b=init_boot
+set "thietbi=kb" & if "!device!" neq "!thietbi!" (echo. - Danh cho thiet bi [Compatible devices]: !thietbi! & echo. - Thiet bi cua ban [Your device]: !device! & pause & exit /B 1)
+set "bl=no" & for /f "tokens=2 delims=: " %%U in ('%fastboot% getvar unlocked 2^>^&1 ^| findstr /l /c:"unlocked:"') do set bl=%%U
+if /i "!bl!"=="no" (echo. [LOI]: Thiet bi chua Unlock Bootloader. [ERROR]: Bootloader is LOCKED. & pause & exit /B 1)
+echo. * Thiet bi cua ban [Your device]: %device% - Khu vuc [Region]: %hwc%
 echo.
 if exist images\super.img.zst (
-echo. - Dang chuyen doi phan vung super. Co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
-echo.   Converting super partition. It may take a long time, depending on your computer configuration.
-echo. ! Luu y: Dung luong trong o dia hien tai cua ban phai lon hon 10GB, neu khong qua trinh chuyen doi super se khong thanh cong. 
-echo.   Note: Make sure the free space in your current drive is greater than 10GB, otherwise the super partition conversion process will fail.
+echo. - Dang chuyen doi phan vung super. Qua trinh nay co the mat vai phut tuy vao cau hinh may.
+echo.   Converting super partition. This may take some time depending on your PC hardware.
+echo. ! Luu y: O dia can trong toi thieu 10GB, neu khong qua trinh chuyen doi se that bai.
+echo.   Note: At least 10GB of free disk space is required, otherwise the conversion will fail.
 echo. - Bam phim bat ky de tiep tuc chuyen doi... 
 echo.   Press any key to continue...
 pause >nul 2>nul
@@ -43,13 +68,9 @@ if "%errorlevel%" equ "0" (
 echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban. 
 echo.    Flashing the first time will erase data and internal memory. 
 set /p CHOICE1=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
-if "%CHOICE1%" == "y" (
-    goto Q2
-) else if "%CHOICE1%" == "n" (
-    goto Q2
-) else (
+if /i "%CHOICE1%"=="y" goto Q2
+if /i "%CHOICE1%"=="n" goto Q2
     goto Q1
-)
 
 :Q2
 echo. 
@@ -57,17 +78,13 @@ if exist images\boot_magisk.img (
 echo. * Cai dat boot_magisk.img (ROOT)?
 echo.   Do you want to flash boot_magisk.img (ROOT)?
 set /p CHOICE2=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
-if "%CHOICE2%" == "y" (
-    goto MAIN
-) else if "%CHOICE2%" == "n" (
-    goto MAIN
-) else (
-    goto Q2
-)
 ) else (
     set CHOICE2=n
     goto MAIN
 )
+if /i "%CHOICE2%"=="y" goto MAIN
+if /i "%CHOICE2%"=="n" goto MAIN
+    goto Q2
 
 :MAIN
 echo. 2. Cap nhat firmware...
@@ -168,26 +185,32 @@ if exist images\vbmeta.img (
 if exist images\vbmeta_system.img (
 %fastboot% flash vbmeta_system images\vbmeta_system.img
 )
-
 if "%CHOICE2%" == "y" (
     %fastboot% flash boot images\boot_magisk.img
 ) else if "%CHOICE2%" == "n" (
     %fastboot% flash boot images\boot.img
 )
-if exist images\super.img (
-echo. 3. Cap nhat phan vung super. Tep nay lon va co the mat nhieu thoi gian, tuy thuoc vao cau hinh may tinh cua ban.
-echo.    Flashing super partition. This file is large and may take a long time depending on your computer configuration.
-%fastboot% flash super images\super.img
-)
 if exist images\cust.img (
 %fastboot% flash cust images\cust.img
 )
-if exist images\persist.img (
-%fastboot% flash persist images\persist.img
-%fastboot% flash persistbak images\persistbak.img
+if exist images\cust.img.0 (
+%fastboot% flash cust images\cust.img.0
+%fastboot% flash cust images\cust.img.1
+)
+::if exist images\persist.img (
+::%fastboot% flash persist images\persist.img
+::%fastboot% flash persistbak images\persistbak.img
+::)
+if exist images\splash.img (
+%fastboot% flash splash images\splash.img
 )
 if exist images\recovery.img (
 %fastboot% flash recovery images\recovery.img
+)
+if exist images\super.img (
+echo. 3. Cap nhat phan vung super... (Tep tin nay rat lon, vui long cho!)
+echo.    Flashing the super partition... (This file is very large, please wait!)
+%fastboot% flash super images\super.img
 )
 if "%CHOICE1%" == "y" (
     %fastboot% erase userdata
