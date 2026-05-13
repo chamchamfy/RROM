@@ -14,35 +14,38 @@ echo. 	Vui long cho cho den khi ket thuc!
 echo. ===================================================================
 echo.
 
-if not exist %fastboot% echo. Khong tim thay: %fastboot% (Not found: %fastboot%). & pause & exit /B 1
+if not exist %fastboot% echo. Khong tim thay [Not found]: %fastboot%. & pause & exit /B 1
 echo. * Dang ket noi thiet bi...
 echo. * Waiting for device...
 echo.
 set device=unknown
 for /l %%i in (1,1,120) do (
     set /a tg=%%i*5
-::    echo. "Thu ket noi lan %%i... (Da cho !tg! giay)"
+    echo. * Ket noi [connecting] thiet bi lan %%i trong !tg! giay...
     for /f "tokens=1" %%t in ('%fastboot% devices 2^>^&1 ^| findstr /v "List"') do (
         if "%%t" neq "" (
-            for /f "usebackq tokens=2 delims=: " %%D in (`%fastboot% getvar product 2^>^&1 ^| findstr /b "product:"`) do set "device=%%D"
+            for /f "tokens=2 delims=: " %%D in ('%fastboot% getvar product 2^>^&1 ^| findstr /b "product:"') do set "device=%%D"
         )
     )
     if "!device!" neq "unknown" goto chay
     timeout /t 5 /nobreak >nul
 )
-echo. [ERROR]: Timeout: 10 mins
 echo. [LOI]: Qua thoi gian cho 10 phut, khong tim thay thiet bi! 
-echo. Nhan phim bat ki de thoat (Press any key to exit)...
+echo. [ERROR]: Timeout: 10 mins
+echo. Nhan phim bat ki de thoat [Press any key to exit]...
 pause >nul 2>nul
 exit
 :chay
-set "hwc=" & for /f "tokens=3" %%A in ('%fastboot% oem hwid 2^>^&1 ^| findstr "\<HwCountry:"') do set hwc=%%A
+echo. * Da ket noi thiet bi [conneted]: %device%
+echo.
+set "hwc=" & for /f "tokens=3" %%A in ('%fastboot% oem hwid 2^>^&1 ^| findstr /c:"HwCountry:"') do set hwc=%%A
 set "b=boot" & %fastboot% getvar partition-size:init_boot 2>&1 | findstr /i "init_boot" >nul && set b=init_boot
 set "thietbi=kb" & if "!device!" neq "!thietbi!" (echo. - Danh cho thiet bi [Compatible devices]: !thietbi! & echo. - Thiet bi cua ban [Your device]: !device! & pause & exit /B 1)
 set "bl=no" & for /f "tokens=2 delims=: " %%U in ('%fastboot% getvar unlocked 2^>^&1 ^| findstr /l /c:"unlocked:"') do set bl=%%U
-if /i "!bl!"=="no" (echo. [LOI]: Thiet bi chua Unlock Bootloader. [ERROR]: Bootloader is LOCKED. & pause & exit /B 1)
-echo. * Thiet bi cua ban [Your device]: %device% - Khu vuc [Region]: %hwc%
+if /i "!bl!"=="no" (echo. [LOI]: Thiet bi [!device!] chua Unlock Bootloader. [ERROR]: Bootloader is LOCKED. & pause & exit /B 1)
+echo. * Thiet bi cua ban [Your device]: %device% * Khu vuc [Region]: %hwc%
 echo.
+
 if exist images\super.img.zst (
 echo. - Dang chuyen doi phan vung super. Qua trinh nay co the mat vai phut tuy vao cau hinh may.
 echo.   Converting super partition. This may take some time depending on your PC hardware.
@@ -67,7 +70,7 @@ if "%errorlevel%" equ "0" (
 :Q1
 echo. 1. Lan cai dat dau tien can xoa du lieu va bo nho trong cua ban. 
 echo.    Flashing the first time will erase data and internal memory. 
-set /p CHOICE1=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
+set /p CHOICE1=" --> Ban co dong y khong? [Do you agree?] [Y/N]: "
 if /i "%CHOICE1%"=="y" goto Q2
 if /i "%CHOICE1%"=="n" goto Q2
     goto Q1
@@ -75,9 +78,9 @@ if /i "%CHOICE1%"=="n" goto Q2
 :Q2
 echo. 
 if exist images\boot_magisk.img (
-echo. * Cai dat boot_magisk.img (ROOT)?
-echo.   Do you want to flash boot_magisk.img (ROOT)?
-set /p CHOICE2=" --> Ban co dong y khong? (Do you agree?) (Y/N): "
+echo. * Cai dat boot_magisk.img [ROOT]?
+echo.   Do you want to flash boot_magisk.img [ROOT]?
+set /p CHOICE2=" --> Ban co dong y khong? [Do you agree?] [Y/N]: "
 ) else (
     set CHOICE2=n
     goto MAIN
@@ -208,8 +211,8 @@ if exist images\recovery.img (
 %fastboot% flash recovery images\recovery.img
 )
 if exist images\super.img (
-echo. 3. Cap nhat phan vung super... (Tep tin nay rat lon, vui long cho!)
-echo.    Flashing the super partition... (This file is very large, please wait!)
+echo. 3. Cap nhat phan vung super... [Tep tin nay rat lon, vui long cho!]
+echo.    Flashing the super partition... [This file is very large, please wait!]
 %fastboot% flash super images\super.img
 )
 if "%CHOICE1%" == "y" (

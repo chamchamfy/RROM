@@ -14,34 +14,36 @@ echo. 	Vui lòng chờ cho đến khi kết thúc!
 echo. ===================================================================
 echo.
 
-if not exist %fastboot% echo. Không tìm thấy: %fastboot% (Not found: %fastboot%). & pause & exit /B 1
+if not exist %fastboot% echo. Không tìm thấy [Not found]: %fastboot%. & pause & exit /B 1
 echo. * Đang kết nối thiết bị...
 echo. * Waiting for device...
 echo.
 set device=unknown
 for /l %%i in (1,1,120) do (
     set /a tg=%%i*5
-::    echo. "Thử kết nối lần %%i... (Đã chờ !tg! giây)"
+    echo. * Kết nối [connecting] thiết bị lần %%i trong !tg! giây...
     for /f "tokens=1" %%t in ('%fastboot% devices 2^>^&1 ^| findstr /v "List"') do (
         if "%%t" neq "" (
-            for /f "usebackq tokens=2 delims=: " %%D in (`%fastboot% getvar product 2^>^&1 ^| findstr /b "product:"`) do set "device=%%D"
+            for /f "tokens=2 delims=: " %%D in ('%fastboot% getvar product 2^>^&1 ^| findstr /b "product:"') do set "device=%%D"
         )
     )
     if "!device!" neq "unknown" goto chay
     timeout /t 5 /nobreak >nul
 )
-echo. [ERROR]: Timeout: 10 mins
 echo. [LỖI]: Quá thời gian chờ 10 phút, không tìm thấy thiết bị! 
-echo. Nhấn phím bất kì để thoát (Press any key to exit)...
+echo. [ERROR]: Timeout: 10 mins
+echo. Nhấn phím bất kì để thoát [Press any key to exit]...
 pause >nul 2>nul
 exit
 :chay
-set "hwc=" & for /f "tokens=3" %%A in ('%fastboot% oem hwid 2^>^&1 ^| findstr "\<HwCountry:"') do set hwc=%%A
+echo. * Đã kết nối thiết bị [conneted]: %device%
+echo.
+set "hwc=" & for /f "tokens=3" %%A in ('%fastboot% oem hwid 2^>^&1 ^| findstr /c:"HwCountry:"') do set hwc=%%A
 set "b=boot" & %fastboot% getvar partition-size:init_boot 2>&1 | findstr /i "init_boot" >nul && set b=init_boot
 set "thietbi=kb" & if "!device!" neq "!thietbi!" (echo. - Dành cho thiết bị [Compatible devices]: !thietbi! & echo. - Thiết bị của bạn [Your device]: !device! & pause & exit /B 1)
 set "bl=no" & for /f "tokens=2 delims=: " %%U in ('%fastboot% getvar unlocked 2^>^&1 ^| findstr /l /c:"unlocked:"') do set bl=%%U
-if /i "!bl!"=="no" (echo. [LỖI]: Thiết bị chưa Unlock Bootloader. [ERROR]: Bootloader is LOCKED. & pause & exit /B 1)
-echo. * Thiết bị của bạn [Your device]: %device% - Khu vực [Region]: %hwc%
+if /i "!bl!"=="no" (echo. [LỖI]: Thiết bị [!device!] chưa Unlock Bootloader. [ERROR]: Bootloader is LOCKED. & pause & exit /B 1)
+echo. * Thiết bị của bạn [Your device]: %device% * Khu vực [Region]: %hwc%
 echo.
 
 if exist images\super.img.zst (
@@ -69,7 +71,7 @@ if "%errorlevel%" equ "0" (
 echo. 1. Lần cài đặt đầu tiên sẽ xoá dữ liệu và bộ nhớ máy của bạn. 
 echo.    Flashing the first time will erase data and internal memory. 
 set CHON1=
-set /p CHON1=" --> Bạn có đồng ý không? (Do you agree?) (Y/N): "
+set /p CHON1=" --> Bạn có đồng ý không? [Do you agree?] [Y/N]: "
 if /i "%CHON1%"=="y" goto Q2
 if /i "%CHON1%"=="n" goto Q2
 echo. [!] Lựa chọn không hợp lệ
@@ -84,9 +86,9 @@ if exist images\boot_ksu.img set R=1
 if exist images\init_boot_magisk.img set R=1
 if exist images\init_boot_ksu.img set R=1
 if "%R%"=="1" (
-echo. * Cài đặt ROOT (magisk/KSU)?
-echo.   Flash ROOT (magisk/KSU)?
-set /p CHON2=" --> Lựa chọn (Input select) (M:Magisk /K:KernelSu /N: Không): "
+echo. * Cài đặt ROOT [magisk/KSU]?
+echo.   Flash ROOT [magisk/KSU]?
+set /p CHON2=" --> Lựa chọn [Input select] [M:Magisk /K:KernelSu /N: Không]: "
 ) else (
     set CHON2=n
     goto MAIN
@@ -280,8 +282,8 @@ if exist images\recovery.img (
 %fastboot% flash recovery_ab images\recovery.img
 )
 if exist images\super.img (
-echo. 3. Cập nhật phân vùng super... (Tập tin này rất lớn. Vui lòng chờ!)
-echo.    Flashing the super partition... (This file is very large, please wait!)
+echo. 3. Cập nhật phân vùng super... [Tập tin này rất lớn. Vui lòng chờ!]
+echo.    Flashing the super partition... [This file is very large, please wait!]
 %fastboot% flash super images\super.img
 )
 if /i "%CHON1%"=="y" (
